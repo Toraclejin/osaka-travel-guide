@@ -1,18 +1,20 @@
 # Osaka Travel Guide · CLAUDE Operations Guide
 
-오사카 여행 가이드 · **본인 + 동행 공용** (읽기 전용 가이드) · **v0.3** (2026-08-09 — 도쿄 친구 가이드에서 이식).
+오사카 여행 가이드 · **본인 + 동행 공용** (읽기 전용 가이드) · **v0.4** (2026-08-09).
 
-> **이 문서는 "코드를 어떻게 운영하는가"의 정본**. 제품 요구사항은 [`PRD.md`](PRD.md), 여행 사실·톤은 [`CONCEPT.md`](CONCEPT.md), 이식 내역은 [`OSAKA_TRANSPLANT_GUIDE.md`](OSAKA_TRANSPLANT_GUIDE.md).
+> **이 문서는 "코드를 어떻게 운영하는가"의 정본.**
+> 문서 전체의 위계·정본 규칙·영향 매트릭스는 **[`DOC-MAP.md`](DOC-MAP.md)** 가 인덱스다 — **새 세션은 거기부터.**
+> 제품 요구사항 [`PRD.md`](PRD.md) · 여행 사실·톤 [`CONCEPT.md`](CONCEPT.md) · **디자인 정본 [`design.md`](design.md)** · 회고 [`learning.md`](learning.md) · 이식 내역 [`OSAKA_TRANSPLANT_GUIDE.md`](OSAKA_TRANSPLANT_GUIDE.md).
 
 ---
 
 ## 0. 권한 경계 (먼저 읽음)
 
 - **WRITE**: 이 폴더 (`오사카 여행 매거진/*`)만
-- **READ**: 이 폴더 내부
-- **금지**: 부모 폴더 / 도쿄 폴더 / 오키나와 폴더 read·write 모두 차단
-- 도쿄 매거진의 패턴이 필요해지면 **즉시 사용자에게 보고** (자동 read 금지). 이식 시점의 결정은 이미 `OSAKA_TRANSPLANT_GUIDE.md`에 박제돼 있으니 거기부터 볼 것.
-- 도쿄판 R9와 같은 정신.
+- **READ**: 이 폴더 + **부모 워크스페이스 전체** (도쿄·오키나와 매거진 포함) — 2026-08-09 사용자 허용
+- **금지**: 다른 매거진 폴더 **WRITE**. 도쿄·오키나와 파일 수정이 필요해지면 **먼저 사용자에게 보고**
+- ⚠ 읽어온 패턴은 **반드시 오사카 컨텍스트로 변형**한다. 그대로 복붙 금지 — **계보가 다르다** (저널형 vs 가이드형, [`DOC-MAP.md § 8`](DOC-MAP.md))
+- 이식 시점의 결정은 이미 `OSAKA_TRANSPLANT_GUIDE.md`에 박제돼 있으니 거기부터 볼 것.
 
 ---
 
@@ -32,9 +34,13 @@
 ```
 오사카 여행 매거진/
 ├── index.html                 본체 — 이거 하나가 앱 전부
+├── overview.html              일행 공유용 구조도 (파생 산출물 — 데이터 바뀌면 같이 갱신)
+├── DOC-MAP.md                 ★ 마스터 인덱스 · 정본 규칙 · 영향 매트릭스 (새 세션 첫 문서)
 ├── CLAUDE.md                  ← 이 문서 (운영 정본)
+├── design.md                  ★ 디자인 정본 — 토큰 · 컴포넌트 · 레이아웃 · 보이스
 ├── PRD.md                     제품 요구사항 · 버전 히스토리
 ├── CONCEPT.md                 여행 사실 · 동행 · 톤
+├── learning.md                ★ 회고 — R-D 룰이 생긴 서사
 ├── OSAKA_TRANSPLANT_GUIDE.md  도쿄 → 오사카 이식 명세 (Vol III 기록)
 ├── README.md                  사용자용 설명
 ├── .gitignore
@@ -84,6 +90,7 @@ GUIDE_DATA = {
 
 - `recommended` → ★ 추천 뱃지 + "추천만" 필터
 - `essential` → 🇰🇷 한국인 필수 뱃지 + 전용 필터
+- `theme` (v0.4 신설 예정 · **미구현**) → `'서브컬쳐'` \| `'역사·문화'`. **카테고리와 직교하는 축**이다 — 카테고리는 "무엇을 하는 곳", 테마는 "왜 가는가". 오사카성은 `관광지` + `역사·문화`, 덴덴타운은 `관광지` + `서브컬쳐`. **네 번째 카테고리를 만들지 말 것** (§ 8 R-D4 · `learning.md § 11`). 표시·색은 [`design.md § 1.5`](design.md)
 - `lat`/`lng` — **생략 가능.** 없으면 지도 핀에서만 빠지고 카드·구글맵 링크는 정상 동작 (`zoneCenter`가 좌표 없는 항목을 건너뜀)
 - `offzone: true` — 핀은 찍되 지도 초기 프레이밍(fitBounds)에서는 제외
 - `maps_url` — `https://www.google.com/maps/search/?api=1&query={영문명 URL인코딩}`. `place_id`를 붙이면 더 정확하지만 **없어도 됨. 모르는 place_id를 지어내지 말 것** (§ 8 R-D3)
@@ -122,23 +129,24 @@ GUIDE_DATA = {
 
 ---
 
-## 5. 디자인 토큰
+## 5. 디자인 — **정본 = [`design.md`](design.md)** ⭐
 
-`index.html` `:root`가 정본. 도쿄 가이드에서 계승하되 **포인트 색 1개만** 바꿨다.
+> 이 챕터는 **운영 중 빠른 참조 요약**이다. 토큰 값·컴포넌트 인벤토리·레이아웃·보이스 실행규칙의 완전한 명세는 `design.md`가 정본.
+> **충돌 시 `design.md`가 이긴다.** 변경 순서는 R-D11 (§ 8).
 
-| 축 | 토큰 | 값 | 비고 |
-|---|---|---|---|
-| frame | `--frame` / `--indigo` | `#1a1b4b` | 매거진 시리즈 공통 축 — **바꾸지 말 것** |
-| page | `--page` / `--page-tint` / `--page-warm` | `#f5f3ee` 계열 | 공통 |
-| ink | `--ink` / `--ink-soft` / `--ink-faint` | `#2a2d3a` 계열 | 공통 |
-| **point** | **`--osaka-red`** | **`#D8452E`** | 도쿄 `--tokyo-red: #d94848`(로즈레드) → 오사카는 버밀리언. **매거진 간 식별 축** |
-| gold | `--gold` 계열 | `#d4af37` | ★ 추천 뱃지 전용 |
-| essential | `--essential` | `#C0455E` | 🇰🇷 한국인 필수 뱃지 전용 |
-| 카테고리 | `--cat-sight` / `--cat-meal` / `--cat-cafe` | 3색 | `CAT` 딕셔너리와 쌍 |
-| 구역 액센트 | `ZONE_ACCENTS` (JS) | 6색 | 구역+원정 합계가 6을 넘으면 색이 순환·중복됨 → 색 추가 필요 |
+| 축 | 토큰 | 한 줄 |
+|---|---|---|
+| frame / page / ink | `--frame` `--page` `--ink` 계열 | **시리즈 공통 — 바꾸지 말 것** |
+| **point** | **`--osaka-red` `#D8452E`** | 버밀리언. 도쿄는 `#d94848`. **매거진 간 식별 축 — 새 매거진에서 바꾸는 건 이것 하나** |
+| 뱃지 전용 | `--gold` / `--essential` | ★추천 / 🇰🇷필수 **전용**. 일반 강조 금지 |
+| 카테고리 | `--cat-sight` / `--cat-meal` / `--cat-cafe` | `CAT` 딕셔너리와 쌍 (R-D4) |
+| 테마 (예정) | `--theme-sub` / `--theme-hist` | 서브컬쳐 / 역사·문화. **카테고리와 직교** (§ 3.2) |
+| 구역 액센트 | `ZONE_ACCENTS` (JS) | **6색 — 현재 정확히 찼다** (구역 5 + 원정 1). 추가 시 색도 같이 늘릴 것 |
 
-- 새 매거진(Vol IV)으로 갈 때 **포인트 색만 바꾸는 게 규칙**. frame/page/ink를 건드리면 시리즈 일관성이 깨진다.
-- `--gold` / `--essential`은 각각의 뱃지 전용. 일반 강조에 쓰지 말 것 (도쿄 R13과 같은 정신).
+**디자인 변경 시 (R-D11)**
+```
+design.md 갱신 → index.html :root 갱신 → 본 § 5 요약 갱신 → BUILD_VERSION
+```
 
 ---
 
@@ -265,6 +273,13 @@ node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.index
 node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.indexOf('const GUIDE_DATA = {'),e=h.indexOf('\n]};',s);const d=eval('('+h.slice(s+19,e+3)+')');let t=0,w=0;d.zones.forEach(z=>z.sections.forEach(sec=>{if(sec.category==='관광지')return;sec.places.forEach(p=>{t++;if(/휴무|휴관|무휴/.test(p.feature))w++})}));console.log(t?w+'/'+t+' 곳에 휴무 표기':'맛집·카페 데이터 없음')"
 ```
 
+### R-D11. 디자인은 세 곳이 같이 움직인다 (삼각 sync)
+
+- 디자인은 `design.md`(정본) · `index.html :root`(실행) · `CLAUDE.md § 5`(운영 요약) **세 곳에 흔적이 남는다.** 한 곳만 고치면 다음 세션이 stale 값을 읽는다.
+- **v0.4 실측**: 토큰 값이 `CLAUDE.md § 5`와 `CONCEPT.md § 5` 두 곳에 적혀 있었다. 아직 안 어긋났을 뿐이었다 (도쿄가 이미 겪고 R12로 해결한 문제 — `learning.md § 9`).
+- ✅ 순서: **`design.md` → `index.html :root` → `CLAUDE.md § 5` → `BUILD_VERSION`**
+- ✅ 충돌 시 `design.md` 우선. `CONCEPT.md § 5`에는 **값을 쓰지 않는다** — "왜 그렇게 정했나"만.
+
 ### R-D6. 원정 전용 렌더 함수를 새로 만들지 않는다
 - `EXCURSIONS[].sections`는 zone과 같은 스키마다. `buildZoneMap` · `buildCatSection` · `buildCard`를 재사용할 것.
 - 별도 렌더러를 만들면 필터·지도·카드 스타일이 두 갈래로 갈라져 반드시 어긋난다 (도쿄판 `buildDineCard`가 그렇게 죽은 코드가 됐다 — 이식 시 제거).
@@ -302,6 +317,17 @@ node -e "const h=require('fs').readFileSync('index.html','utf8'); const cats=[..
 # 5. 이전 매거진 잔재 (도쿄·우에노·디즈니 등)
 #    BUILD_VERSION(이식 출처 표기)과 R-D2 룰 주석은 의도된 것이므로 제외한다.
 grep -niE "tokyo|도쿄|우에노|디즈니|마이하마" index.html | grep -vE "BUILD_VERSION|R-D2" || echo "OK — 잔재 없음"
+```
+
+```bash
+# 6. 문서 고아 검출 — 모든 .md 가 DOC-MAP 에 등록됐고 양방향 링크가 있는지 (R-D11 계열)
+for f in *.md; do
+  reg=$(grep -c "]($f)" DOC-MAP.md); [ "$f" = "DOC-MAP.md" ] && reg=1
+  inb=$(grep -l "]($f)" *.md 2>/dev/null | grep -vx "$f" | wc -l | tr -d ' ')
+  out=$(grep -oE '\]\([A-Za-z_.-]+\.md\)' "$f" | sort -u | wc -l | tr -d ' ')
+  s="OK "; [ "$reg" -eq 0 ] && s="!!미등록 "; [ "$inb" -eq 0 ] && s="$s!!인바운드0 "; [ "$out" -eq 0 ] && s="$s!!막다른길 "
+  echo "$s$f (등록:$reg 인:$inb 아웃:$out)"
+done
 ```
 
 ---
@@ -345,8 +371,10 @@ npx --yes serve -l 8767 .
 - 평문 비번 박제 (R-D2)
 - 검증 안 한 좌표·추측 `place_id` 커밋 (R-D3)
 - `--frame` / `--page` / `--ink` 축 변경 (매거진 시리즈 공통)
+- `design.md` / `:root` / 본 § 5 중 **한 곳만** 갱신 (R-D11)
+- 네 번째 카테고리 신설 — 테마 축을 먼저 검토할 것 (§ 3.2 · `learning.md § 11`)
 - `git push --force` / `git reset --hard` (사용자 명시 요청 없이)
-- 도쿄·오키나와 폴더 자동 read·write (§ 0)
+- **도쿄·오키나와 폴더 write** (읽기는 허용 — § 0)
 
 ---
 
@@ -359,9 +387,12 @@ npx --yes serve -l 8767 .
 | 2 | `zones[].access` | ✅ **역 기준으로 작성** (숙소 비의존). 숙소 확정 시 도보 시간 추가 가능 |
 | 2 | **맛집·카페 데이터** — 현재 **0곳** | ⚠ **최대 공백.** 리서치 필요 |
 | 2 | `base_hotel` — 현재 `null` | **숙소 확정 대기** (엔진은 `null`을 우아하게 처리 중) |
+| **2** | **`theme` 축 구현** — `서브컬쳐` / `역사·문화` | 🆕 동행 요청 (2026-08-09). § 3.2 스키마 + [`design.md § 1.5`](design.md) 토큰 + 내비 칩 |
+| **2** | **서브컬쳐 장소 리서치** — 덴덴타운·게임센터·e스포츠·PC방 | 🆕 **0곳.** 좌표 land-check 필수 (R-D3) |
+| **2** | **역사·문화 장소 리서치** — 오사카성 외 확충 | 🆕 오사카성 1곳만 있음. **서브컬쳐와 동등한 비중**으로 채울 것 |
 | 3 | 원정 `routes`의 소요시간·요금 재확인 | 출발 전 1회 |
 | 3 | USJ · 나라 · 고베 원정 추가 여부 | 사용자 결정 |
-| 4 | `CONCEPT.md`의 여행 사실 채우기 | **날짜·동행 확정 대기** |
+| 4 | `CONCEPT.md`의 여행 사실 채우기 | **날짜·숙소·인원 확정 대기** (동행 관심사는 일부 확정됨) |
 | 5 | 전체 스모크 테스트 (§ 10) | Phase 2~4 완료 후 |
 
 ### 좌표 land-check 방법 (재현용)
@@ -377,3 +408,15 @@ fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encode
 ```
 
 영문명으로 안 잡히면 **일본어 정식명**으로 재조회한다 (`梅田スカイビル` · `天保山大観覧車` · `花見小路通` 등). 그런 장소는 `maps_url` 쿼리도 일본어로 두는 게 검색 성공률이 높다.
+
+---
+
+## 14. 참조
+
+- **위(L0)** — 여행 사실·톤 [`CONCEPT.md`](CONCEPT.md) · 요구사항·범위 밖 [`PRD.md`](PRD.md)
+- **옆(L1)** — **디자인 정본** [`design.md`](design.md) (본 § 5는 그 요약) · 계보 [`OSAKA_TRANSPLANT_GUIDE.md`](OSAKA_TRANSPLANT_GUIDE.md)
+- **아래** — `index.html` · 회고 [`learning.md`](learning.md) (§ 8 R-D 룰이 생긴 서사)
+- **인덱스** — **[`DOC-MAP.md`](DOC-MAP.md)** — 정본 규칙 · 영향 매트릭스 · 위험신호 진단표
+- **사용자용** — [`README.md`](README.md)
+
+⚠ 부모 워크스페이스 문서는 **읽기 전용**이고, 저널 계보 전제라 오사카에 안 맞는 항목이 있다 → [`DOC-MAP.md § 8`](DOC-MAP.md)
