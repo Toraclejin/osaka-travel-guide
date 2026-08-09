@@ -88,6 +88,10 @@ GUIDE_DATA = {
 - `offzone: true` — 핀은 찍되 지도 초기 프레이밍(fitBounds)에서는 제외
 - `maps_url` — `https://www.google.com/maps/search/?api=1&query={영문명 URL인코딩}`. `place_id`를 붙이면 더 정확하지만 **없어도 됨. 모르는 place_id를 지어내지 말 것** (§ 8 R-D3)
 
+**⏰ 정기휴무는 `feature` 안에 쓴다.** 별도 필드를 만들지 않는다 (§ 8 R-D10).
+- ✅ `"오리 육수 라멘. 줄 빨리 빠짐. **수요일 휴무**"`
+- 영업 *시간*은 쓰지 않는다 — 변동이 잦아 틀린 정보가 된다. **요일 휴무만** 쓴다 (이건 잘 안 바뀌고, 헛걸음의 주원인이다)
+
 ### 3.3 `EXCURSIONS[]` — 원정 (하루 통째로 쓰는 시외 일정)
 
 도쿄판의 `DISNEY` 단일 객체를 배열로 일반화한 것. 원정 추가 = 객체 하나 push.
@@ -242,6 +246,24 @@ node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.index
 - 점이 하나면 bounds 크기가 0이라 `pad()`를 써도 0이고, `fitBounds`가 **maxZoom(19)까지 튄다**. 골목 한 칸만 보이는 지도가 된다.
 - ✅ `if (pts.length === 1) map.setView(pts[0], 15); else map.fitBounds(...)`
 - 📍 R-D8로 구역을 쪼개면 1곳짜리 구역이 실제로 생기므로 세트로 지켜야 하는 룰이다.
+
+### R-D10. 정기휴무는 쓰고, 영업시간은 쓰지 않는다
+- 일본 가게는 코로나 이후 **영업시간 변경이 잦다.** 시간을 박아두면 반드시 틀린 정보가 되고, 그 정보를 믿고 간 일행이 헛걸음한다.
+- 반면 **요일 정기휴무(定休日)는 잘 안 바뀌고**, 헛걸음의 가장 큰 원인이다. 이건 반드시 쓴다.
+- ✅ `feature` 문자열 끝에 `· 수요일 휴무` / `· 월·화 휴무` / `· 부정기 휴무 (인스타 확인)`
+- ❌ `hours` 같은 별도 필드 신설 — PRD § 7의 "실시간 정보 안 함"과 충돌하고, 스키마만 무거워진다
+- ❌ `11:00~19:00` 같은 영업시간 명기
+
+**출발 전 1회 일괄 검증** (도쿄판 `reference/HOURS_CHECK.md`에서 계승한 절차):
+1. 여행 날짜의 **요일**을 확정한다
+2. `맛집`·`카페` 전 항목의 정기휴무를 구글맵/공식/인스타로 확인
+3. 여행 요일에 걸리는 곳은 `feature`에 휴무를 명기하거나, 그 요일 대안을 같은 구역에 하나 더 넣는다
+4. 미술관·박물관은 **월요일 휴관**이 기본값이다. 관광지도 같이 훑을 것
+
+```bash
+# 정기휴무가 적힌 장소 비율 (맛집·카페 기준)
+node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.indexOf('const GUIDE_DATA = {'),e=h.indexOf('\n]};',s);const d=eval('('+h.slice(s+19,e+3)+')');let t=0,w=0;d.zones.forEach(z=>z.sections.forEach(sec=>{if(sec.category==='관광지')return;sec.places.forEach(p=>{t++;if(/휴무|휴관|무휴/.test(p.feature))w++})}));console.log(t?w+'/'+t+' 곳에 휴무 표기':'맛집·카페 데이터 없음')"
+```
 
 ### R-D6. 원정 전용 렌더 함수를 새로 만들지 않는다
 - `EXCURSIONS[].sections`는 zone과 같은 스키마다. `buildZoneMap` · `buildCatSection` · `buildCard`를 재사용할 것.
