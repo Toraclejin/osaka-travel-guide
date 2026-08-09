@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: https://*.basemaps.cartocdn.com; base-uri 'none'; form-action 'none';" />
 <meta name="theme-color" content="#1a1b4b" />
-<title>오사카 친구 가이드</title>
-<meta name="description" content="오사카·교토 자유여행 가이드 — 구역별 관광지·맛집·카페, 탭하면 구글맵." />
+<title>오사카 여행 가이드</title>
+<meta name="description" content="오사카·교토 여행 가이드 — 구역별 관광지·맛집·카페, 탭하면 구글맵." />
 <!-- 접속 비번 게이트 — FOUC 방지. 토큰 없으면 즉시 .auth-locked 부착 → 본문 가림. 평문 비번 박제 X (SHA-256 해시만). -->
 <script>
   (function () {
@@ -24,7 +24,7 @@
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   /* =====================================================
-     오사카 친구 가이드 — 단일 파일 · 외부 의존성 0 · 시스템 폰트
+     오사카 여행 가이드 — 단일 파일 · 외부 의존성 0 · 시스템 폰트
      ===================================================== */
   :root {
     --frame:      #1a1b4b;
@@ -422,11 +422,11 @@
 </style>
 </head>
 <body>
-  <!-- 접속 비번 게이트 (친구 전용). 인증 OK 시 JS 가 .auth-locked 제거 → 게이트 숨김. -->
+  <!-- 접속 비번 게이트 (동행 전용). 인증 OK 시 JS 가 .auth-locked 제거 → 게이트 숨김. -->
   <div class="auth-gate" id="auth-gate" role="dialog" aria-modal="true" aria-label="비공개 접속">
     <div class="auth-card">
-      <div class="auth-eyebrow">Private · 친구 전용</div>
-      <h1 class="auth-title">오사카<br><span class="red">친구 가이드</span></h1>
+      <div class="auth-eyebrow">Private · 우리끼리</div>
+      <h1 class="auth-title">오사카<br><span class="red">여행 가이드</span></h1>
       <p class="auth-deck">아는 사람만 들어와요.</p>
       <div class="auth-q">
         <span class="auth-q-mark">Q.</span>
@@ -442,9 +442,9 @@
   </div>
   <main class="sheet">
     <header class="masthead">
-      <div class="kicker">A Friend's Guide · 친구를 위한 오사카</div>
+      <div class="kicker">A Travel Guide · 같이 가는 오사카</div>
       <h1 class="mast-title">OSAKA<span class="dot">.</span></h1>
-      <div class="mast-sub" id="mast-sub">오사카 친구 가이드</div>
+      <div class="mast-sub" id="mast-sub">오사카 여행 가이드</div>
       <p class="mast-lede">동선 짜지 마. 그날 있는 구역 하나 정하고, 그 안에서 관광지·맛집·카페 끌리는 곳 골라 탭하면 구글맵이 바로 열려. <b>★</b>는 특히 추천, <b>🇰🇷 한국인 필수</b>는 오사카 오면 다들 가는 코스. 교토는 아래 <b>원정</b> 섹션에 따로 있어.</p>
       <div class="mast-meta" id="mast-meta"></div>
     </header>
@@ -475,40 +475,44 @@
    데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
    장소 추가/수정 시 이 객체만 고치면 됨.
    ============================================================ */
-const BUILD_VERSION = 'v0.1-2026-08-09-TRANSPLANT-FROM-TOKYO-GUIDE';
+const BUILD_VERSION = 'v0.3-2026-08-09-RENAME-TRAVEL-GUIDE';
 
-const GUIDE_DATA = {"title":"오사카 친구 가이드","base_hotel":null,"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[
-{"id":1,"name":"미나미 (난바·도톤보리·신사이바시)","access":"TODO — 숙소 확정 후 입력","sections":[
+const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[
+{"id":1,"name":"미나미 (난바·도톤보리·신사이바시)","access":"난바·신사이바시역 (미도스지선) · 기타에서 8분","sections":[
 {"category":"관광지","places":[
 {"name_ko":"도톤보리 · 구리코 사인","name_en":"Dotonbori Glico Sign","feature":"오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷","recommended":true,"essential":true,"lat":34.6687,"lng":135.5013,"maps_url":"https://www.google.com/maps/search/?api=1&query=Dotonbori%20Glico%20Sign"},
 {"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 오전~오후가 활발","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},
 {"name_ko":"신사이바시스지 상점가","name_en":"Shinsaibashi-suji Shopping Street","feature":"600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류","recommended":true,"essential":false,"lat":34.6723,"lng":135.501,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shinsaibashi-suji%20Shopping%20Street"},
 {"name_ko":"호젠지 요코초","name_en":"Hozenji Yokocho","feature":"이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적","recommended":true,"essential":false,"lat":34.6684,"lng":135.5025,"maps_url":"https://www.google.com/maps/search/?api=1&query=Hozenji%20Yokocho"},
 {"name_ko":"아메리카무라","name_en":"Amerikamura","feature":"빈티지·스트리트 패션 구역. 산카쿠 공원 중심","recommended":false,"essential":false,"lat":34.6716,"lng":135.4972,"maps_url":"https://www.google.com/maps/search/?api=1&query=Amerikamura"},
-{"name_ko":"난바 야사카 신사","name_en":"Namba Yasaka Shrine","feature":"거대한 사자머리 무대. 사진 한 장 확실한 곳","recommended":false,"essential":false,"lat":34.658,"lng":135.4964,"maps_url":"https://www.google.com/maps/search/?api=1&query=Namba%20Yasaka%20Shrine"}
+{"name_ko":"난바 야사카 신사","name_en":"Namba Yasaka Shrine","feature":"거대한 사자머리 무대. 사진 한 장 확실한 곳","recommended":false,"essential":false,"lat":34.6615,"lng":135.4967,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E9%9B%A3%E6%B3%A2%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE"}
 ]}
 ]},
-{"id":2,"name":"기타 (우메다·나카노시마)","access":"TODO — 숙소 확정 후 입력","sections":[
+{"id":2,"name":"기타 (우메다·나카노시마)","access":"우메다·오사카역 (미도스지선/JR) · 미나미에서 8분","sections":[
 {"category":"관광지","places":[
-{"name_ko":"우메다 스카이빌딩 공중정원","name_en":"Umeda Sky Building Kuchu Teien Observatory","feature":"173m 옥외 전망대. 해질녘~야경 타이밍이 정답","recommended":true,"essential":true,"lat":34.7052,"lng":135.4899,"maps_url":"https://www.google.com/maps/search/?api=1&query=Umeda%20Sky%20Building%20Kuchu%20Teien%20Observatory"},
+{"name_ko":"우메다 스카이빌딩 공중정원","name_en":"Umeda Sky Building","feature":"173m 옥외 전망대. 해질녘~야경 타이밍이 정답","recommended":true,"essential":true,"lat":34.7053,"lng":135.4905,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%A2%85%E7%94%B0%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%93%E3%83%AB%20%E7%A9%BA%E4%B8%AD%E5%BA%AD%E5%9C%92%E5%B1%95%E6%9C%9B%E5%8F%B0"},
 {"name_ko":"HEP FIVE 관람차","name_en":"HEP FIVE Ferris Wheel","feature":"빨간 관람차. 우메다 한복판. 짧고 가볍게","recommended":false,"essential":false,"lat":34.7043,"lng":135.5006,"maps_url":"https://www.google.com/maps/search/?api=1&query=HEP%20FIVE%20Ferris%20Wheel"},
 {"name_ko":"나카노시마 공원","name_en":"Nakanoshima Park","feature":"강 사이 섬. 중앙공회당·장미원. 도심 속 산책 구간","recommended":false,"essential":false,"lat":34.6925,"lng":135.5075,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nakanoshima%20Park"},
 {"name_ko":"오사카 나카노시마 미술관","name_en":"Nakanoshima Museum of Art Osaka","feature":"검은 상자 건축. 비 오는 날 실내 대안","recommended":false,"essential":false,"lat":34.6914,"lng":135.4919,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nakanoshima%20Museum%20of%20Art%20Osaka"}
 ]}
 ]},
-{"id":3,"name":"신세카이·덴노지·쓰루하시","access":"TODO — 숙소 확정 후 입력","sections":[
+{"id":3,"name":"신세카이·덴노지·쓰루하시","access":"덴노지·신이마미야역 (미도스지선/JR 순환선) · 난바에서 5분","sections":[
 {"category":"관광지","places":[
 {"name_ko":"쓰텐카쿠","name_en":"Tsutenkaku Tower","feature":"신세카이 상징탑. 쇼와 레트로 간판 거리와 세트","recommended":true,"essential":true,"lat":34.6524,"lng":135.5063,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsutenkaku%20Tower"},
 {"name_ko":"시텐노지","name_en":"Shitenno-ji Temple","feature":"일본 最古급 관영 사찰(593년). 가람 배치가 교과서적","recommended":true,"essential":false,"lat":34.6543,"lng":135.5165,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shitenno-ji%20Temple"},
 {"name_ko":"아베노 하루카스","name_en":"Abeno Harukas","feature":"일본 최고층급 300m. 전망대 하루카스300","recommended":false,"essential":false,"lat":34.6459,"lng":135.5138,"maps_url":"https://www.google.com/maps/search/?api=1&query=Abeno%20Harukas"},
-{"name_ko":"쓰루하시 코리아타운","name_en":"Tsuruhashi Korea Town","feature":"재일 코리안 상권. 한국 음식·식재료. 역 주변 골목 자체가 볼거리","recommended":false,"essential":false,"lat":34.6531,"lng":135.5354,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsuruhashi%20Korea%20Town"}
+{"name_ko":"쓰루하시 코리아타운","name_en":"Osaka Korea Town","feature":"재일 코리안 상권. 한국 음식·식재료. 역 주변 골목 자체가 볼거리","recommended":false,"essential":false,"lat":34.6606,"lng":135.537,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E3%82%B3%E3%83%AA%E3%82%A2%E3%82%BF%E3%82%A6%E3%83%B3"}
 ]}
 ]},
-{"id":4,"name":"오사카성·베이","access":"TODO — 숙소 확정 후 입력","sections":[
+{"id":4,"name":"오사카성·모리노미야","access":"오사카성공원역 (JR 순환선) · 모리노미야역 (주오선)","sections":[
 {"category":"관광지","places":[
-{"name_ko":"오사카성","name_en":"Osaka Castle","feature":"천수각 + 해자 + 공원. 최소 2시간. 니시노마루 정원에서 정면 뷰","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},
+{"name_ko":"오사카성","name_en":"Osaka Castle","feature":"천수각 + 해자 + 공원. 최소 2시간. 니시노마루 정원에서 정면 뷰","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"}
+]}
+]},
+{"id":5,"name":"베이 (가이유칸·덴포잔)","access":"오사카코역 (주오선) · 반나절 코스","sections":[
+{"category":"관광지","places":[
 {"name_ko":"오사카 해유관 (가이유칸)","name_en":"Osaka Aquarium Kaiyukan","feature":"세계 최대급 수족관. 고래상어. 베이 반나절","recommended":true,"essential":false,"lat":34.6545,"lng":135.429,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Aquarium%20Kaiyukan"},
-{"name_ko":"덴포잔 대관람차","name_en":"Tempozan Giant Ferris Wheel","feature":"해유관 옆. 항만·아카시 대교 방향 조망","recommended":false,"essential":false,"lat":34.656,"lng":135.4295,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tempozan%20Giant%20Ferris%20Wheel"}
+{"name_ko":"덴포잔 대관람차","name_en":"Tempozan Giant Ferris Wheel","feature":"해유관 옆. 항만·아카시 대교 방향 조망","recommended":false,"essential":false,"lat":34.6563,"lng":135.431,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A9%E4%BF%9D%E5%B1%B1%E5%A4%A7%E8%A6%B3%E8%A6%A7%E8%BB%8A"}
 ]}
 ]}
 ]};
@@ -548,7 +552,7 @@ const ZONE_ACCENTS = ['#B23A48', '#2E5E8C', '#2F7D5B', '#7A4FA3', '#B8702A', '#3
 const EXCURSIONS = [
   {
     id: 'kyoto',
-    accent: '#7A4FA3',
+    accent: '#3E6E6B',
     chip: '★ 교토',
     title: '교토 당일 원정',
     area: '교토 · 오사카에서 편도 30~60분',
@@ -585,11 +589,11 @@ const EXCURSIONS = [
     ],
     sections: [
       { category: '관광지', places: [
-{"name_ko":"후시미이나리 대사","name_en":"Fushimi Inari Taisha","feature":"천 개의 붉은 도리이. 24시간 개방 — 이른 아침이나 밤이 한적함","recommended":true,"essential":true,"lat":34.9671,"lng":135.7727,"maps_url":"https://www.google.com/maps/search/?api=1&query=Fushimi%20Inari%20Taisha"},
+{"name_ko":"후시미이나리 대사","name_en":"Fushimi Inari Taisha","feature":"천 개의 붉은 도리이. 24시간 개방 — 이른 아침이나 밤이 한적함","recommended":true,"essential":true,"lat":34.9675,"lng":135.7797,"maps_url":"https://www.google.com/maps/search/?api=1&query=Fushimi%20Inari%20Taisha"},
 {"name_ko":"기요미즈데라","name_en":"Kiyomizu-dera","feature":"절벽 위 목조 무대. 산넨자카·니넨자카 오르막이 세트","recommended":true,"essential":true,"lat":34.9949,"lng":135.785,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kiyomizu-dera"},
 {"name_ko":"아라시야마 대나무길","name_en":"Arashiyama Bamboo Grove","feature":"대나무 터널. 9시 넘으면 사람에 묻힘 — 아침 승부","recommended":true,"essential":true,"lat":35.017,"lng":135.6717,"maps_url":"https://www.google.com/maps/search/?api=1&query=Arashiyama%20Bamboo%20Grove"},
 {"name_ko":"금각사 (킨카쿠지)","name_en":"Kinkaku-ji","feature":"금박 누각 + 연못 반영. 북서쪽 — 남쪽 코스와 하루에 묶지 말 것","recommended":true,"essential":false,"lat":35.0394,"lng":135.7292,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kinkaku-ji"},
-{"name_ko":"기온 하나미코지","name_en":"Gion Hanamikoji","feature":"돌바닥 화류가. 해질녘. ※ 사유 골목 촬영 금지 구역 있음 — 표지판 확인","recommended":true,"essential":false,"lat":35.0036,"lng":135.7752,"maps_url":"https://www.google.com/maps/search/?api=1&query=Gion%20Hanamikoji"},
+{"name_ko":"기온 하나미코지","name_en":"Hanamikoji Street","feature":"돌바닥 화류가. 해질녘. ※ 사유 골목 촬영 금지 구역 있음 — 표지판 확인","recommended":true,"essential":false,"lat":35.008,"lng":135.7755,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%8A%B1%E8%A6%8B%E5%B0%8F%E8%B7%AF%E9%80%9A%20%E4%BA%AC%E9%83%BD"},
 {"name_ko":"니조성","name_en":"Nijo Castle","feature":"쇼군 별궁. 밟으면 우는 마루(우구이스바리)","recommended":false,"essential":false,"lat":35.0142,"lng":135.7481,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nijo%20Castle"},
 {"name_ko":"니시키 시장","name_en":"Nishiki Market","feature":"400m 먹거리 아케이드. \"교토의 부엌\". 서서 먹기","recommended":true,"essential":false,"lat":35.005,"lng":135.7649,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nishiki%20Market"}
       ] }
@@ -916,9 +920,15 @@ function initLeafletMap(entry) {
 
   // pad() 는 위경도 박스를 비율로 넓힐 뿐이라, 가장자리 핀의 아이콘(위로 솟은 모양)이 잘림.
   // 픽셀 단위 padding 을 같이 줘야 원정처럼 넓게 퍼진 좌표군에서도 핀이 안 잘림.
+  // 좌표 1개짜리 구역은 bounds 크기가 0 이라 fitBounds 가 maxZoom(19) 까지 튄다 → setView 로 분기.
   const FIT = { padding: [30, 30] };
-  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.12), FIT);
-  setTimeout(() => { try { map.invalidateSize(); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.12), FIT); } catch (e) {} }, 120);
+  const frame = () => {
+    if (!pts.length) return;
+    if (pts.length === 1) map.setView(pts[0], 15);
+    else map.fitBounds(L.latLngBounds(pts).pad(0.12), FIT);
+  };
+  frame();
+  setTimeout(() => { try { map.invalidateSize(); frame(); } catch (e) {} }, 120);
 }
 
 function setupZoneMaps() {

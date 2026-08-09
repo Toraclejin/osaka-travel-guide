@@ -1,6 +1,6 @@
-# Osaka Friend's Guide · CLAUDE Operations Guide
+# Osaka Travel Guide · CLAUDE Operations Guide
 
-오사카 친구 가이드 · **동행 공유용** (읽기 전용 가이드) · **v0.1** (2026-08-09 — 도쿄 친구 가이드에서 이식).
+오사카 여행 가이드 · **본인 + 동행 공용** (읽기 전용 가이드) · **v0.3** (2026-08-09 — 도쿄 친구 가이드에서 이식).
 
 > **이 문서는 "코드를 어떻게 운영하는가"의 정본**. 제품 요구사항은 [`PRD.md`](PRD.md), 여행 사실·톤은 [`CONCEPT.md`](CONCEPT.md), 이식 내역은 [`OSAKA_TRANSPLANT_GUIDE.md`](OSAKA_TRANSPLANT_GUIDE.md).
 
@@ -21,7 +21,7 @@
 - **단일 HTML 파일** `index.html` 하나. 더블클릭하면 열림. 빌드 없음, 번들러 없음, npm 없음.
 - **외부 의존성 2개뿐**: Leaflet (unpkg CDN) + 지도 타일 (CARTO). 나머지는 시스템 폰트.
 - **저장소 없음.** localStorage는 비번 게이트 토큰 하나만 씀. 사용자 입력·기록 기능 **없음** — 읽기 전용 가이드다.
-- **용도**: 동행에게 링크(또는 파일) 하나 던지면, 그 사람이 그날 있는 구역을 골라 관광지·맛집·카페를 탭 → 구글맵이 열림.
+- **용도**: 같이 가는 사람 전원이 링크(또는 파일) 하나만 열면, 그날 있는 구역을 골라 관광지·맛집·카페를 탭 → 구글맵이 열림. **본인도 사용자다** — 남에게 주는 가이드가 아니다.
 
 > ⚠ **도쿄 메인 매거진(`index.html` 20,901줄)과 다른 앱이다.** 이 앱은 그 매거진의 `guide/` 서브앱 계보다. 저널·사진·별점·매거진 발행 기능은 여기 없다. 그런 기능이 필요하다는 요청이 오면 "다른 앱"임을 먼저 말할 것.
 
@@ -72,7 +72,7 @@ GUIDE_DATA = {
 |---|---|---|
 | `base_hotel` | object \| **null** | `{name, area, note}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 매스트헤드 호텔 칩이 생략되고 원정 길찾기 출발지가 `Osaka Station`으로 대체됨 (`excursionOrigin()`) |
 | `zones[].id` | number | 화면에 `AREA 01` 형태로 표시. 앵커 id = `zone-{id}` |
-| `zones[].access` | string | 숙소 기준 접근 시간. 숙소 확정 전에는 `TODO — 숙소 확정 후 입력` |
+| `zones[].access` | string | **역 기준**으로 쓴다 (`난바·신사이바시역 (미도스지선) · 기타에서 8분`). 숙소에 의존하지 않으므로 숙소 미정이어도 유효하다. 숙소가 정해지면 도보 시간만 덧붙이면 됨 |
 | `sections[].category` | string | **`관광지` / `맛집` / `카페` 셋 중 하나.** `CAT` 딕셔너리 키와 정확히 일치해야 색·아이콘·필터가 붙음 |
 
 ### 3.2 `place` — 장소 하나
@@ -111,7 +111,7 @@ GUIDE_DATA = {
 
 1. `index.html`에서 `GUIDE_DATA` (또는 `EXCURSIONS[].sections`) 안 해당 `places` 배열을 찾는다
 2. **한 줄 = 한 장소** 포맷을 지킨다 (diff 가독성 · 도쿄판에서 계승)
-3. `maps_url`은 영문명을 URL 인코딩해서 만든다
+3. `maps_url`은 영문명을 URL 인코딩해서 만든다. 영문명으로 지오코딩이 안 되는 곳은 **일본어 정식명**을 쿼리로 쓴다 (§ 13 참고)
 4. 좌표는 § 8 R-D3의 land-check를 거친다
 5. `BUILD_VERSION` 갱신
 6. § 9 자가 점검 실행
@@ -227,6 +227,22 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 - `pad(n)`은 위경도 박스를 비율로 넓힐 뿐이라, 가장자리 핀의 **아이콘이 잘린다** (원정처럼 넓게 퍼진 좌표군에서 실제 발생).
 - ✅ `map.fitBounds(bounds.pad(0.12), { padding: [30, 30] })`
 
+### R-D8. 구역 하나는 "그 안에서 걸어 다닐 수 있는" 범위여야 한다
+- **v0.1 사고**: `오사카성·베이`를 한 구역으로 묶었는데 오사카성(34.687,135.526)과 가이유칸(34.654,135.429)이 **약 9km** 떨어져 있었다. "구역 하나 고르고 그 안에서 골라라"는 이 앱의 전제(PRD § 2)와 정면 충돌.
+- ✅ 새 구역을 만들거나 장소를 추가할 때 **구역 내 최대 거리**를 확인한다. 대략 **반경 2km / 도보 30분** 안이 기준.
+- ✅ 넘으면 구역을 쪼갠다. 장소가 1~2곳뿐인 구역이 생겨도 그게 정직하다 (베이는 실제로 반나절 2곳짜리 목적지다).
+- ✅ 하루를 통째로 써야 하는 거리면 구역이 아니라 **원정(`EXCURSIONS`)**으로.
+
+```bash
+# 구역 내 최대 거리 점검
+node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.indexOf('const GUIDE_DATA = {'),e=h.indexOf('\n]};',s);const d=eval('('+h.slice(s+19,e+3)+')');const hav=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dA=t(b[0]-a[0]),dO=t(b[1]-a[1]);return 2*R*Math.asin(Math.sqrt(Math.sin(dA/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dO/2)**2))};d.zones.forEach(z=>{const p=[];z.sections.forEach(s=>s.places.forEach(x=>{if(x.lat)p.push([x.lat,x.lng])}));let m=0;p.forEach(a=>p.forEach(b=>{m=Math.max(m,hav(a,b))}));console.log((m>4?'!! ':'OK ')+'zone'+z.id+' 최대 '+m.toFixed(1)+'km  '+z.name)})"
+```
+
+### R-D9. 좌표 1개짜리 구역은 `fitBounds` 대신 `setView`
+- 점이 하나면 bounds 크기가 0이라 `pad()`를 써도 0이고, `fitBounds`가 **maxZoom(19)까지 튄다**. 골목 한 칸만 보이는 지도가 된다.
+- ✅ `if (pts.length === 1) map.setView(pts[0], 15); else map.fitBounds(...)`
+- 📍 R-D8로 구역을 쪼개면 1곳짜리 구역이 실제로 생기므로 세트로 지켜야 하는 룰이다.
+
 ### R-D6. 원정 전용 렌더 함수를 새로 만들지 않는다
 - `EXCURSIONS[].sections`는 zone과 같은 스키마다. `buildZoneMap` · `buildCatSection` · `buildCard`를 재사용할 것.
 - 별도 렌더러를 만들면 필터·지도·카드 스타일이 두 갈래로 갈라져 반드시 어긋난다 (도쿄판 `buildDineCard`가 그렇게 죽은 코드가 됐다 — 이식 시 제거).
@@ -314,13 +330,28 @@ npx --yes serve -l 8767 .
 
 ## 13. 미해결 — 다음 작업
 
-| Phase | 내용 | 블로커 |
+| Phase | 내용 | 상태 / 블로커 |
 |---|---|---|
-| 2 | **좌표 land-check** — 현재 24곳 좌표는 전부 미검증 시드 | 없음. 바로 가능 |
-| 2 | **맛집·카페 데이터** — 현재 0곳. 구역별로 채워야 함 | 없음 (리서치 필요) |
-| 2 | `zones[].access` — 전부 `TODO` | **숙소 확정** |
-| 2 | `base_hotel` — 현재 `null` | **숙소 확정** |
-| 3 | 원정 `routes`의 소요시간·요금 재확인 | 없음. 출발 전 1회 |
+| 2 | 좌표 land-check (24곳) | ✅ **완료** (v0.2). Nominatim/OSM 대조 → 4곳 정정 |
+| 2 | 구역 반경 점검 | ✅ **완료** (v0.2). 오사카성·베이 9km → 2개로 분리 (R-D8) |
+| 2 | `zones[].access` | ✅ **역 기준으로 작성** (숙소 비의존). 숙소 확정 시 도보 시간 추가 가능 |
+| 2 | **맛집·카페 데이터** — 현재 **0곳** | ⚠ **최대 공백.** 리서치 필요 |
+| 2 | `base_hotel` — 현재 `null` | **숙소 확정 대기** (엔진은 `null`을 우아하게 처리 중) |
+| 3 | 원정 `routes`의 소요시간·요금 재확인 | 출발 전 1회 |
 | 3 | USJ · 나라 · 고베 원정 추가 여부 | 사용자 결정 |
-| 4 | `CONCEPT.md`의 여행 사실 채우기 | **날짜·동행 확정** |
+| 4 | `CONCEPT.md`의 여행 사실 채우기 | **날짜·동행 확정 대기** |
 | 5 | 전체 스모크 테스트 (§ 10) | Phase 2~4 완료 후 |
+
+### 좌표 land-check 방법 (재현용)
+
+Nominatim(OSM)으로 대조한다. 1req/s 정책을 지킬 것. `Δ < 0.3km`면 OK, 그 이상이면 OSM 쪽을 신뢰하고 정정.
+
+```bash
+node -e "
+const q='Osaka Castle';
+fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q),
+ {headers:{'User-Agent':'osaka-guide-landcheck/0.1 (personal travel guide QA)'}})
+ .then(r=>r.json()).then(j=>console.log(j[0]? j[0].lat+','+j[0].lon+'  '+j[0].display_name : '결과 없음'));"
+```
+
+영문명으로 안 잡히면 **일본어 정식명**으로 재조회한다 (`梅田スカイビル` · `天保山大観覧車` · `花見小路通` 등). 그런 장소는 `maps_url` 쿼리도 일본어로 두는 게 검색 성공률이 높다.
