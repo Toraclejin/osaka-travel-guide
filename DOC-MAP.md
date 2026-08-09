@@ -117,6 +117,9 @@ L0~L3 전 문서는 끝에 **참조**를 둔다 — **위**(출처) / **옆**(�
 | 만지는 것 | 같이 볼 것 |
 |---|---|
 | 지도 fitBounds | **R-D5** 픽셀 padding + **R-D9** 단일 좌표 → 스모크 7·8 |
+| 동선(폴리라인) | `places` **배열 순서가 곧 동선** → 순서 바꾸면 번호·범례도 같이 바뀜 → `noRoute` 대상인지 확인 → **CSP에 `connect-src` 추가 금지**(OSRM 불가, `PRD.md` F3) |
+| 원정을 zone처럼 재조립하는 자리 | `buildZoneMap({name, sections, noRoute})` — **지도가 읽는 필드를 늘리면 이 줄도 늘린다** (`learning.md § 12`) |
+| `base_hotel`에 좌표 추가 | R-D3 land-check → 숙소 핀 + loop 동선이 자동 생성 → `CLAUDE.md § 3.1` |
 | 필터 로직 | `.catsec` 구조 → `.zone` 통째 숨김 vs `.excursion` 장소만 숨김 **비대칭 유지** → 스모크 5·6 |
 | 스크롤스파이 | **R-D7** 세로 스크롤 금지 → 스모크 4 |
 | 새 DOM 생성 | `E()` 헬퍼만. `innerHTML`은 정적 SVG 상수 전용 (`CLAUDE.md § 6`) |

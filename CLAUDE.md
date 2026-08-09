@@ -76,7 +76,7 @@ GUIDE_DATA = {
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `base_hotel` | object \| **null** | `{name, area, note}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 매스트헤드 호텔 칩이 생략되고 원정 길찾기 출발지가 `Osaka Station`으로 대체됨 (`excursionOrigin()`) |
+| `base_hotel` | object \| **null** | `{name, area, note, lat?, lng?}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 ① 매스트헤드 호텔 칩 생략 ② 원정 길찾기 출발지가 `Osaka Station`으로 대체 (`excursionOrigin()`) ③ 지도에 숙소 핀·loop 동선 없음. **`lat`/`lng`를 채우면 각 구역 지도에 숙소 핀이 생기고 동선이 `숙소 → 장소들 → 숙소` loop로 바뀐다** (§ 7). 좌표는 R-D3 land-check 필수 |
 | `zones[].id` | number | 화면에 `AREA 01` 형태로 표시. 앵커 id = `zone-{id}` |
 | `zones[].access` | string | **역 기준**으로 쓴다 (`난바·신사이바시역 (미도스지선) · 기타에서 8분`). 숙소에 의존하지 않으므로 숙소 미정이어도 유효하다. 숙소가 정해지면 도보 시간만 덧붙이면 됨 |
 | `sections[].category` | string | **`관광지` / `맛집` / `카페` 셋 중 하나.** `CAT` 딕셔너리 키와 정확히 일치해야 색·아이콘·필터가 붙음 |
@@ -113,6 +113,8 @@ GUIDE_DATA = {
 ```
 
 - `sections`가 zone과 **완전히 같은 스키마**라서 `buildZoneMap` · `buildCatSection` · `buildCard` · 상단 분류 필터가 전부 그대로 걸린다. 원정 전용 렌더 함수를 새로 만들지 말 것.
+- `noRoute: true` — 지도에서 **동선 점선을 끈다**. 교토처럼 "하루에 한쪽만 도는" 곳은 7곳을 한 줄로 이으면 *이 순서로 다 돌면 된다*는 잘못된 신호가 된다.
+- ⚠ **원정을 zone처럼 재조립해 넘기는 자리가 있다** (`buildZoneMap({ name, sections, noRoute })`). 지도가 읽는 필드를 늘리면 **그 줄도 같이 늘려야 한다** — 실제로 `noRoute`를 빠뜨려 교토에 동선이 그려진 적이 있다 (`learning.md § 12`).
 - 앵커 id = `ex-{id}`. 내비 칩 라벨 = `chip` (없으면 `title`).
 - `routes[].name`에 `택시`/`didi`/`차로`가 들어가면 길찾기 링크가 `driving` 모드로 나감. 그 외는 `transit`.
 
@@ -197,7 +199,11 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 **지도**
 - `zoneCenter(zone)` — 좌표 평균 (offzone·좌표없음 제외)
 - `buildZoneMap(zone, accent)` — 지도 컨테이너 + 범례 + 구글맵 버튼. **`zone.id`를 쓰지 않으므로 원정 객체도 그대로 넣을 수 있다**
-- `initLeafletMap(entry)` — Leaflet 인스턴스. 핀↔이름칩 하이라이트 연동
+- `initLeafletMap(entry)` — Leaflet 인스턴스. 핀↔이름칩 하이라이트 연동 + **동선 폴리라인** + 숙소 핀
+  - **동선 = `places` 배열 순서.** 별도 순서 필드가 없다. 순서를 바꾸려면 배열 순서를 바꾼다 (번호·범례·동선이 한꺼번에 따라옴)
+  - 조건: `!zone.noRoute && routePts.length >= 2`. `offzone`은 동선에서도 빠짐
+  - ⚠ **직선이다.** 도쿄 메인은 OSRM으로 도로 곡선을 그리지만 그쪽 CSP엔 `connect-src`가 열려 있다. 이 앱은 `default-src 'none'` + `connect-src` 없음 → **fetch 자체가 불가**하고 CSP 완화는 § 12 금지. 정확한 길찾기는 구글맵 링크가 담당한다
+  - `base_hotel.lat/lng`가 있으면 `[숙소, ...장소들, 숙소]` loop + 숙소 핀. 없으면 장소들만 잇는다
 - `setupZoneMaps()` / `refreshVisibleMaps()` — IntersectionObserver 지연 init + `invalidateSize`
 - `ZONE_MAP_REG` — 지도 레지스트리
 
@@ -315,8 +321,9 @@ node -e "const h=require('fs').readFileSync('index.html','utf8'); const cats=[..
 
 ```bash
 # 5. 이전 매거진 잔재 (도쿄·우에노·디즈니 등)
-#    BUILD_VERSION(이식 출처 표기)과 R-D2 룰 주석은 의도된 것이므로 제외한다.
-grep -niE "tokyo|도쿄|우에노|디즈니|마이하마" index.html | grep -vE "BUILD_VERSION|R-D2" || echo "OK — 잔재 없음"
+#    의도된 언급은 제외한다 — BUILD_VERSION(이식 출처) · R-D2 룰 주석 ·
+#    "왜 도쿄처럼 못 하는지"를 설명하는 주석(OSRM / 도쿄식 loop).
+grep -niE "tokyo|도쿄|우에노|디즈니|마이하마" index.html | grep -vE "BUILD_VERSION|R-D2|OSRM|도쿄식" || echo "OK — 잔재 없음"
 ```
 
 ```bash
@@ -343,6 +350,9 @@ done
 | 5 | 분류 필터 `맛집` | 구역은 맛집만, 원정 섹션은 장소만 걸러지고 가는 법·할 일은 그대로 |
 | 6 | 필터 조합으로 결과 0 | "조건에 맞는 장소가 없어요" 표시 |
 | 7 | 지도 핀 탭 | 팝업 + 하단 이름 칩 하이라이트 연동 |
+| 7-a | 구역 지도 동선 | 번호 순서대로 점선 연결. 범례에 "직선이라 실제 길은 아니에요" 문구 |
+| 7-b | 교토 원정 지도 | **동선 점선 없음** (`noRoute`). 핀·범례는 정상 |
+| 7-c | 오사카성 구역 (1곳) | 동선 없음 + `setView` (골목 한 칸까지 안 튐, R-D9) |
 | 8 | 이름 칩 탭 | 해당 핀으로 지도 이동 + 강조 |
 | 9 | 장소 카드 탭 | 구글맵 새 탭. **엉뚱한 장소 아님** (R-D3) |
 | 10 | 원정 길찾기 버튼 | 구글맵 길찾기. 숙소 미정이면 오사카역 출발 |

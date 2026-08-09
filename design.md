@@ -130,6 +130,8 @@ _디자인 시스템 **정본**_ · **v1.1** (2026-08-09) · Vol. III
 | `.zone-map` · `.zone-map-canvas` | Leaflet 컨테이너 | IO 지연 init + `invalidateSize` |
 | `.zm-legend` · `.zm-leg-item` · `.zm-leg-num` · `.zm-leg-name` | 하단 이름 칩 | **핀↔칩 양방향 하이라이트 — 이식 자산 중 가장 손이 많이 간 부분. 건드리지 말 것** |
 | `.zm-pin` · `.zm-pin-dot` | 번호 핀 | 아이콘이 좌표 위로 솟음 → **fitBounds 픽셀 padding 필수 (R-D5)** |
+| `.zm-pin.is-home` · `.zm-pin-home` | 숙소 핀 (사각형) | `--frame` 인디고. **`base_hotel.lat/lng`가 있을 때만** 그려진다. 번호를 갖지 않는다 |
+| (Leaflet polyline) | **동선 점선** | 구역 액센트색 · `weight 3` · `opacity .6` · `dashArray '5, 7'` · `interactive: false`. **CSS 클래스 없음** — JS 옵션으로 스타일링. 색은 `ZONE_ACCENTS` 재사용이라 새 토큰이 필요 없다 |
 | `.zone-map-link` · `.zml-*` | "이 구역 구글맵에서 보기" | |
 | `.map-pop` · `.leaflet-popup-content` | 팝업 | Leaflet 기본 덮어씀 |
 
