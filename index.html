@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: https://*.basemaps.cartocdn.com; base-uri 'none'; form-action 'none';" />
+<meta name="theme-color" content="#1a1b4b" />
+<title>오사카 친구 가이드</title>
+<meta name="description" content="오사카·교토 자유여행 가이드 — 구역별 관광지·맛집·카페, 탭하면 구글맵." />
+<!-- 접속 비번 게이트 — FOUC 방지. 토큰 없으면 즉시 .auth-locked 부착 → 본문 가림. 평문 비번 박제 X (SHA-256 해시만). -->
+<script>
+  (function () {
+    try {
+      if (localStorage.getItem('osaka-guide-auth-v1') !== 'ok') {
+        document.documentElement.classList.add('auth-locked');
+      }
+    } catch (e) {
+      document.documentElement.classList.add('auth-locked');
+    }
+  })();
+</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1b4b'/%3E%3Ccircle cx='48' cy='16' r='6' fill='%23d94848'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='900' fill='%23f5f3ee' letter-spacing='-1'%3EO%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  /* =====================================================
+     오사카 친구 가이드 — 단일 파일 · 외부 의존성 0 · 시스템 폰트
+     ===================================================== */
+  :root {
+    --frame:      #1a1b4b;
+    --page:       #f5f3ee;
+    --page-tint:  #ebe7df;
+    --page-warm:  #efece4;
+    --white:      #ffffff;
+    --ink:        #2a2d3a;
+    --ink-soft:   #5a5d6a;
+    --ink-faint:  #8a8d99;
+    --indigo:     #1a1b4b;
+    --indigo-light:#4a4d8b;
+    --osaka-red:  #D8452E;
+    --gold:       #d4af37;
+    --gold-dark:  #a08828;
+    --gold-glow:  rgba(212,175,55,.4);
+    --essential:      #C0455E;
+    --essential-dark: #97324a;
+    --essential-glow: rgba(192,69,94,.26);
+    --line:       #d9d6cf;
+    --line-faint: #e7e4dd;
+    --shadow:     rgba(26,27,75,.10);
+
+    --cat-sight:  #4A55A3;
+    --cat-meal:   #D67025;
+    --cat-cafe:   #8B6F47;
+
+    --r:          12px;
+    --pad-x:      clamp(18px, 5vw, 56px);
+
+    --sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+            "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, system-ui, sans-serif;
+    --serif: Georgia, "Times New Roman", "Apple SD Gothic Neo", serif;
+  }
+
+  /* ===== 접속 비번 게이트 ===== */
+  html.auth-locked body > *:not(.auth-gate) { visibility: hidden !important; }
+  html.auth-locked body { overflow: hidden !important; }
+  html:not(.auth-locked) .auth-gate { display: none !important; }
+  .auth-gate {
+    position: fixed; inset: 0; z-index: 99999;
+    background:
+      radial-gradient(130% 55% at 50% -8%, rgba(74,77,139,.35), transparent 62%),
+      var(--frame);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; overflow: auto;
+  }
+  .auth-card {
+    width: min(420px, 92vw); background: var(--page); border-radius: var(--r);
+    padding: 36px 32px 28px; box-shadow: 0 24px 64px rgba(0,0,0,.35);
+    text-align: center; color: var(--ink);
+  }
+  .auth-eyebrow {
+    font-family: var(--sans); font-weight: 700; font-size: 10px;
+    letter-spacing: .32em; text-transform: uppercase; color: var(--osaka-red); margin-bottom: 14px;
+  }
+  .auth-title {
+    font-family: var(--sans); font-weight: 800; font-size: clamp(34px, 9vw, 50px);
+    line-height: 1.02; letter-spacing: -.02em; color: var(--indigo); margin: 0 0 10px;
+  }
+  .auth-title .red { color: var(--osaka-red); }
+  .auth-deck { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-soft); margin: 0 0 24px; }
+  .auth-q {
+    display: inline-flex; align-items: baseline; gap: 8px; padding: 10px 16px;
+    background: var(--page-warm); border-left: 2px solid var(--osaka-red);
+    border-radius: 0 6px 6px 0; margin-bottom: 18px;
+  }
+  .auth-q-mark { font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .18em; color: var(--osaka-red); }
+  .auth-q-text { font-family: var(--serif); font-style: italic; font-size: 14.5px; color: var(--ink); }
+  .auth-form { display: flex; gap: 8px; margin-bottom: 12px; }
+  .auth-input {
+    flex: 1; padding: 12px 16px; border: 1px solid var(--line); border-radius: 6px;
+    background: #fff; font-family: var(--sans); font-size: 18px; letter-spacing: .4em;
+    text-align: center; color: var(--ink); outline: none; transition: border-color .15s;
+    -webkit-text-security: disc; text-security: disc;
+  }
+  .auth-input:focus { border-color: var(--osaka-red); }
+  .auth-input:disabled { opacity: .5; cursor: not-allowed; }
+  .auth-submit {
+    padding: 12px 18px; background: var(--indigo); color: var(--page); border: none; border-radius: 6px;
+    font-family: var(--sans); font-weight: 600; font-size: 12px; letter-spacing: .18em;
+    text-transform: uppercase; cursor: pointer; transition: background .15s; white-space: nowrap;
+  }
+  .auth-submit:hover:not(:disabled) { background: var(--osaka-red); }
+  .auth-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .auth-msg { font-family: var(--sans); font-size: 12.5px; color: var(--osaka-red); min-height: 18px; margin-bottom: 8px; }
+  .auth-msg.ok { color: #2e7d32; }
+  .auth-note { font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-faint); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(130% 55% at 50% -8%, rgba(74,77,139,.35), transparent 62%),
+      var(--frame);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(0px, 3vw, 40px);
+    min-height: 100vh;
+  }
+
+  .sheet {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--page);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(13,14,46,.45);
+    position: relative;
+  }
+  .sheet::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--osaka-red), var(--gold) 55%, var(--indigo-light));
+    z-index: 2;
+  }
+
+  /* ===== Icons ===== */
+  .ico { display: inline-flex; align-items: center; justify-content: center; }
+  .ico svg { width: 1em; height: 1em; display: block; }
+
+  /* ===== Masthead ===== */
+  .masthead { padding: clamp(30px,7vw,60px) var(--pad-x) clamp(20px,4vw,30px); background: linear-gradient(180deg, var(--page-warm), var(--page)); }
+  .kicker {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .34em; text-transform: uppercase;
+    color: var(--osaka-red); display: flex; align-items: center; gap: 9px; margin-bottom: 12px;
+  }
+  .kicker::before { content:''; width: 22px; height: 2px; background: var(--osaka-red); }
+  .mast-title { font-size: clamp(58px,17vw,150px); font-weight: 900; letter-spacing: -.045em; line-height: .82; color: var(--indigo); }
+  .mast-title .dot { color: var(--osaka-red); }
+  .mast-sub { font-family: var(--serif); font-style: italic; font-size: clamp(19px,4.4vw,30px); color: var(--ink-soft); margin-top: 10px; }
+  .mast-lede { margin-top: 16px; max-width: 56ch; font-size: 15px; color: var(--ink-soft); }
+
+  .mast-meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 9px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--page-tint); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 13px; font-size: 13px; color: var(--ink);
+  }
+  .pill .ico { color: var(--osaka-red); font-size: 15px; }
+  .pill b { font-weight: 700; }
+
+  /* ===== Sticky nav ===== */
+  .nav {
+    position: sticky; top: 0; z-index: 30;
+    background: rgba(245,243,238,.9);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    backdrop-filter: saturate(180%) blur(10px);
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .nav-row { display: flex; align-items: center; gap: 8px; padding: 9px var(--pad-x); }
+  .nav-row.zones { border-bottom: 1px dashed var(--line-faint); }
+  .nav-row .scroller {
+    display: flex; gap: 7px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; flex: 1; padding-bottom: 1px;
+  }
+  .nav-row .scroller::-webkit-scrollbar { display: none; }
+  .nav-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; flex-shrink: 0; }
+
+  .chip {
+    flex-shrink: 0; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--line); background: var(--white); color: var(--ink-soft);
+    border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 7px; line-height: 1;
+    transition: background .15s, color .15s, border-color .15s; font-family: inherit;
+  }
+  .chip:hover { border-color: var(--indigo-light); color: var(--indigo); }
+  .chip .cnt { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .chip .swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .zone-chip[aria-current="true"] { background: var(--zc, var(--indigo)); border-color: var(--zc, var(--indigo)); color: #fff; }
+  .chip[aria-pressed="true"] { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+  .chip[aria-pressed="true"] .cnt { color: rgba(255,255,255,.72); }
+  .chip.rec { gap: 6px; }
+  .chip.rec .ico { font-size: 13px; color: var(--gold-dark); }
+  .chip.rec[aria-pressed="true"] { background: var(--gold); border-color: var(--gold-dark); color: #3a2e05; }
+  .chip.rec[aria-pressed="true"] .ico { color: #3a2e05; }
+  .chip.rec[aria-pressed="true"] .cnt { color: rgba(58,46,5,.6); }
+  .chip.ess { gap: 6px; }
+  .chip.ess[aria-pressed="true"] { background: var(--essential); border-color: var(--essential-dark); color: #fff; }
+  .chip.ess[aria-pressed="true"] .cnt { color: rgba(255,255,255,.72); }
+
+  /* ===== Body ===== */
+  .body { padding: clamp(18px,4vw,34px) var(--pad-x) clamp(40px,8vw,72px); }
+
+  .zone { margin-top: clamp(30px,6vw,48px); scroll-margin-top: 104px; }
+  .zone:first-child { margin-top: 6px; }
+  .zone.hide { display: none; }
+
+  .zone-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 11px; border-bottom: 2px solid var(--zc, var(--indigo)); }
+  .zone-tag {
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    background: var(--zc); color: #fff; border-radius: 7px; padding: 5px 10px;
+    font-size: 12px; font-weight: 800; letter-spacing: .04em;
+  }
+  .zone-name { font-family: var(--serif); font-weight: 700; font-size: clamp(27px,6vw,46px); line-height: 1; color: var(--indigo); letter-spacing: -.01em; }
+  .zone-access { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-faint); }
+  .zone-access .ico { color: var(--zc); font-size: 14px; }
+
+  /* ===== Zone map link (탭하면 실제 구글맵으로 그 구역이 열림) ===== */
+  .zone-map-link {
+    margin-top: 13px; display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: var(--ink);
+    background: var(--page-warm); border: 1px solid var(--line); border-left: 4px solid var(--zc);
+    border-radius: var(--r); padding: 12px 15px;
+    transition: box-shadow .16s, transform .16s, border-color .16s;
+    -webkit-tap-highlight-color: rgba(26,27,75,.06);
+  }
+  .zone-map-link:hover { box-shadow: 0 8px 20px var(--shadow); transform: translateY(-1px); }
+  .zone-map-link:active { transform: translateY(0); box-shadow: 0 3px 10px var(--shadow); }
+  .zml-icon { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; background: var(--zc); color: #fff; display: flex; align-items: center; justify-content: center; }
+  .zml-icon .ico { font-size: 20px; }
+  .zml-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .zml-title { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+  .zml-sub { font-size: 12px; color: var(--ink-faint); margin-top: 1px; }
+  .zml-arrow { flex-shrink: 0; font-size: 18px; color: var(--zc); transition: transform .15s; }
+  .zone-map-link:hover .zml-arrow { transform: translateX(3px); }
+
+  /* ===== Zone embedded map (실제 구글맵 iframe + 하단 전체화면 버튼) ===== */
+  .zone-map { margin-top: 13px; border: 1px solid var(--line); border-left: 4px solid var(--zc); border-radius: var(--r); overflow: hidden; background: var(--page-warm); }
+  .zone-map-canvas { width: 100%; height: clamp(210px, 48vw, 300px); background: var(--page-tint); z-index: 0; }
+  .zone-map-canvas.leaflet-container { font: inherit; background: var(--page-tint); }
+  .zone-map .zone-map-link { margin-top: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: #fff; }
+  .zone-map .zone-map-link:hover { transform: none; box-shadow: none; background: var(--page-warm); }
+  .zone-map .zone-map-link:active { transform: none; }
+  .map-pop .mp-name { font-weight: 700; font-size: 14px; color: var(--ink); }
+  .map-pop .mp-feat { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.45; }
+  .map-pop .mp-link { display: inline-block; margin-top: 7px; font-size: 12.5px; font-weight: 700; color: var(--indigo); text-decoration: none; }
+  .map-pop .mp-link:hover { color: var(--osaka-red); }
+  /* 번호 핀 + 범례 — 지도에서 어느 점이 어디인지 바로 보이게 (todo 2026-06-21) */
+  .zm-pin.leaflet-div-icon { background: transparent; border: 0; }
+  .zm-pin-dot { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; font-size: 11.5px; font-weight: 800; line-height: 1; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); font-family: inherit; }
+  .zm-pin.is-rec .zm-pin-dot { box-shadow: 0 0 0 2px rgba(212,175,55,.5), 0 1px 5px rgba(0,0,0,.4); }
+  .zm-legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 11px 12px; border-top: 1px solid var(--line); background: #fff; }
+  .zm-leg-item { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid var(--line); border-radius: 999px; background: var(--page-warm); padding: 4px 11px 4px 4px; font: inherit; font-size: 12px; color: var(--ink); cursor: pointer; transition: border-color .15s, transform .05s; }
+  .zm-leg-item:hover { border-color: var(--zc); }
+  .zm-leg-item:active { transform: translateY(1px); }
+  .zm-leg-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; flex: 0 0 auto; color: #fff; font-size: 10.5px; font-weight: 800; line-height: 1; }
+  .zm-leg-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .zm-leg-item.is-rec .zm-leg-name { font-weight: 700; }
+  /* 이름↔핀 하이라이트 연동 */
+  .zm-legend-hint { flex: 0 0 100%; font-size: 11px; color: var(--ink-soft); margin: 0 2px 2px; }
+  .zm-pin .zm-pin-dot { transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+  .zone-map-canvas.zm-focus .zm-pin .zm-pin-dot { opacity: .28; }
+  .zone-map-canvas.zm-focus .zm-pin.zm-pin--active .zm-pin-dot,
+  .zone-map-canvas .zm-pin.zm-pin--hover .zm-pin-dot { opacity: 1; }
+  .zm-pin.zm-pin--hover .zm-pin-dot { transform: scale(1.28); box-shadow: 0 2px 9px rgba(0,0,0,.5); }
+  .zm-pin.zm-pin--active .zm-pin-dot { transform: scale(1.5); box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--osaka-red), 0 3px 11px rgba(0,0,0,.5); }
+  .zm-leg-item.is-hover { border-color: var(--zc); }
+  .zm-leg-item.is-active { border-color: var(--zc); background: var(--page-tint); box-shadow: inset 0 0 0 1.5px var(--zc); }
+  .zm-leg-item.is-flash { animation: zmLegFlash 1.2s ease; }
+  @keyframes zmLegFlash { 0%, 100% { box-shadow: none; } 25% { background: var(--page-tint); box-shadow: inset 0 0 0 1.5px var(--zc); } }
+  .leaflet-popup-content { margin: 11px 13px; font-family: inherit; }
+
+  /* 원정 길찾기 버튼 — 숙소 → 원정 목적지 */
+  .dir-btn { display: flex; align-items: center; gap: 12px; text-decoration: none; background: var(--zc); color: #fff; border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 8px 22px rgba(168,51,106,.26); transition: transform .15s, box-shadow .15s; -webkit-tap-highlight-color: rgba(0,0,0,.1); }
+  .dir-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(168,51,106,.34); }
+  .dir-btn:active { transform: translateY(0); }
+  .dir-ico { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dir-ico .ico { font-size: 22px; }
+  .dir-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .dir-t { font-size: 15px; font-weight: 800; }
+  .dir-sub { font-size: 11.5px; opacity: .9; margin-top: 1px; }
+  .dir-arrow { flex-shrink: 0; font-size: 20px; }
+
+  /* ===== Category section ===== */
+  .catsec { margin-top: clamp(18px,4vw,26px); }
+  .catsec.hide { display: none; }
+  .cat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
+  .cat-badge { display: inline-flex; align-items: center; gap: 6px; color: #fff; border-radius: 7px; padding: 5px 11px 5px 9px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; }
+  .cat-badge .ico { font-size: 14px; }
+  .cat-ko { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .cat-line { flex: 1; height: 1px; background: var(--line-faint); }
+  .cat-cnt { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+  /* ===== Place cards ===== */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px,1fr)); gap: 11px; }
+  .place {
+    display: flex; flex-direction: column; text-decoration: none; color: inherit;
+    background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: var(--r); padding: 15px 16px 13px; position: relative;
+    transition: box-shadow .16s, transform .16s, border-color .16s;
+    -webkit-tap-highlight-color: rgba(26,27,75,.06);
+  }
+  .place:hover { box-shadow: 0 10px 24px var(--shadow); transform: translateY(-2px); }
+  .place:active { transform: translateY(0); box-shadow: 0 4px 12px var(--shadow); }
+  .place.hide { display: none; }
+  .place.rec { background: linear-gradient(180deg,#fffdf4,#fff); }
+  .place.essential { background: linear-gradient(180deg,#fff6f8,#fff); }
+  .p-essential { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--essential); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; border-radius: 999px; padding: 3px 9px; box-shadow: 0 0 0 3px var(--essential-glow); white-space: nowrap; }
+
+  .p-top { display: flex; align-items: flex-start; gap: 9px; }
+  .p-name { flex: 1; font-size: 16.5px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .p-star { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--gold); color: #3a2e05; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; border-radius: 999px; padding: 3px 8px 3px 6px; box-shadow: 0 0 0 3px var(--gold-glow); white-space: nowrap; }
+  .p-star .ico { font-size: 11px; }
+  .p-en { font-size: 11.5px; font-weight: 500; letter-spacing: .04em; color: var(--ink-faint); margin-top: 3px; }
+  .p-feat { font-size: 13.5px; color: var(--ink-soft); margin-top: 9px; flex: 1; }
+  .p-go { margin-top: 13px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--indigo); }
+  .p-go .ico { font-size: 14px; color: var(--osaka-red); }
+  .p-go .arrow { transition: transform .15s; }
+  .place:hover .p-go { color: var(--osaka-red); }
+  .place:hover .p-go .arrow { transform: translateX(3px); }
+
+  .empty { display: none; text-align: center; color: var(--ink-faint); font-size: 14px; padding: 56px 0; }
+  .empty.show { display: block; }
+
+  /* ===== 원정(Excursion) 섹션 — 하루 통째로 쓰는 시외 일정 전용 블록 ===== */
+  .excursion {
+    margin-top: clamp(30px,6vw,52px);
+    scroll-margin-top: 104px;
+    background: linear-gradient(180deg, #faf1f6, var(--page) 55%);
+    border: 1.5px solid var(--zc);
+    border-radius: 16px;
+    padding: clamp(16px,4vw,30px);
+    box-shadow: 0 14px 36px rgba(168,51,106,.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .excursion::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--zc); z-index: 1; }
+  .excursion .zone-head { border-bottom-color: var(--zc); }
+  .excursion .zone-tag { background: var(--zc); }
+  .ex-scope { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--zc); background: rgba(168,51,106,.08); border: 1px solid rgba(168,51,106,.25); border-radius: 999px; padding: 6px 12px; }
+  .ex-scope .ico { font-size: 13px; }
+  .ex-intro { margin-top: 12px; font-size: 14.5px; color: var(--ink-soft); max-width: 60ch; }
+  .block-h { display: flex; align-items: center; gap: 9px; margin: clamp(20px,4vw,28px) 0 13px; }
+  .block-h .bh-bar { width: 16px; height: 2px; background: var(--zc); }
+  .block-h .bh-t { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--zc); text-transform: uppercase; }
+  .block-h .bh-ko { font-size: 15px; font-weight: 700; color: var(--ink); }
+
+  .route-card { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--zc); border-radius: var(--r); padding: 14px 16px; }
+  .route-card + .route-card { margin-top: 10px; }
+  a.route-card { display: block; text-decoration: none; color: inherit; cursor: pointer; transition: box-shadow .15s, transform .15s, border-color .15s; -webkit-tap-highlight-color: rgba(168,51,106,.08); }
+  a.route-card:hover { box-shadow: 0 10px 24px var(--shadow); transform: translateY(-1px); border-color: var(--zc); }
+  a.route-card:active { transform: translateY(0); box-shadow: 0 3px 10px var(--shadow); }
+  .rc-go { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-faint); display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; color: var(--zc); }
+  .rc-go .ico { font-size: 15px; }
+  .rc-go .rc-go-arrow { margin-left: auto; transition: transform .15s; }
+  a.route-card:hover .rc-go-arrow { transform: translateX(3px); }
+  .rc-head { display: flex; align-items: center; gap: 10px; }
+  .rc-num { width: 26px; height: 26px; border-radius: 50%; background: var(--zc); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rc-name { flex: 1; font-size: 15px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .rc-best { font-size: 10px; font-weight: 800; letter-spacing: .04em; color: #fff; background: var(--zc); border-radius: 999px; padding: 2px 7px; }
+  .rc-meta { font-size: 12px; color: var(--ink-faint); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rc-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 11px; }
+  .rc-step { background: var(--page-tint); border: 1px solid var(--line); border-radius: 7px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .rc-conn { display: inline-flex; align-items: center; gap: 4px; color: var(--zc); font-size: 11px; font-weight: 600; }
+  .rc-conn .ico { font-size: 13px; }
+  .rc-note { margin-top: 10px; font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+
+  .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .info-list li { display: flex; gap: 9px; font-size: 13.5px; color: var(--ink-soft); }
+  .info-list li .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--zc); margin-top: 7px; flex-shrink: 0; }
+
+  .todo-list { border-top: 1px solid var(--line-faint); }
+  .todo-item { display: flex; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--line-faint); }
+  .todo-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--zc); color: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .todo-mark .ico { font-size: 13px; }
+  .todo-t { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .todo-d { font-size: 13px; color: var(--ink-soft); margin-top: 2px; line-height: 1.55; }
+  .dine-note { margin: 10px 0 4px; font-size: 12.5px; color: var(--ink-faint); }
+
+  /* ===== Footer ===== */
+  .foot { border-top: 1px solid var(--line); padding: 22px var(--pad-x) 28px; color: var(--ink-faint); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+
+  /* ===== Back to top ===== */
+  .totop {
+    position: fixed; right: 16px; bottom: 16px; z-index: 40;
+    width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+    background: var(--indigo); color: #fff; font-size: 18px;
+    box-shadow: 0 6px 18px rgba(13,14,46,.4); display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .2s;
+  }
+  .totop.show { display: flex; opacity: 1; }
+  .totop .ico { font-size: 20px; }
+
+  @media (max-width: 600px) {
+    body { padding: 0; }
+    .sheet { border-radius: 0; box-shadow: none; }
+    .grid { grid-template-columns: 1fr; }
+    .zone-access { margin-left: 0; width: 100%; margin-top: 2px; }
+    .nav-row { padding-top: 8px; padding-bottom: 8px; }
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; max-width: 100%; }
+    .nav, .totop { display: none; }
+    .place { break-inside: avoid; transform: none; box-shadow: none; }
+    .zone, .catsec { break-inside: avoid; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; transition: none !important; } }
+</style>
+</head>
+<body>
+  <!-- 접속 비번 게이트 (친구 전용). 인증 OK 시 JS 가 .auth-locked 제거 → 게이트 숨김. -->
+  <div class="auth-gate" id="auth-gate" role="dialog" aria-modal="true" aria-label="비공개 접속">
+    <div class="auth-card">
+      <div class="auth-eyebrow">Private · 친구 전용</div>
+      <h1 class="auth-title">오사카<br><span class="red">친구 가이드</span></h1>
+      <p class="auth-deck">아는 사람만 들어와요.</p>
+      <div class="auth-q">
+        <span class="auth-q-mark">Q.</span>
+        <span class="auth-q-text">여행지 도시 이름(영어) + 여행연도 — 예: abcde1234</span>
+      </div>
+      <form class="auth-form" id="auth-form" autocomplete="off" novalidate>
+        <input type="text" class="auth-input" id="auth-input" placeholder="••••••" inputmode="text" maxlength="16" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <button type="submit" class="auth-submit" id="auth-submit">열기 ↵</button>
+      </form>
+      <div class="auth-msg" id="auth-msg" aria-live="polite"></div>
+      <div class="auth-note">힌트만 보여요.</div>
+    </div>
+  </div>
+  <main class="sheet">
+    <header class="masthead">
+      <div class="kicker">A Friend's Guide · 친구를 위한 오사카</div>
+      <h1 class="mast-title">OSAKA<span class="dot">.</span></h1>
+      <div class="mast-sub" id="mast-sub">오사카 친구 가이드</div>
+      <p class="mast-lede">동선 짜지 마. 그날 있는 구역 하나 정하고, 그 안에서 관광지·맛집·카페 끌리는 곳 골라 탭하면 구글맵이 바로 열려. <b>★</b>는 특히 추천, <b>🇰🇷 한국인 필수</b>는 오사카 오면 다들 가는 코스. 교토는 아래 <b>원정</b> 섹션에 따로 있어.</p>
+      <div class="mast-meta" id="mast-meta"></div>
+    </header>
+
+    <nav class="nav" aria-label="구역 및 필터">
+      <div class="nav-row zones">
+        <span class="nav-lbl">구역</span>
+        <div class="scroller" id="zone-nav"></div>
+      </div>
+      <div class="nav-row filters">
+        <span class="nav-lbl">분류</span>
+        <div class="scroller" id="filter-nav"></div>
+      </div>
+    </nav>
+
+    <div class="body" id="body"></div>
+
+    <footer class="foot">
+      <span>탭하면 구글맵이 새 탭에서 열립니다</span>
+      <span id="foot-count"></span>
+    </footer>
+  </main>
+
+  <button class="totop" id="totop" aria-label="맨 위로" type="button"></button>
+
+<script>
+/* ============================================================
+   데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
+   장소 추가/수정 시 이 객체만 고치면 됨.
+   ============================================================ */
+const BUILD_VERSION = 'v0.1-2026-08-09-TRANSPLANT-FROM-TOKYO-GUIDE';
+
+const GUIDE_DATA = {"title":"오사카 친구 가이드","base_hotel":null,"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[
+{"id":1,"name":"미나미 (난바·도톤보리·신사이바시)","access":"TODO — 숙소 확정 후 입력","sections":[
+{"category":"관광지","places":[
+{"name_ko":"도톤보리 · 구리코 사인","name_en":"Dotonbori Glico Sign","feature":"오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷","recommended":true,"essential":true,"lat":34.6687,"lng":135.5013,"maps_url":"https://www.google.com/maps/search/?api=1&query=Dotonbori%20Glico%20Sign"},
+{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 오전~오후가 활발","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},
+{"name_ko":"신사이바시스지 상점가","name_en":"Shinsaibashi-suji Shopping Street","feature":"600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류","recommended":true,"essential":false,"lat":34.6723,"lng":135.501,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shinsaibashi-suji%20Shopping%20Street"},
+{"name_ko":"호젠지 요코초","name_en":"Hozenji Yokocho","feature":"이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적","recommended":true,"essential":false,"lat":34.6684,"lng":135.5025,"maps_url":"https://www.google.com/maps/search/?api=1&query=Hozenji%20Yokocho"},
+{"name_ko":"아메리카무라","name_en":"Amerikamura","feature":"빈티지·스트리트 패션 구역. 산카쿠 공원 중심","recommended":false,"essential":false,"lat":34.6716,"lng":135.4972,"maps_url":"https://www.google.com/maps/search/?api=1&query=Amerikamura"},
+{"name_ko":"난바 야사카 신사","name_en":"Namba Yasaka Shrine","feature":"거대한 사자머리 무대. 사진 한 장 확실한 곳","recommended":false,"essential":false,"lat":34.658,"lng":135.4964,"maps_url":"https://www.google.com/maps/search/?api=1&query=Namba%20Yasaka%20Shrine"}
+]}
+]},
+{"id":2,"name":"기타 (우메다·나카노시마)","access":"TODO — 숙소 확정 후 입력","sections":[
+{"category":"관광지","places":[
+{"name_ko":"우메다 스카이빌딩 공중정원","name_en":"Umeda Sky Building Kuchu Teien Observatory","feature":"173m 옥외 전망대. 해질녘~야경 타이밍이 정답","recommended":true,"essential":true,"lat":34.7052,"lng":135.4899,"maps_url":"https://www.google.com/maps/search/?api=1&query=Umeda%20Sky%20Building%20Kuchu%20Teien%20Observatory"},
+{"name_ko":"HEP FIVE 관람차","name_en":"HEP FIVE Ferris Wheel","feature":"빨간 관람차. 우메다 한복판. 짧고 가볍게","recommended":false,"essential":false,"lat":34.7043,"lng":135.5006,"maps_url":"https://www.google.com/maps/search/?api=1&query=HEP%20FIVE%20Ferris%20Wheel"},
+{"name_ko":"나카노시마 공원","name_en":"Nakanoshima Park","feature":"강 사이 섬. 중앙공회당·장미원. 도심 속 산책 구간","recommended":false,"essential":false,"lat":34.6925,"lng":135.5075,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nakanoshima%20Park"},
+{"name_ko":"오사카 나카노시마 미술관","name_en":"Nakanoshima Museum of Art Osaka","feature":"검은 상자 건축. 비 오는 날 실내 대안","recommended":false,"essential":false,"lat":34.6914,"lng":135.4919,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nakanoshima%20Museum%20of%20Art%20Osaka"}
+]}
+]},
+{"id":3,"name":"신세카이·덴노지·쓰루하시","access":"TODO — 숙소 확정 후 입력","sections":[
+{"category":"관광지","places":[
+{"name_ko":"쓰텐카쿠","name_en":"Tsutenkaku Tower","feature":"신세카이 상징탑. 쇼와 레트로 간판 거리와 세트","recommended":true,"essential":true,"lat":34.6524,"lng":135.5063,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsutenkaku%20Tower"},
+{"name_ko":"시텐노지","name_en":"Shitenno-ji Temple","feature":"일본 最古급 관영 사찰(593년). 가람 배치가 교과서적","recommended":true,"essential":false,"lat":34.6543,"lng":135.5165,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shitenno-ji%20Temple"},
+{"name_ko":"아베노 하루카스","name_en":"Abeno Harukas","feature":"일본 최고층급 300m. 전망대 하루카스300","recommended":false,"essential":false,"lat":34.6459,"lng":135.5138,"maps_url":"https://www.google.com/maps/search/?api=1&query=Abeno%20Harukas"},
+{"name_ko":"쓰루하시 코리아타운","name_en":"Tsuruhashi Korea Town","feature":"재일 코리안 상권. 한국 음식·식재료. 역 주변 골목 자체가 볼거리","recommended":false,"essential":false,"lat":34.6531,"lng":135.5354,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsuruhashi%20Korea%20Town"}
+]}
+]},
+{"id":4,"name":"오사카성·베이","access":"TODO — 숙소 확정 후 입력","sections":[
+{"category":"관광지","places":[
+{"name_ko":"오사카성","name_en":"Osaka Castle","feature":"천수각 + 해자 + 공원. 최소 2시간. 니시노마루 정원에서 정면 뷰","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},
+{"name_ko":"오사카 해유관 (가이유칸)","name_en":"Osaka Aquarium Kaiyukan","feature":"세계 최대급 수족관. 고래상어. 베이 반나절","recommended":true,"essential":false,"lat":34.6545,"lng":135.429,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Aquarium%20Kaiyukan"},
+{"name_ko":"덴포잔 대관람차","name_en":"Tempozan Giant Ferris Wheel","feature":"해유관 옆. 항만·아카시 대교 방향 조망","recommended":false,"essential":false,"lat":34.656,"lng":135.4295,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tempozan%20Giant%20Ferris%20Wheel"}
+]}
+]}
+]};
+
+/* ============================================================
+   상수 — SVG 아이콘(정적), 카테고리/구역 메타
+   ============================================================ */
+const SVG = {
+  pin:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 4.9 7 13 7 13s7-8.1 7-13a7 7 0 0 0-7-7zm0 9.6A2.6 2.6 0 1 1 12 6.4a2.6 2.6 0 0 1 0 5.2z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.9 6.1 6.7.6-5 4.5 1.5 6.6L12 17.9 5.9 20.6l1.5-6.6-5-4.5 6.7-.6z"/></svg>',
+  hotel:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 21V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v4h5a1 1 0 0 1 1 1v11h-2v-2H5v2H3zm4-13h2V6H7v2zm0 4h2v-2H7v2zm0 4h2v-2H7v2zm4-8h2V6h-2v2zm0 4h2v-2h-2v2zm0 4h2v-2h-2v2zm6 0h2v-2h-2v2zm0-4h2v-2h-2v2z"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  up:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  sight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M4.5 10.5h15M6 7v12M18 7v12"/></svg>',
+  meal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a2 2 0 0 0 4 0V3M8 11v10M17 3c-1.7 0-3 2-3 4.5S15.3 12 17 12v9"/></svg>',
+  cafe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9z"/><path d="M17 10h2a2.5 2.5 0 0 1 0 5h-2M8 3v2M12 3v2"/></svg>',
+  map:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>',
+  route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.3"/><circle cx="18" cy="5" r="2.3"/><path d="M8.3 19H14a4 4 0 0 0 0-8H10a4 4 0 0 1 0-8h5.7"/></svg>'
+};
+
+const CAT = {
+  '관광지': { key: 'sight', color: 'var(--cat-sight)', en: 'SIGHTS', icon: SVG.sight },
+  '맛집':   { key: 'meal',  color: 'var(--cat-meal)',  en: 'EATS',   icon: SVG.meal },
+  '카페':   { key: 'cafe',  color: 'var(--cat-cafe)',  en: 'CAFÉS',  icon: SVG.cafe }
+};
+const ZONE_ACCENTS = ['#B23A48', '#2E5E8C', '#2F7D5B', '#7A4FA3', '#B8702A', '#3E6E6B'];
+
+/* ============================================================
+   원정(Excursion) — 하루를 통째로 쓰는 시외 일정.
+   zone 과 다른 점: "가는 법 / 도착 후 / 해야 할 것" 이 본체이고, 장소 목록은 부록.
+   sections[] 는 zone 과 완전히 같은 스키마 → buildZoneMap · buildCard · 필터 전부 그대로 재사용.
+   원정 추가 시 이 배열에 객체 하나만 push (USJ · 나라 · 고베 등).
+   ⚠ routes 의 소요시간·요금은 변동됨. 출발 전 1회 재확인 (CLAUDE.md § 출발 전 점검).
+   ============================================================ */
+const EXCURSIONS = [
+  {
+    id: 'kyoto',
+    accent: '#7A4FA3',
+    chip: '★ 교토',
+    title: '교토 당일 원정',
+    area: '교토 · 오사카에서 편도 30~60분',
+    scopeNote: '아래 내용은 교토 가는 날에만 해당',
+    intro: '오사카에서 편도 30~60분. 가깝다고 얕보면 하루가 증발함 — 교토는 남쪽(후시미이나리·기요미즈·기온)과 북서쪽(금각사·아라시야마)이 정반대라, 하루에 한쪽만 잡는 게 정답. 아침 일찍 나가서 인파 앞서고, 사찰 대부분 16:30~17:00에 닫으니 역순으로 짜지 말 것.',
+    destinationQuery: 'Kyoto Station',
+    routes: [
+      { n: 1, name: 'JR 신쾌속 (오사카역 → 교토역)', best: true, time: '약 30분', fare: '약 ¥580',
+        steps: [ {s:'오사카역'}, {s:'교토역', via:'JR 교토선 신쾌속'} ],
+        note: '가장 빠르고 단순. IC카드 찍고 타면 끝. 교토역에서 버스·지하철·JR 나라선(후시미이나리)으로 갈아타기 좋아서 어느 코스든 무난. 숙소가 우메다·오사카역 쪽이면 무조건 이거.' },
+      { n: 2, name: '한큐 교토선 특급 (오사카우메다 → 교토카와라마치)', time: '약 45분', fare: '약 ¥410',
+        steps: [ {s:'오사카우메다'}, {s:'교토카와라마치', via:'한큐 교토선 특급'} ],
+        note: '요금이 가장 쌈. 도착지가 교토역이 아니라 시내 한복판(가와라마치) — 니시키 시장·기온이 도보권이라 관광 시작점으로는 오히려 이쪽이 나음. 특급도 추가요금 없음.' },
+      { n: 3, name: '게이한 본선 특급 (요도야바시 → 기온시조)', time: '약 55분', fare: '약 ¥430',
+        steps: [ {s:'요도야바시'}, {s:'기온시조', via:'게이한 본선 특급'} ],
+        note: '숙소가 난바·미나미 쪽이면 지하철 미도스지선으로 요도야바시까지 몇 정거장. 후시미이나리(후시미이나리역)·기요미즈(기요미즈고조역)를 가는 길에 그냥 지나침 — 남쪽 코스 잡을 거면 최적.' },
+      { n: 4, name: '신칸센 (신오사카 → 교토)', time: '약 15분', fare: '약 ¥1,450',
+        steps: [ {s:'신오사카'}, {s:'교토', via:'도카이도 신칸센'} ],
+        note: '시간을 돈으로 사는 옵션. 신오사카까지 가는 시간을 더하면 실제 이득은 크지 않음. JR패스 있거나 늦잠 잤을 때.' }
+    ],
+    arrival: [
+      '교토역 도착 — 지하철 가라스마선(북쪽 시내), JR 나라선(후시미이나리 2정거장), 버스터미널이 다 모여 있음. 코인로커도 여기가 제일 많음.',
+      '한큐 가와라마치 도착 — 니시키 시장·폰토초·기온이 전부 도보 10분 안. 짐 없이 바로 걷기 시작 가능.',
+      '게이한 기온시조 도착 — 야사카 신사·기온 하나미코지가 도보권, 기요미즈까지 오르막 20분.',
+      '시내 이동은 버스보다 전철+도보를 우선. 교토 시내버스는 관광 성수기에 정체가 심하고 만차로 못 타는 경우가 잦음.'
+    ],
+    todo: [
+      { t: '남쪽 or 북서쪽 — 하루에 한쪽만', d: '후시미이나리·기요미즈·기온(남동) / 금각사·아라시야마(북서)는 가로지르는 데만 1시간 넘게 걸림. 욕심내면 이동만 하다 끝남. 첫 방문이면 남동쪽 추천.' },
+      { t: '아침 일찍 출발', d: '기요미즈·아라시야마는 9시가 지나면 사람에 묻힘. 8시 전 도착이면 완전히 다른 장소. 후시미이나리는 24시간이라 이른 아침·밤 둘 다 가능.' },
+      { t: '닫는 시간 역산', d: '사찰·정원 대부분 16:30~17:00 마감(입장은 30분 전 마감). 마지막 일정을 사찰로 잡지 말고, 저녁은 기온·폰토초 같은 거리로 두기.' },
+      { t: 'IC카드 그대로', d: '오사카에서 쓰던 이코카·스이카 그대로 JR·한큐·게이한·지하철 다 됨. 별도 티켓 안 사도 됨. 버스도 IC 가능.' },
+      { t: '짐은 역 코인로커에', d: '캐리어 끌고 산넨자카 오르막은 지옥. 교토역·가와라마치역 로커에 맡기고 몸만 움직이기. 오전에 차니까 도착하자마자.' },
+      { t: '촬영 매너', d: '기온 일부 사유 골목은 촬영 금지(벌금 표지판 있음). 마이코·게이코를 따라다니며 찍는 건 금지. 표지판 있으면 그대로 따를 것.' }
+    ],
+    sections: [
+      { category: '관광지', places: [
+{"name_ko":"후시미이나리 대사","name_en":"Fushimi Inari Taisha","feature":"천 개의 붉은 도리이. 24시간 개방 — 이른 아침이나 밤이 한적함","recommended":true,"essential":true,"lat":34.9671,"lng":135.7727,"maps_url":"https://www.google.com/maps/search/?api=1&query=Fushimi%20Inari%20Taisha"},
+{"name_ko":"기요미즈데라","name_en":"Kiyomizu-dera","feature":"절벽 위 목조 무대. 산넨자카·니넨자카 오르막이 세트","recommended":true,"essential":true,"lat":34.9949,"lng":135.785,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kiyomizu-dera"},
+{"name_ko":"아라시야마 대나무길","name_en":"Arashiyama Bamboo Grove","feature":"대나무 터널. 9시 넘으면 사람에 묻힘 — 아침 승부","recommended":true,"essential":true,"lat":35.017,"lng":135.6717,"maps_url":"https://www.google.com/maps/search/?api=1&query=Arashiyama%20Bamboo%20Grove"},
+{"name_ko":"금각사 (킨카쿠지)","name_en":"Kinkaku-ji","feature":"금박 누각 + 연못 반영. 북서쪽 — 남쪽 코스와 하루에 묶지 말 것","recommended":true,"essential":false,"lat":35.0394,"lng":135.7292,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kinkaku-ji"},
+{"name_ko":"기온 하나미코지","name_en":"Gion Hanamikoji","feature":"돌바닥 화류가. 해질녘. ※ 사유 골목 촬영 금지 구역 있음 — 표지판 확인","recommended":true,"essential":false,"lat":35.0036,"lng":135.7752,"maps_url":"https://www.google.com/maps/search/?api=1&query=Gion%20Hanamikoji"},
+{"name_ko":"니조성","name_en":"Nijo Castle","feature":"쇼군 별궁. 밟으면 우는 마루(우구이스바리)","recommended":false,"essential":false,"lat":35.0142,"lng":135.7481,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nijo%20Castle"},
+{"name_ko":"니시키 시장","name_en":"Nishiki Market","feature":"400m 먹거리 아케이드. \"교토의 부엌\". 서서 먹기","recommended":true,"essential":false,"lat":35.005,"lng":135.7649,"maps_url":"https://www.google.com/maps/search/?api=1&query=Nishiki%20Market"}
+      ] }
+    ]
+  }
+];
+
+
+/* ============================================================
+   DOM helpers — 사용자 텍스트는 textContent, SVG는 정적 상수만 innerHTML
+   ============================================================ */
+function E(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function icon(markup, cls) {
+  const s = document.createElement('span');
+  s.className = 'ico' + (cls ? ' ' + cls : '');
+  s.innerHTML = markup;          // markup = SVG 상수만 (사용자 데이터 아님)
+  return s;
+}
+function zoneAccent(i) { return ZONE_ACCENTS[i % ZONE_ACCENTS.length]; }
+
+/* 장소 순회 — 구역(zone) + 원정(excursion) 양쪽. 필터 칩 카운트·총계가 둘 다 반영됨. */
+function eachPlace(fn) {
+  GUIDE_DATA.zones.forEach((z, zi) => z.sections.forEach(s => s.places.forEach(p => fn(p, s, z, zi))));
+  EXCURSIONS.forEach(ex => (ex.sections || []).forEach(s => s.places.forEach(p => fn(p, s, ex, -1))));
+}
+function count(pred) { let n = 0; eachPlace((p, s, z) => { if (pred(p, s, z)) n++; }); return n; }
+
+/* ============================================================
+   상태
+   ============================================================ */
+let activeCat = 'all';
+let recOnly = false;
+let essentialOnly = false;
+
+/* ============================================================
+   렌더 — 마스트헤드 / 내비 / 구역
+   ============================================================ */
+function renderMast() {
+  document.getElementById('mast-sub').textContent = GUIDE_DATA.title;
+  const meta = document.getElementById('mast-meta');
+  const h = GUIDE_DATA.base_hotel;
+  if (h) {
+    const p = E('span', 'pill');
+    p.appendChild(icon(SVG.hotel));
+    const t = E('span');
+    t.appendChild(E('b', null, h.name));
+    if (h.note) t.appendChild(document.createTextNode(' · ' + h.note));
+    p.appendChild(t);
+    meta.appendChild(p);
+  }
+  const total = count(() => true);
+  const p2 = E('span', 'pill');
+  p2.appendChild(icon(SVG.grid));
+  const exN = EXCURSIONS.length;
+  p2.appendChild(document.createTextNode(GUIDE_DATA.zones.length + '개 구역' + (exN ? ' + 원정 ' + exN : '') + ' · 총 ' + total + '곳'));
+  meta.appendChild(p2);
+  document.getElementById('foot-count').textContent = total + ' places · ' + GUIDE_DATA.zones.length + ' areas' + (EXCURSIONS.length ? ' + ' + EXCURSIONS.length + ' excursion' : '');
+}
+
+function renderNav() {
+  // 구역 바로가기
+  const zn = document.getElementById('zone-nav');
+  GUIDE_DATA.zones.forEach((z, zi) => {
+    const b = E('button', 'chip zone-chip');
+    b.type = 'button';
+    b.dataset.target = 'zone-' + z.id;
+    b.style.setProperty('--zc', zoneAccent(zi));
+    b.appendChild(E('span', null, String(z.id).padStart(2, '0') + ' ' + z.name));
+    b.addEventListener('click', () => {
+      const el = document.getElementById('zone-' + z.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    zn.appendChild(b);
+  });
+  // 원정 섹션 바로가기 (EXCURSIONS 개수만큼)
+  EXCURSIONS.forEach(ex => {
+    const dz = E('button', 'chip zone-chip');
+    dz.type = 'button';
+    dz.dataset.target = 'ex-' + ex.id;
+    dz.style.setProperty('--zc', ex.accent);
+    dz.appendChild(E('span', null, ex.chip || ex.title));
+    dz.addEventListener('click', () => {
+      const el = document.getElementById('ex-' + ex.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    zn.appendChild(dz);
+  });
+
+  // 분류 필터
+  const fn = document.getElementById('filter-nav');
+  const cats = [{ key: 'all', label: '전체', color: null }];
+  ['관광지', '맛집', '카페'].forEach(ko => { if (count((p, s) => s.category === ko) > 0) cats.push({ key: CAT[ko].key, label: ko, color: CAT[ko].color }); });
+  cats.forEach(c => {
+    const b = E('button', 'chip cat-filter');
+    b.type = 'button';
+    b.dataset.filter = c.key;
+    b.setAttribute('aria-pressed', c.key === activeCat ? 'true' : 'false');
+    if (c.color) { const sw = E('span', 'swatch'); sw.style.background = c.color; b.appendChild(sw); }
+    b.appendChild(E('span', null, c.label));
+    b.appendChild(E('span', 'cnt', String(count((p, s) => c.key === 'all' ? true : CAT[s.category].key === c.key))));
+    b.addEventListener('click', () => { activeCat = c.key; syncFilters(); applyFilter(); });
+    fn.appendChild(b);
+  });
+  const rec = E('button', 'chip rec');
+  rec.type = 'button'; rec.id = 'rec-toggle';
+  rec.setAttribute('aria-pressed', 'false');
+  rec.appendChild(icon(SVG.star));
+  rec.appendChild(E('span', null, '추천만'));
+  rec.appendChild(E('span', 'cnt', String(count(p => p.recommended))));
+  rec.addEventListener('click', () => { recOnly = !recOnly; syncFilters(); applyFilter(); });
+  fn.appendChild(rec);
+
+  const essN = count(p => p.essential);
+  if (essN > 0) {
+    const ess = E('button', 'chip ess');
+    ess.type = 'button'; ess.id = 'ess-toggle';
+    ess.setAttribute('aria-pressed', 'false');
+    ess.appendChild(E('span', null, '🇰🇷 한국인 필수만'));
+    ess.appendChild(E('span', 'cnt', String(essN)));
+    ess.addEventListener('click', () => { essentialOnly = !essentialOnly; syncFilters(); applyFilter(); });
+    fn.appendChild(ess);
+  }
+}
+
+function syncFilters() {
+  document.querySelectorAll('.cat-filter').forEach(b => b.setAttribute('aria-pressed', b.dataset.filter === activeCat ? 'true' : 'false'));
+  const r = document.getElementById('rec-toggle');
+  if (r) r.setAttribute('aria-pressed', recOnly ? 'true' : 'false');
+  const e = document.getElementById('ess-toggle');
+  if (e) e.setAttribute('aria-pressed', essentialOnly ? 'true' : 'false');
+}
+
+function buildCard(p, cat) {
+  const a = document.createElement('a');
+  a.className = 'place' + (p.recommended ? ' rec' : '') + (p.essential ? ' essential' : '');
+  a.href = p.maps_url || '#';
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.style.setProperty('--accent', cat.color);
+  a.dataset.cat = cat.key;
+  a.dataset.rec = p.recommended ? '1' : '0';
+  a.dataset.ess = p.essential ? '1' : '0';
+
+  const top = E('div', 'p-top');
+  top.appendChild(E('div', 'p-name', p.name_ko));
+  // 한국인 필수 배지가 추천(★)보다 우선 — 카드당 배지 하나로 정리
+  if (p.essential) {
+    top.appendChild(E('span', 'p-essential', '🇰🇷 한국인 필수'));
+  } else if (p.recommended) {
+    const st = E('span', 'p-star');
+    st.appendChild(icon(SVG.star));
+    st.appendChild(E('span', null, '추천'));
+    top.appendChild(st);
+  }
+  a.appendChild(top);
+  if (p.name_en && p.name_en !== p.name_ko) a.appendChild(E('div', 'p-en', p.name_en));
+  if (p.feature) a.appendChild(E('p', 'p-feat', p.feature));
+
+  const go = E('div', 'p-go');
+  go.appendChild(icon(SVG.pin));
+  go.appendChild(E('span', null, '구글맵 열기'));
+  go.appendChild(icon(SVG.arrow, 'arrow'));
+  a.appendChild(go);
+  return a;
+}
+
+/* 구역 중심 좌표 (장소들의 평균) — offzone(구역서 멀리 떨어진 장소)은 중심 계산에서 제외 */
+function zoneCenter(zone) {
+  let n = 0, la = 0, ln = 0;
+  zone.sections.forEach(s => s.places.forEach(p => { if (!p.offzone && typeof p.lat === 'number' && typeof p.lng === 'number') { la += p.lat; ln += p.lng; n++; } }));
+  return n ? { lat: la / n, lng: ln / n, n: n } : null;
+}
+
+/* "이 구역 구글맵에서 보기" 버튼 — 탭하면 그 동네가 실제 구글맵으로 열림(외부 임베드 X) */
+function buildZoneMapLink(zone, accent) {
+  const c = zoneCenter(zone);
+  if (!c) return null;
+  let total = 0, rec = 0;
+  zone.sections.forEach(s => s.places.forEach(p => { total++; if (p.recommended) rec++; }));
+
+  const a = document.createElement('a');
+  a.className = 'zone-map-link';
+  a.href = 'https://www.google.com/maps/@?api=1&map_action=map&center=' + c.lat.toFixed(6) + ',' + c.lng.toFixed(6) + '&zoom=14';
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.style.setProperty('--zc', accent);
+
+  const ib = E('span', 'zml-icon');
+  ib.appendChild(icon(SVG.map));
+  a.appendChild(ib);
+
+  const tx = E('span', 'zml-text');
+  tx.appendChild(E('span', 'zml-title', '이 구역 구글맵에서 보기'));
+  tx.appendChild(E('span', 'zml-sub', zone.name + ' · ' + total + '곳' + (rec ? ' · 추천 ' + rec : '')));
+  a.appendChild(tx);
+
+  a.appendChild(icon(SVG.arrow, 'zml-arrow'));
+  return a;
+}
+
+/* 구역 지도 — Leaflet 인터랙티브 지도에 그 구역의 모든 장소를 핀으로 표시 + 하단 구글맵 버튼.
+   ※ 구글맵은 API 키 없이는 임베드 차단(X-Frame-Options). 표시는 OSM 데이터 기반 지도,
+     핀 탭 → 이름·설명 + '구글맵 열기', 하단 버튼 → 그 구역을 구글맵으로. */
+const ZONE_MAP_REG = [];
+function buildZoneMap(zone, accent) {
+  if (!zoneCenter(zone)) return null;
+  const wrap = E('div', 'zone-map');
+  wrap.style.setProperty('--zc', accent);
+  const canvas = E('div', 'zone-map-canvas');
+  canvas.setAttribute('role', 'application');
+  canvas.setAttribute('aria-label', zone.name + ' 지도 — 장소 핀');
+  wrap.appendChild(canvas);
+  wrap.appendChild(buildZoneMapLink(zone, accent));
+  ZONE_MAP_REG.push({ el: canvas, zone: zone, accent: accent, map: null });
+  return wrap;
+}
+
+function initLeafletMap(entry) {
+  if (entry.el.dataset.init === '1' || !window.L) return;
+  entry.el.dataset.init = '1';
+  const map = L.map(entry.el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, zoomControl: true, attributionControl: true });
+  entry.map = map;
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap, © CARTO'
+  }).addTo(map);
+
+  const pts = [];
+  const legendItems = [];
+  let num = 0;
+  entry.zone.sections.forEach(s => s.places.forEach(p => {
+    if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
+    num++;
+    const rec = !!p.recommended;
+    const bg = rec ? '#d4af37' : entry.accent;
+    const ic = L.divIcon({
+      className: 'zm-pin' + (rec ? ' is-rec' : ''),
+      html: '<span class="zm-pin-dot" style="background:' + bg + '">' + num + '</span>',
+      iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -13]
+    });
+    const m = L.marker([p.lat, p.lng], { icon: ic, title: p.name_ko, riseOnHover: true }).addTo(map);
+    const pop = E('div', 'map-pop');
+    pop.appendChild(E('div', 'mp-name', num + '. ' + p.name_ko + (rec ? ' ★' : '')));
+    if (p.feature) pop.appendChild(E('div', 'mp-feat', p.feature));
+    if (p.maps_url) {
+      const a = E('a', 'mp-link', '구글맵 열기 →');
+      a.href = p.maps_url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      pop.appendChild(a);
+    }
+    m.bindPopup(pop);
+    legendItems.push({ num: num, name: p.name_ko, rec: rec, bg: bg, lat: p.lat, lng: p.lng, marker: m, btn: null });
+    // offzone(구역서 멀리 떨어진 장소)은 fitBounds 프레이밍에서 제외 — 핀·범례·팝업은 그대로,
+    // 지도 초기 줌만 구역 군집에 맞춤. 범례 칩 탭하면 그 핀으로 setView 됨.
+    if (!p.offzone) pts.push([p.lat, p.lng]);
+  }));
+
+  // ===== 이름↔핀 하이라이트 연동 =====
+  const canvas = entry.el;
+  let activeIdx = -1;
+  const markerEl = (it) => { try { return it.marker.getElement(); } catch (e) { return null; } };
+  function setHover(idx, on) {
+    const it = legendItems[idx]; if (!it) return;
+    const el = markerEl(it); if (el) el.classList.toggle('zm-pin--hover', !!on);
+    if (it.btn) it.btn.classList.toggle('is-hover', !!on);
+  }
+  function deactivate(it) {
+    if (!it) return;
+    const el = markerEl(it); if (el) el.classList.remove('zm-pin--active');
+    try { it.marker.setZIndexOffset(0); } catch (e) {}
+    if (it.btn) { it.btn.classList.remove('is-active'); it.btn.setAttribute('aria-pressed', 'false'); }
+  }
+  function clearActive() {
+    if (activeIdx >= 0) deactivate(legendItems[activeIdx]);
+    activeIdx = -1;
+    canvas.classList.remove('zm-focus');
+  }
+  function selectPlace(idx, opts) {
+    opts = opts || {};
+    if (activeIdx >= 0 && activeIdx !== idx) deactivate(legendItems[activeIdx]);
+    const it = legendItems[idx]; if (!it) return;
+    activeIdx = idx;
+    canvas.classList.add('zm-focus');
+    const el = markerEl(it); if (el) el.classList.add('zm-pin--active');
+    try { it.marker.setZIndexOffset(1000); } catch (e) {}
+    if (it.btn) { it.btn.classList.add('is-active'); it.btn.setAttribute('aria-pressed', 'true'); }
+    if (opts.pan !== false) { try { map.setView([it.lat, it.lng], Math.max(map.getZoom(), 15), { animate: true }); } catch (e) {} }
+    if (opts.popup !== false) { try { it.marker.openPopup(); } catch (e) {} }
+  }
+
+  if (legendItems.length) {
+    const legend = E('div', 'zm-legend');
+    legend.appendChild(E('div', 'zm-legend-hint', '이름을 탭하면 지도에서 위치가 표시돼요'));
+    legendItems.forEach((it, idx) => {
+      const b = E('button', 'zm-leg-item' + (it.rec ? ' is-rec' : ''));
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      const badge = E('span', 'zm-leg-num', String(it.num));
+      badge.style.background = it.bg;
+      b.appendChild(badge);
+      b.appendChild(E('span', 'zm-leg-name', it.name + (it.rec ? ' ★' : '')));
+      b.addEventListener('click', () => { try { selectPlace(idx); } catch (e) {} });
+      b.addEventListener('mouseenter', () => setHover(idx, true));
+      b.addEventListener('mouseleave', () => setHover(idx, false));
+      it.btn = b;
+      legend.appendChild(b);
+    });
+    canvas.parentNode.insertBefore(legend, canvas.nextSibling);
+  }
+
+  // 핀 → 범례 칩 연동 (탭 시 강조, 호버 미리보기). 팝업은 Leaflet 기본 동작이 띄움.
+  legendItems.forEach((it, idx) => {
+    it.marker.on('click', () => {
+      try { selectPlace(idx, { pan: false, popup: false }); } catch (e) {}
+      if (it.btn) { it.btn.classList.add('is-flash'); setTimeout(() => { try { it.btn.classList.remove('is-flash'); } catch (e) {} }, 1200); }
+    });
+    it.marker.on('mouseover', () => setHover(idx, true));
+    it.marker.on('mouseout', () => setHover(idx, false));
+  });
+  map.on('click', () => { try { clearActive(); } catch (e) {} });
+
+  // pad() 는 위경도 박스를 비율로 넓힐 뿐이라, 가장자리 핀의 아이콘(위로 솟은 모양)이 잘림.
+  // 픽셀 단위 padding 을 같이 줘야 원정처럼 넓게 퍼진 좌표군에서도 핀이 안 잘림.
+  const FIT = { padding: [30, 30] };
+  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.12), FIT);
+  setTimeout(() => { try { map.invalidateSize(); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.12), FIT); } catch (e) {} }, 120);
+}
+
+function setupZoneMaps() {
+  const tryInit = (entry) => { if (window.L) initLeafletMap(entry); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((ents, obs) => {
+      ents.forEach(e => {
+        if (e.isIntersecting) {
+          const entry = ZONE_MAP_REG.find(x => x.el === e.target);
+          if (entry) { tryInit(entry); if (entry.el.dataset.init === '1') obs.unobserve(e.target); }
+        }
+      });
+    }, { rootMargin: '250px 0px 250px 0px' });
+    ZONE_MAP_REG.forEach(x => io.observe(x.el));
+  }
+  // Leaflet(defer) 로드 완료 후, 현재 화면에 가까운 지도들 보강 초기화
+  window.addEventListener('load', () => {
+    if (!window.L) return;
+    ZONE_MAP_REG.forEach(entry => {
+      if (entry.el.dataset.init === '1') return;
+      const r = entry.el.getBoundingClientRect();
+      if (r.top < window.innerHeight + 350 && r.bottom > -350) initLeafletMap(entry);
+    });
+  });
+}
+
+function refreshVisibleMaps() {
+  ZONE_MAP_REG.forEach(e => { if (e.map && e.el.offsetParent !== null) { try { e.map.invalidateSize(); } catch (_) {} } });
+}
+
+/* 카테고리 섹션 한 덩이 — 구역과 원정이 공유 (필터가 .catsec 단위로 동작하므로 구조 동일해야 함) */
+function buildCatSection(s) {
+  const cat = CAT[s.category] || { key: 'sight', color: 'var(--indigo-light)', en: s.category, icon: SVG.sight };
+  const cs = E('div', 'catsec');
+  cs.dataset.cat = cat.key;
+  const ch = E('div', 'cat-head');
+  const badge = E('span', 'cat-badge');
+  badge.style.background = cat.color;
+  badge.appendChild(icon(cat.icon));
+  badge.appendChild(E('span', null, cat.en));
+  ch.appendChild(badge);
+  ch.appendChild(E('span', 'cat-ko', s.category));
+  ch.appendChild(E('span', 'cat-line'));
+  ch.appendChild(E('span', 'cat-cnt', s.places.length + '곳'));
+  cs.appendChild(ch);
+  const grid = E('div', 'grid');
+  s.places.forEach(p => grid.appendChild(buildCard(p, cat)));
+  cs.appendChild(grid);
+  return cs;
+}
+
+function renderZones() {
+  const body = document.getElementById('body');
+  GUIDE_DATA.zones.forEach((zone, zi) => {
+    const accent = zoneAccent(zi);
+    const sec = E('section', 'zone');
+    sec.id = 'zone-' + zone.id;
+    sec.style.setProperty('--zc', accent);
+
+    const head = E('div', 'zone-head');
+    const tag = E('span', 'zone-tag');
+    tag.appendChild(E('span', null, 'AREA ' + String(zone.id).padStart(2, '0')));
+    head.appendChild(tag);
+    head.appendChild(E('h2', 'zone-name', zone.name));
+    if (zone.access) {
+      const acc = E('span', 'zone-access');
+      acc.appendChild(icon(SVG.clock));
+      acc.appendChild(E('span', null, zone.access));
+      head.appendChild(acc);
+    }
+    sec.appendChild(head);
+
+    const zl = buildZoneMap(zone, accent);
+    if (zl) sec.appendChild(zl);
+
+    zone.sections.forEach(s => sec.appendChild(buildCatSection(s)));
+    body.appendChild(sec);
+  });
+  const empty = E('div', 'empty', '조건에 맞는 장소가 없어요. 필터를 풀어보세요.');
+  empty.id = 'empty';
+  body.appendChild(empty);
+}
+
+/* ===== 원정(Excursion) 섹션 렌더 ===== */
+function blockH(en, ko) {
+  const h = E('div', 'block-h');
+  h.appendChild(E('span', 'bh-bar'));
+  h.appendChild(E('span', 'bh-t', en));
+  h.appendChild(E('span', 'bh-ko', ko));
+  return h;
+}
+/* 구글맵 길찾기 딥링크 — 숙소(미정이면 오사카역) → 원정 목적지.
+   직선이 아니라 실제 경로를 transit(전철) / driving(택시) 모드로 표시. */
+function excursionOrigin() {
+  const b = GUIDE_DATA.base_hotel;
+  return (b && b.name) ? (b.name + ', Osaka') : 'Osaka Station';
+}
+function excursionDirUrl(ex, mode) {
+  return 'https://www.google.com/maps/dir/?api=1' +
+    '&origin=' + encodeURIComponent(excursionOrigin()) +
+    '&destination=' + encodeURIComponent(ex.destinationQuery || ex.title) +
+    '&travelmode=' + (mode === 'driving' ? 'driving' : 'transit');
+}
+function renderExcursions() {
+  const body = document.getElementById('body');
+  EXCURSIONS.forEach(ex => body.appendChild(buildExcursion(ex)));
+}
+
+function buildExcursion(ex) {
+  const acc = ex.accent;
+  const sec = E('section', 'excursion');
+  sec.id = 'ex-' + ex.id;
+  sec.style.setProperty('--zc', acc);
+
+  const head = E('div', 'zone-head');
+  const tag = E('span', 'zone-tag');
+  tag.appendChild(E('span', null, 'EXCURSION'));
+  head.appendChild(tag);
+  head.appendChild(E('h2', 'zone-name', ex.title));
+  if (ex.area) {
+    const ac = E('span', 'zone-access');
+    ac.appendChild(icon(SVG.clock));
+    ac.appendChild(E('span', null, ex.area));
+    head.appendChild(ac);
+  }
+  sec.appendChild(head);
+
+  if (ex.scopeNote) {
+    const scope = E('div', 'ex-scope');
+    scope.appendChild(icon(SVG.star));
+    scope.appendChild(E('span', null, ex.scopeNote));
+    sec.appendChild(scope);
+  }
+  if (ex.intro) sec.appendChild(E('p', 'ex-intro', ex.intro));
+
+  // 원정지 지도 — zone 과 스키마가 같으므로 buildZoneMap 을 그대로 재사용
+  if (ex.sections && ex.sections.length) {
+    const zl = buildZoneMap({ name: ex.title, sections: ex.sections }, acc);
+    if (zl) sec.appendChild(zl);
+  }
+
+  // 가는 법
+  if (ex.routes && ex.routes.length) {
+    sec.appendChild(blockH('Getting There', '가는 법 — ' + ex.routes.length + '가지'));
+    const dir = document.createElement('a');
+    dir.className = 'dir-btn';
+    dir.href = excursionDirUrl(ex, 'transit');
+    dir.target = '_blank';
+    dir.rel = 'noopener noreferrer';
+    const dico = E('span', 'dir-ico');
+    dico.appendChild(icon(SVG.route));
+    dir.appendChild(dico);
+    const dtx = E('span', 'dir-text');
+    dtx.appendChild(E('span', 'dir-t', ex.title + ' 길찾기'));
+    dtx.appendChild(E('span', 'dir-sub', excursionOrigin() + ' 출발 · 대중교통 · 구글맵에서 열기'));
+    dir.appendChild(dtx);
+    dir.appendChild(icon(SVG.arrow, 'dir-arrow'));
+    sec.appendChild(dir);
+
+    ex.routes.forEach(r => {
+      const mode = /택시|didi|driving|차로/i.test(r.name) ? 'driving' : 'transit';
+      const card = document.createElement('a');
+      card.className = 'route-card';
+      card.href = excursionDirUrl(ex, mode);
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      const rh = E('div', 'rc-head');
+      rh.appendChild(E('span', 'rc-num', String(r.n)));
+      const nm = E('span', 'rc-name');
+      nm.appendChild(E('span', null, r.name));
+      if (r.best) nm.appendChild(E('span', 'rc-best', '추천'));
+      rh.appendChild(nm);
+      rh.appendChild(E('span', 'rc-meta', r.time + ' · ' + r.fare));
+      card.appendChild(rh);
+      const steps = E('div', 'rc-steps');
+      r.steps.forEach((st, i) => {
+        if (i > 0) {
+          const conn = E('span', 'rc-conn');
+          conn.appendChild(icon(SVG.arrow));
+          if (st.via) conn.appendChild(E('span', null, st.via));
+          steps.appendChild(conn);
+        }
+        steps.appendChild(E('span', 'rc-step', st.s));
+      });
+      card.appendChild(steps);
+      if (r.note) card.appendChild(E('p', 'rc-note', r.note));
+      const go = E('div', 'rc-go');
+      go.appendChild(icon(SVG.route));
+      go.appendChild(E('span', null, (mode === 'driving' ? '택시·차 경로로' : '전철 경로로') + ' 구글맵 길찾기'));
+      go.appendChild(icon(SVG.arrow, 'rc-go-arrow'));
+      card.appendChild(go);
+      sec.appendChild(card);
+    });
+  }
+
+  // 도착 후
+  if (ex.arrival && ex.arrival.length) {
+    sec.appendChild(blockH('After Arrival', '도착 후'));
+    const ul = E('ul', 'info-list');
+    ex.arrival.forEach(t => {
+      const li = document.createElement('li');
+      li.appendChild(E('span', 'dot'));
+      li.appendChild(E('span', null, t));
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul);
+  }
+
+  // 해야 할 것
+  if (ex.todo && ex.todo.length) {
+    sec.appendChild(blockH('To-Do', '해야 할 것'));
+    const tl = E('div', 'todo-list');
+    ex.todo.forEach(it => {
+      const row = E('div', 'todo-item');
+      const mk = E('span', 'todo-mark');
+      mk.appendChild(icon(SVG.star));
+      row.appendChild(mk);
+      const tx = E('div');
+      tx.appendChild(E('div', 'todo-t', it.t));
+      tx.appendChild(E('div', 'todo-d', it.d));
+      row.appendChild(tx);
+      tl.appendChild(row);
+    });
+    sec.appendChild(tl);
+  }
+
+  // 원정지 장소 — 구역과 같은 .catsec 구조라 상단 분류 필터가 그대로 걸림
+  if (ex.sections && ex.sections.length) {
+    sec.appendChild(blockH('Places', '원정지 장소'));
+    if (ex.dineNote) sec.appendChild(E('p', 'dine-note', ex.dineNote));
+    ex.sections.forEach(s => sec.appendChild(buildCatSection(s)));
+  }
+
+  return sec;
+}
+
+function applyFilter() {
+  let any = false;
+  document.querySelectorAll('.zone').forEach(z => {
+    let zVis = false;
+    z.querySelectorAll('.catsec').forEach(cs => {
+      const catOk = activeCat === 'all' || cs.dataset.cat === activeCat;
+      let sVis = false;
+      cs.querySelectorAll('.place').forEach(card => {
+        const show = catOk && (!recOnly || card.dataset.rec === '1') && (!essentialOnly || card.dataset.ess === '1');
+        card.classList.toggle('hide', !show);
+        if (show) sVis = true;
+      });
+      cs.classList.toggle('hide', !sVis);
+      if (sVis) zVis = true;
+    });
+    z.classList.toggle('hide', !zVis);
+    if (zVis) any = true;
+  });
+  // 원정 — 장소 목록만 필터. 가는 법·할 일은 분류와 무관하므로 섹션 자체는 항상 표시.
+  document.querySelectorAll('.excursion').forEach(ex => {
+    ex.querySelectorAll('.catsec').forEach(cs => {
+      const catOk = activeCat === 'all' || cs.dataset.cat === activeCat;
+      let sVis = false;
+      cs.querySelectorAll('.place').forEach(card => {
+        const show = catOk && (!recOnly || card.dataset.rec === '1') && (!essentialOnly || card.dataset.ess === '1');
+        card.classList.toggle('hide', !show);
+        if (show) sVis = true;
+      });
+      cs.classList.toggle('hide', !sVis);
+      if (sVis) any = true;
+    });
+  });
+  document.getElementById('empty').classList.toggle('show', !any);
+  setTimeout(refreshVisibleMaps, 60);
+}
+
+/* 스크롤 시 현재 구역 칩 하이라이트
+   ⚠ 칩 강조 시 절대 페이지(세로)를 스크롤하지 않음 — 가로 스크롤러만 이동.
+      (이전 버그: 칩이 sticky 내비 안에 있어 scrollIntoView 가 페이지를 맨 위로 끌어올림) */
+function setupScrollSpy() {
+  const scroller = document.getElementById('zone-nav');
+  const chips = {};
+  document.querySelectorAll('.zone-chip').forEach(c => { chips[c.dataset.target] = c; });
+  function centerChip(c) {
+    if (!scroller) return;
+    const cr = c.getBoundingClientRect(), sr = scroller.getBoundingClientRect();
+    const delta = (cr.left - sr.left) - (sr.width - cr.width) / 2;
+    scroller.scrollBy({ left: delta, behavior: 'smooth' });  // 가로만. 세로 스크롤 미관여
+  }
+  const io = new IntersectionObserver((ents) => {
+    ents.forEach(e => {
+      if (e.isIntersecting) {
+        Object.values(chips).forEach(c => c.removeAttribute('aria-current'));
+        const c = chips[e.target.id];
+        if (c) { c.setAttribute('aria-current', 'true'); centerChip(c); }
+      }
+    });
+  }, { rootMargin: '-110px 0px -65% 0px', threshold: 0 });
+  document.querySelectorAll('.zone, .excursion').forEach(z => io.observe(z));
+}
+
+/* 맨 위로 버튼 */
+function setupToTop() {
+  const btn = document.getElementById('totop');
+  btn.appendChild(icon(SVG.up));
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  window.addEventListener('scroll', () => { btn.classList.toggle('show', window.scrollY > 600); }, { passive: true });
+}
+
+/* ============================================================
+   init
+   ============================================================ */
+document.title = GUIDE_DATA.title;
+renderMast();
+renderNav();
+renderZones();
+renderExcursions();
+applyFilter();
+setupScrollSpy();
+setupToTop();
+setupZoneMaps();
+</script>
+
+<!-- 접속 비번 게이트 로직 — 평문 비번 박제 X (SHA-256 해시만). 5회 실패 = 5분 잠금.
+     ⚠ 한계: devtools 로 localStorage 조작 / 소스의 해시 우회는 기술 사용자에게 가능.
+        본 게이트 = 일반 사용자·검색 엔진 차단 효과만. (메인 매거진과 동일 정책) -->
+<script>
+(function () {
+  'use strict';
+  var AUTH_HASH = '5442bf94951d669b7615bd08e9749e5aa1424426efae7e51a25acaa0b145a61a';  // 평문 비번은 코드·주석·문서 어디에도 남기지 않음 (CLAUDE.md § 비번 변경 절차 참고)
+  var AUTH_KEY = 'osaka-guide-auth-v1';        // 비번 변경 시 v 버전 bump → 구 토큰 무효화. ⚠ 평문 비번을 주석에 쓰지 말 것 (도쿄판 결함 R-D2)
+  var AUTH_LOCK_KEY = 'osaka-guide-auth-lock';
+  var AUTH_ATTEMPT_KEY = 'osaka-guide-auth-attempts';
+  var AUTH_MAX_ATTEMPTS = 5;
+  var AUTH_LOCK_MS = 5 * 60 * 1000;
+
+  async function sha256Hex(s) {
+    // 한글 NFC 정규화 (macOS / iOS 가 NFD 로 입력 가능 — 자모 분리 방지)
+    var normalized = (typeof s === 'string') ? s.normalize('NFC') : '';
+    var buf = new TextEncoder().encode(normalized);
+    var hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  function isAuthed() { try { return localStorage.getItem(AUTH_KEY) === 'ok'; } catch (e) { return false; } }
+  function markOk() {
+    try {
+      localStorage.setItem(AUTH_KEY, 'ok');
+      localStorage.removeItem(AUTH_ATTEMPT_KEY);
+      localStorage.removeItem(AUTH_LOCK_KEY);
+    } catch (e) {}
+    document.documentElement.classList.remove('auth-locked');
+    var gate = document.getElementById('auth-gate');
+    if (gate) gate.style.display = 'none';
+  }
+
+  function initAuthGate() {
+    if (isAuthed()) {
+      document.documentElement.classList.remove('auth-locked');
+      var g = document.getElementById('auth-gate');
+      if (g) g.style.display = 'none';
+      return;
+    }
+    var input = document.getElementById('auth-input');
+    var form = document.getElementById('auth-form');
+    var submit = document.getElementById('auth-submit');
+    var msg = document.getElementById('auth-msg');
+    if (!input || !form) return;
+
+    var lockTimer = null;
+    function updateLockState() {
+      var lockUntil = 0;
+      try { lockUntil = parseInt(localStorage.getItem(AUTH_LOCK_KEY) || '0', 10) || 0; } catch (e) {}
+      var now = Date.now();
+      if (lockUntil > now) {
+        var sec = Math.ceil((lockUntil - now) / 1000);
+        input.disabled = true; submit.disabled = true;
+        if (msg) msg.textContent = '잠금 — ' + sec + '초 후 재시도';
+        if (lockTimer) clearTimeout(lockTimer);
+        lockTimer = setTimeout(updateLockState, 1000);
+        return true;
+      }
+      input.disabled = false; submit.disabled = false;
+      return false;
+    }
+
+    async function tryAuth() {
+      if (updateLockState()) return;
+      var v = (input.value || '').trim();
+      if (!v) return;
+      submit.disabled = true;
+      var ok = false;
+      try { ok = ((await sha256Hex(v)) === AUTH_HASH); } catch (e) { ok = false; }
+      if (ok) {
+        if (msg) { msg.textContent = '열림.'; msg.classList.add('ok'); }
+        markOk();
+        setTimeout(function () { try { window.location.reload(); } catch (e) {} }, 240);
+      } else {
+        var attempts = 0;
+        try { attempts = (parseInt(localStorage.getItem(AUTH_ATTEMPT_KEY) || '0', 10) || 0) + 1; } catch (e) { attempts = 1; }
+        try { localStorage.setItem(AUTH_ATTEMPT_KEY, String(attempts)); } catch (e) {}
+        input.value = ''; submit.disabled = false;
+        if (attempts >= AUTH_MAX_ATTEMPTS) {
+          var lockUntil = Date.now() + AUTH_LOCK_MS;
+          try { localStorage.setItem(AUTH_LOCK_KEY, String(lockUntil)); localStorage.setItem(AUTH_ATTEMPT_KEY, '0'); } catch (e) {}
+          if (msg) msg.textContent = AUTH_MAX_ATTEMPTS + '회 실패 — 5분 잠금';
+          updateLockState();
+        } else {
+          if (msg) msg.textContent = '다시 (' + attempts + '/' + AUTH_MAX_ATTEMPTS + ')';
+          input.focus();
+        }
+      }
+    }
+
+    form.addEventListener('submit', function (e) { e.preventDefault(); tryAuth(); });
+    updateLockState();
+    setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAuthGate);
+  } else {
+    initAuthGate();
+  }
+})();
+</script>
+</body>
+</html>
