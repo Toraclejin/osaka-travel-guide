@@ -96,6 +96,16 @@ GUIDE_DATA = {
 - `recommended` → ★ 추천 뱃지 + "추천만" 필터
 - `essential` → 🇰🇷 한국인 필수 뱃지 + 전용 필터
 - `theme` (v0.4 신설 예정 · **미구현**) → `'서브컬쳐'` \| `'역사·문화'`. **카테고리와 직교하는 축**이다 — 카테고리는 "무엇을 하는 곳", 테마는 "왜 가는가". 오사카성은 `관광지` + `역사·문화`, 덴덴타운은 `관광지` + `서브컬쳐`. **네 번째 카테고리를 만들지 말 것** (§ 8 R-D4 · `learning.md § 11`). 표시·색은 [`design.md § 1.5`](design.md)
+- `deep` (v0.12) — **심층 정보.** 있으면 카드 안에 접이 블록이 생기고, 없으면 아예 안 그려진다
+  ```
+  deep: { what: '어떤 곳인가 2~3줄',
+          see:  ['이건 보고 오자 — 3~4개'],
+          insight: '알고 보면 (왜 흥미로운가)',
+          link: { url, label } }
+  ```
+  - `**강조**` 가 `<b>` 로 변환된다 (`rich()`)
+  - **`link` 는 실재 확인 필수** (R-D3). ko 위키 우선 → 없으면 ja 위키 → 그것도 없으면 공식 페이지
+  - ⚠ `what` 은 백과사전 요약이 아니다. **`feature` 가 "갈지 말지", `deep` 은 "가서 뭘 보고 뭘 알까"** 다
 - `lat`/`lng` — **생략 가능.** 없으면 지도 핀에서만 빠지고 카드·구글맵 링크는 정상 동작 (`zoneCenter`가 좌표 없는 항목을 건너뜀)
 - `offzone: true` — 핀은 찍되 지도 초기 프레이밍(fitBounds)에서는 제외
 - `maps_url` — `https://www.google.com/maps/search/?api=1&query={영문명 URL인코딩}`. `place_id`를 붙이면 더 정확하지만 **없어도 됨. 모르는 place_id를 지어내지 말 것** (§ 8 R-D3)
@@ -211,7 +221,10 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 - `buildSchedule(zone)` — **그 날의 흐름** 시간표. `zone.schedule` 없으면 `null` 반환 → 기존 구역은 영향 없음
   - ⚠ **분 단위 강박 일정표가 아니다** (`PRD.md § 7`). 시각을 박는 것은 ① 시설 마감처럼 어길 수 없는 것 ② 배 시각처럼 놓치면 끝나는 것 뿐. 나머지는 순서와 대략적 시작점만 준다
 - `buildCatSection(s)` — **구역·원정 공용** 카테고리 섹션. 필터가 `.catsec` 단위로 돌아가므로 구조를 바꾸면 필터가 깨진다
-- `buildCard(p, cat)` — 장소 카드
+- `buildCard(p, cat)` — 장소 카드. **바깥은 `div.place`(필터·스타일), 지도 링크는 안쪽 `a.p-link`**
+  - ⚠ 예전엔 카드 전체가 `<a>` 였다. `<a>` 안에는 `<details>` 를 넣을 수 없어서(대화형 요소 중첩 금지) v0.12에서 갈랐다
+  - `applyFilter` 가 `.place` 의 `data-rec`/`data-ess` 를 보므로 **바깥이 `.place` 를 유지해야 한다**
+- `buildDeep(d)` — 장소 심층 정보 `<details>`. `place.deep` 없으면 호출 안 함
 - `renderZones()` / `renderExcursions()` / `buildExcursion(ex)`
 - `blockH(en, ko)` — 원정 안 소제목
 

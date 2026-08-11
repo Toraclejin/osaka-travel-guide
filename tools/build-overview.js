@@ -70,12 +70,26 @@ const zoneHtml = D.zones.map(z => {
       <div class="zs-row"><div class="zs-t">${esc(s.t)}</div><div>
         <div class="zs-w">${esc(s.w)}</div>${s.n ? `<div class="zs-n">${esc(s.n)}</div>` : ''}
       </div></div>`).join('');
+  const deepHtml = d => {
+    if (!d) return '';
+    const see = (d.see || []).map(s => `<li>${md(s)}</li>`).join('');
+    return `
+        <details class="pd"><summary>어떤 곳이고 뭘 볼까</summary>
+          <div class="pd-b">
+            ${d.what ? `<p class="pd-what">${md(d.what)}</p>` : ''}
+            ${see ? `<div class="pd-h">이건 보고 오자</div><ul class="pd-see">${see}</ul>` : ''}
+            ${d.insight ? `<div class="pd-h">알고 보면</div><p class="pd-i">${md(d.insight)}</p>` : ''}
+            ${d.link && d.link.url ? `<a class="pd-l" href="${esc(d.link.url)}" target="_blank" rel="noopener noreferrer">${esc(d.link.label || '더 읽기')} →</a>` : ''}
+          </div>
+        </details>`;
+  };
   const list = places.map((p, i) => `
       <li><div class="pn"><span class="num">${i + 1}</span>${esc(p.name_ko)}${
         p.recommended ? '<span class="badge b-star">★</span>' : ''}${
         p.essential ? '<span class="badge b-ess">🇰🇷</span>' : ''}</div>
         <div class="pf">${md(p.feature)}</div>
-        <a class="pg" href="${esc(p.maps_url)}" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>`).join('');
+        <a class="pg" href="${esc(p.maps_url)}" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a>
+        ${deepHtml(p.deep)}</li>`).join('');
   return `
   <section class="zone">
     <div class="zone-top"><span class="tag">${esc(z.tag || ('AREA ' + String(z.id).padStart(2, '0')))}</span>
@@ -138,6 +152,20 @@ ul.places li{padding:11px 0;border-top:1px solid var(--line-faint)}
 .pf{font-size:0.8125rem;color:var(--ink-soft);margin-top:4px}
 .pg{display:inline-block;margin-top:6px;font-size:0.7813rem;color:var(--osaka-red);text-decoration:none;font-weight:600}
 .pg:hover{text-decoration:underline}
+.pd{margin-top:9px;border:1px solid var(--line-faint);border-radius:9px;background:var(--page-warm);overflow:hidden}
+.pd summary{padding:9px 12px;cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--ink-soft);list-style:none}
+.pd summary::-webkit-details-marker{display:none}
+.pd summary::after{content:' +';color:var(--ink-faint)}
+.pd[open] summary{color:var(--osaka-red)}
+.pd[open] summary::after{content:' −';color:var(--osaka-red)}
+.pd-b{padding:0 12px 12px}
+.pd-what{margin:2px 0 0;font-size:0.8438rem;line-height:1.65}
+.pd-h{font-size:0.6875rem;font-weight:800;letter-spacing:.08em;color:var(--osaka-red);margin:12px 0 5px}
+.pd-see{margin:0;padding-left:17px;font-size:0.8438rem;line-height:1.6;color:var(--ink-soft)}
+.pd-see li{margin:4px 0}
+.pd-i{margin:0;font-size:0.8438rem;line-height:1.65;color:var(--ink-soft);border-left:2px solid var(--osaka-red);padding-left:10px}
+.pd-l{display:inline-block;margin-top:11px;font-size:0.8125rem;font-weight:700;color:var(--frame);text-decoration:none}
+.pd-l:hover{text-decoration:underline}
 .transfer{margin:30px 0;background:var(--frame);color:var(--page);border-radius:var(--r);padding:18px 17px 16px}
 .tr-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .tr-tag{background:var(--osaka-red);color:#fff;font-size:0.7188rem;font-weight:800;letter-spacing:.1em;padding:4px 8px;border-radius:4px;flex:none}
