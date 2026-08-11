@@ -121,6 +121,7 @@ _디자인 시스템 **정본**_ · **v1.1** (2026-08-09) · Vol. III
 | `.grid` · `.place` | 카드 그리드 | |
 | `.p-top` · `.p-name` · `.p-en` · `.p-feat` · `.p-go` | 카드 내부 | `.p-feat` 한 줄에 **정기휴무 포함** (R-D10) |
 | `.p-star` · `.p-essential` | ★ / 🇰🇷 뱃지 | § 1.4 전용 토큰 |
+| `.transfer` · `.tr-head` · `.tr-tag` · `.tr-row` · `.tr-need` · `.tr-warn` · `.tr-tip` | **선착장 ↔ 숙소 이동** (맨 위 ARRIVAL / 맨 아래 DEPARTURE) | **인디고 면**이다 — 지면 위에 프레임색 블록을 놓아 "여행의 바깥 경계"임을 시각적으로 구분. `.tr-warn`은 포인트색 반투명 배경 + 테두리 |
 | `.empty` | 필터 결과 0 | `PRD.md` F4 |
 | `.sheet` · `.body` · `.block-h` · `.info-list` | 지면 골격 · 소제목 | |
 

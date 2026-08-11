@@ -42,6 +42,27 @@ const build = (html.match(/BUILD_VERSION = '([^']+)'/) || [, '?'])[1];
 let total = 0;
 D.zones.forEach(z => z.sections.forEach(s => { total += s.places.length; }));
 
+/* 선착장 ↔ 숙소 이동 블록 — 도착은 맨 위, 복귀는 맨 아래 */
+function transferHtml(kind) {
+  const T = D.transfer && D.transfer[kind];
+  if (!T) return '';
+  const steps = (T.steps || []).map(s => `
+      <div class="tr-row"><div class="tr-t">${esc(s.t)}</div><div>
+        <div class="tr-w">${esc(s.w)}</div>${s.d ? `<div class="tr-d">${esc(s.d)}</div>` : ''}
+      </div></div>`).join('');
+  const need = (T.need || []).map(n => `<li>${esc(n)}</li>`).join('');
+  return `
+  <section class="transfer">
+    <div class="tr-head"><span class="tr-tag">${esc(T.tag)}</span><h2>${esc(T.title)}</h2>
+      <span class="tr-date">${esc(T.date || '')}</span></div>
+    ${T.lede ? `<p class="tr-lede">${esc(T.lede)}</p>` : ''}
+    ${T.warn ? `<div class="tr-warn">${md(T.warn)}</div>` : ''}
+    ${steps}
+    ${need ? `<div class="tr-need"><div class="tr-need-h">챙길 것</div><ul>${need}</ul></div>` : ''}
+    ${T.tip ? `<p class="tr-tip">${esc(T.tip)}</p>` : ''}
+  </section>`;
+}
+
 const zoneHtml = D.zones.map(z => {
   const places = [];
   z.sections.forEach(s => s.places.forEach(p => places.push(p)));
@@ -113,6 +134,23 @@ ul.places li{padding:11px 0;border-top:1px solid var(--line-faint)}
 .pf{font-size:13px;color:var(--ink-soft);margin-top:4px}
 .pg{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--osaka-red);text-decoration:none;font-weight:600}
 .pg:hover{text-decoration:underline}
+.transfer{margin:30px 0;background:var(--frame);color:var(--page);border-radius:var(--r);padding:18px 17px 16px}
+.tr-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.tr-tag{background:var(--osaka-red);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.1em;padding:4px 8px;border-radius:4px;flex:none}
+.tr-head h2{font-size:17px;margin:0}
+.tr-date{margin-left:auto;font-size:12px;color:#b9b7c8;flex:none}
+.tr-lede{margin:10px 0 0;font-size:13.5px;color:#cfcede}
+.tr-warn{margin-top:13px;padding:11px 12px;border-radius:8px;background:rgba(216,69,46,.16);border:1px solid rgba(216,69,46,.5);font-size:13px;color:#f0eef7;line-height:1.55}
+.tr-warn b{color:#fff}
+.tr-row{display:grid;grid-template-columns:58px 1fr;gap:11px;padding:9px 0;border-top:1px solid rgba(245,243,238,.14)}
+.tr-t{font-size:12.5px;font-weight:800;color:var(--osaka-red);font-variant-numeric:tabular-nums}
+.tr-w{font-size:14px}
+.tr-d{font-size:12.5px;color:#b9b7c8;margin-top:2px;line-height:1.5}
+.tr-need{margin-top:15px;padding:12px 13px;background:rgba(245,243,238,.08);border-radius:8px}
+.tr-need-h{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--osaka-red);margin-bottom:6px}
+.tr-need ul{margin:0;padding-left:17px;font-size:13px;color:#dedcea}
+.tr-need li{margin:3px 0}
+.tr-tip{margin:13px 0 0;font-size:12.5px;color:#b9b7c8;font-style:italic}
 footer{background:var(--frame);color:#a9a7bb;font-size:11.5px;padding:20px var(--pad-x) 26px;text-align:center}
 footer b{color:var(--page)}
 </style></head><body><div class="wrap">
@@ -122,7 +160,7 @@ footer b{color:var(--page)}
   <p class="lede">8/24(월) 입항 ~ 8/26(수) 출항 · 2박 3일 · 남자 4명. 날짜별 흐름과 갈 곳을 한 장으로. 시각은 참고용이고, 못 박은 건 시설 마감과 배 시간뿐이다 — 늦으면 뒤로 밀면 된다.</p>
   <div class="pills"><span class="pill">2박 3일</span><span class="pill">총 <b>${total}곳</b></span><span class="pill">교토 <b>제외</b></span><span class="pill">숙소 <b>미정</b></span></div>
 </header>
-<main>${zoneHtml}</main>
+<main>${transferHtml('arrival')}${zoneHtml}${transferHtml('departure')}</main>
 <footer><b>오사카 여행 계획표</b> · ${esc(build)}<br>
 자동 생성 — 정본은 <b>index.html</b> 의 GUIDE_DATA. 지도·동선은 실제 가이드에서 볼 수 있다.</footer>
 </div></body></html>

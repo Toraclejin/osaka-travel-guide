@@ -46,6 +46,23 @@ ul.places li{padding:11px 0;border-top:1px solid var(--line-faint)}
 .pf{font-size:13px;color:var(--ink-soft);margin-top:4px}
 .pg{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--osaka-red);text-decoration:none;font-weight:600}
 .pg:hover{text-decoration:underline}
+.transfer{margin:30px 0;background:var(--frame);color:var(--page);border-radius:var(--r);padding:18px 17px 16px}
+.tr-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.tr-tag{background:var(--osaka-red);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.1em;padding:4px 8px;border-radius:4px;flex:none}
+.tr-head h2{font-size:17px;margin:0}
+.tr-date{margin-left:auto;font-size:12px;color:#b9b7c8;flex:none}
+.tr-lede{margin:10px 0 0;font-size:13.5px;color:#cfcede}
+.tr-warn{margin-top:13px;padding:11px 12px;border-radius:8px;background:rgba(216,69,46,.16);border:1px solid rgba(216,69,46,.5);font-size:13px;color:#f0eef7;line-height:1.55}
+.tr-warn b{color:#fff}
+.tr-row{display:grid;grid-template-columns:58px 1fr;gap:11px;padding:9px 0;border-top:1px solid rgba(245,243,238,.14)}
+.tr-t{font-size:12.5px;font-weight:800;color:var(--osaka-red);font-variant-numeric:tabular-nums}
+.tr-w{font-size:14px}
+.tr-d{font-size:12.5px;color:#b9b7c8;margin-top:2px;line-height:1.5}
+.tr-need{margin-top:15px;padding:12px 13px;background:rgba(245,243,238,.08);border-radius:8px}
+.tr-need-h{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--osaka-red);margin-bottom:6px}
+.tr-need ul{margin:0;padding-left:17px;font-size:13px;color:#dedcea}
+.tr-need li{margin:3px 0}
+.tr-tip{margin:13px 0 0;font-size:12.5px;color:#b9b7c8;font-style:italic}
 footer{background:var(--frame);color:#a9a7bb;font-size:11.5px;padding:20px var(--pad-x) 26px;text-align:center}
 footer b{color:var(--page)}
 </style></head><body><div class="wrap">
@@ -56,6 +73,33 @@ footer b{color:var(--page)}
   <div class="pills"><span class="pill">2박 3일</span><span class="pill">총 <b>19곳</b></span><span class="pill">교토 <b>제외</b></span><span class="pill">숙소 <b>미정</b></span></div>
 </header>
 <main>
+  <section class="transfer">
+    <div class="tr-head"><span class="tr-tag">ARRIVAL</span><h2>오사카항 → 시내 숙소</h2>
+      <span class="tr-date">8/24 (월)</span></div>
+    <p class="tr-lede">배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.</p>
+    
+    
+      <div class="tr-row"><div class="tr-t">10:00</div><div>
+        <div class="tr-w">하선</div><div class="tr-d">오사카항 국제페리터미널 (난코·사키시마)</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~10:40</div><div>
+        <div class="tr-w">입국수속 · 세관</div><div class="tr-d">Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~11:00</div><div>
+        <div class="tr-w">팬스타 무료 셔틀 승차</div><div class="tr-d">터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~11:10</div><div>
+        <div class="tr-w">코스모스퀘어역에서 IC카드 준비</div><div class="tr-d">ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~11:40</div><div>
+        <div class="tr-w">주오선 → 혼마치 환승 → 미도스지선 → 난바</div><div class="tr-d">환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">12:00</div><div>
+        <div class="tr-w">숙소 짐 보관</div><div class="tr-d">체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함</div>
+      </div></div>
+    <div class="tr-need"><div class="tr-need-h">챙길 것</div><ul><li>여권 · 승선권</li><li>Visit Japan Web 등록 QR (없으면 종이 신고서)</li><li>엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다</li><li>IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820</li><li>숙소 이름·주소를 일본어로 캡처</li></ul></div>
+    <p class="tr-tip">IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다.</p>
+  </section>
   <section class="zone">
     <div class="zone-top"><span class="tag">DAY 1</span>
       <h2>히데요시의 오사카</h2><span class="cnt">4곳</span></div>
@@ -225,7 +269,40 @@ footer b{color:var(--page)}
       <li><div class="pn"><span class="num">2</span>덴포잔 대관람차</div>
         <div class="pf">해유관 옆. 항만 조망. 배 타기 전 1시간이면 충분</div>
         <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A9%E4%BF%9D%E5%B1%B1%E5%A4%A7%E8%A6%B3%E8%A6%A7%E8%BB%8A" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
+  </section>
+  <section class="transfer">
+    <div class="tr-head"><span class="tr-tag">DEPARTURE</span><h2>숙소 → 오사카항</h2>
+      <span class="tr-date">8/26 (수)</span></div>
+    <p class="tr-lede">이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.</p>
+    <div class="tr-warn">선사 공지 기준 <b>수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)</b> 이다. 13:50 이 막차라면 난바에서 <b>12:50 이전에는 출발</b>해야 한다. 시각표는 시즌마다 바뀌니 <b>승선권·선사 공지로 반드시 재확인할 것.</b></div>
+    
+      <div class="tr-row"><div class="tr-t">~09:00</div><div>
+        <div class="tr-w">체크아웃 · 짐은 숙소에 보관</div><div class="tr-d">오전 일정은 짐 없이 움직인다</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">12:00</div><div>
+        <div class="tr-w">마지막 점심</div><div class="tr-d">배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">12:30</div><div>
+        <div class="tr-w">숙소에서 짐 수령</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">12:50</div><div>
+        <div class="tr-w">난바 출발</div><div class="tr-d">미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~13:20</div><div>
+        <div class="tr-w">코스모스퀘어역 도착 → 2층에서 셔틀 승차</div><div class="tr-d">역 1층 편의점이 마지막 일본 쇼핑 기회</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">~13:40</div><div>
+        <div class="tr-w">페리터미널 도착</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">—</div><div>
+        <div class="tr-w">발권 · 수하물 수속 → 출국수속</div><div class="tr-d">공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30</div>
+      </div></div>
+      <div class="tr-row"><div class="tr-t">17:00</div><div>
+        <div class="tr-w">출항</div>
+      </div></div>
+    <div class="tr-need"><div class="tr-need-h">챙길 것</div><ul><li>여권 · 승선권</li><li>IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)</li><li>면세 구매분은 개봉하지 말 것</li><li>캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다</li></ul></div>
+    <p class="tr-tip">배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로.</p>
   </section></main>
-<footer><b>오사카 여행 계획표</b> · v0.6-2026-08-10-DAY-PLAN<br>
+<footer><b>오사카 여행 계획표</b> · v0.7-2026-08-10-PORT-TRANSFER<br>
 자동 생성 — 정본은 <b>index.html</b> 의 GUIDE_DATA. 지도·동선은 실제 가이드에서 볼 수 있다.</footer>
 </div></body></html>

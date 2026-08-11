@@ -79,6 +79,7 @@ GUIDE_DATA = {
 |---|---|---|
 | `base_hotel` | object \| **null** | `{name, area, note, lat?, lng?}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 ① 매스트헤드 호텔 칩 생략 ② 원정 길찾기 출발지가 `Osaka Station`으로 대체 (`excursionOrigin()`) ③ 지도에 숙소 핀·loop 동선 없음. **`lat`/`lng`를 채우면 각 구역 지도에 숙소 핀이 생기고 동선이 `숙소 → 장소들 → 숙소` loop로 바뀐다** (§ 7). 좌표는 R-D3 land-check 필수 |
 | `zones[].id` | number | 앵커 id = `zone-{id}`. 내비 칩 번호 |
+| `transfer` | object \| 생략 | **선착장 ↔ 숙소 이동.** `{arrival:{...}, departure:{...}}`. 각각 `{tag, date, title, lede, warn?, steps:[{t,w,d?}], need:[string], tip?}`. **`arrival`은 첫 구역 앞, `departure`는 맨 끝**에 렌더 — 여행이 시작·끝나는 순서 그대로. `warn`의 `**강조**`는 `<b>`로 변환된다 (`innerHTML` 아님 — 조각을 나눠 `textContent`) |
 | `zones[].tag` | string \| 생략 | 헤더 배지. **있으면 그걸 쓰고, 없으면 `AREA 01`** 로 폴백. v0.6부터 `DAY 1` / `DAY 2 밤` / `옵션` 을 쓴다 |
 | `zones[].schedule` | array \| 생략 | **그 날의 흐름.** `[{t:'14:00', w:'무엇을', n:'왜/주의'}]`. 없으면 시간표 블록 자체가 안 그려진다 (`buildSchedule` 이 `null` 반환) |
 | `zones[].access` | string | **역 기준**으로 쓴다 (`난바·신사이바시역 (미도스지선) · 기타에서 8분`). 숙소에 의존하지 않으므로 숙소 미정이어도 유효하다. 숙소가 정해지면 도보 시간만 덧붙이면 됨 |
@@ -194,6 +195,9 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 **렌더**
 - `renderMast()` — 매스트헤드 (호텔 칩 · 총계 pill · 푸터 카운트)
 - `renderNav()` — 구역 칩 + 원정 칩 + 분류 필터 + 추천/필수 토글
+- `buildTransfer(kind)` — `'arrival'` / `'departure'` 이동 블록. `GUIDE_DATA.transfer` 없으면 `null`
+  - **도착은 `renderZones` 맨 앞, 복귀는 `#empty` 뒤.** 순서를 바꾸지 말 것 — 페이지가 곧 여행의 시간축이다
+  - ⚠ 셔틀·수속 시각은 **시즌마다 바뀐다.** `warn`에 "재확인" 문구를 반드시 남길 것
 - `buildSchedule(zone)` — **그 날의 흐름** 시간표. `zone.schedule` 없으면 `null` 반환 → 기존 구역은 영향 없음
   - ⚠ **분 단위 강박 일정표가 아니다** (`PRD.md § 7`). 시각을 박는 것은 ① 시설 마감처럼 어길 수 없는 것 ② 배 시각처럼 놓치면 끝나는 것 뿐. 나머지는 순서와 대략적 시작점만 준다
 - `buildCatSection(s)` — **구역·원정 공용** 카테고리 섹션. 필터가 `.catsec` 단위로 돌아가므로 구조를 바꾸면 필터가 깨진다
