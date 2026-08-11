@@ -115,6 +115,11 @@
   }
   .auth-submit:hover:not(:disabled) { background: var(--osaka-red); }
   .auth-submit:disabled { opacity: .5; cursor: not-allowed; }
+  /* 한글 IME 자동 보정 안내 — 변환이 일어났을 때만 잠깐 뜬다 */
+  .auth-ime { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-soft); background: var(--page-tint);
+              border-radius: 7px; padding: 0 10px; max-height: 0; overflow: hidden; opacity: 0;
+              transition: max-height .18s ease, opacity .18s ease, padding .18s ease; text-align: left; }
+  .auth-ime.show { max-height: 60px; opacity: 1; padding: 8px 10px; margin-bottom: 8px; }
   .auth-msg { font-family: var(--sans); font-size: 0.7813rem; color: var(--osaka-red); min-height: 18px; margin-bottom: 8px; }
   .auth-msg.ok { color: #2e7d32; }
   .auth-note { font-family: var(--serif); font-style: italic; font-size: 0.7188rem; color: var(--ink-faint); }
@@ -504,6 +509,7 @@
         <input type="text" class="auth-input" id="auth-input" placeholder="••••••" inputmode="text" maxlength="16" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
         <button type="submit" class="auth-submit" id="auth-submit">열기 ↵</button>
       </form>
+      <div class="auth-ime" id="auth-ime" aria-live="polite"></div>
       <div class="auth-msg" id="auth-msg" aria-live="polite"></div>
       <div class="auth-note">힌트만 보여요.</div>
     </div>
@@ -543,7 +549,7 @@
    데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
    장소 추가/수정 시 이 객체만 고치면 됨.
    ============================================================ */
-const BUILD_VERSION = 'v0.8-2026-08-10-TYPE-SCALE';
+const BUILD_VERSION = 'v0.9-2026-08-10-IME-FIX';
 
 const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"transfer":{"arrival":{"tag":"ARRIVAL","date":"8/24 (월)","title":"오사카항 → 시내 숙소","lede":"배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.","steps":[{"t":"10:00","w":"하선","d":"오사카항 국제페리터미널 (난코·사키시마)"},{"t":"~10:40","w":"입국수속 · 세관","d":"Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성"},{"t":"~11:00","w":"팬스타 무료 셔틀 승차","d":"터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것"},{"t":"~11:10","w":"코스모스퀘어역에서 IC카드 준비","d":"ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름"},{"t":"~11:40","w":"주오선 → 혼마치 환승 → 미도스지선 → 난바","d":"환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다"},{"t":"12:00","w":"숙소 짐 보관","d":"체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함"}],"need":["여권 · 승선권","Visit Japan Web 등록 QR (없으면 종이 신고서)","엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다","IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820","숙소 이름·주소를 일본어로 캡처"],"tip":"IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다."},"departure":{"tag":"DEPARTURE","date":"8/26 (수)","title":"숙소 → 오사카항","lede":"이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.","warn":"선사 공지 기준 **수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)** 이다. 13:50 이 막차라면 난바에서 **12:50 이전에는 출발**해야 한다. 시각표는 시즌마다 바뀌니 **승선권·선사 공지로 반드시 재확인할 것.**","steps":[{"t":"~09:00","w":"체크아웃 · 짐은 숙소에 보관","d":"오전 일정은 짐 없이 움직인다"},{"t":"12:00","w":"마지막 점심","d":"배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레"},{"t":"12:30","w":"숙소에서 짐 수령"},{"t":"12:50","w":"난바 출발","d":"미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것"},{"t":"~13:20","w":"코스모스퀘어역 도착 → 2층에서 셔틀 승차","d":"역 1층 편의점이 마지막 일본 쇼핑 기회"},{"t":"~13:40","w":"페리터미널 도착"},{"t":"—","w":"발권 · 수하물 수속 → 출국수속","d":"공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30"},{"t":"17:00","w":"출항"}],"need":["여권 · 승선권","IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)","면세 구매분은 개봉하지 말 것","캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다"],"tip":"배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로."}},"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[{"id":1,"tag":"DAY 1","name":"히데요시의 오사카","access":"다니마치욘초메역 (주오선·다니마치선) · 8/24(월) · 항구에서 주오선 직결","schedule":[{"t":"11:00","w":"팬스타 셔틀 → 코스모스퀘어","n":"주오선 승차"},{"t":"12:00","w":"숙소 짐 보관 (난바)","n":"체크인 전"},{"t":"12:30","w":"점심"},{"t":"14:00","w":"오사카 역사박물관","n":"¥600 · 입장 16:30 마감"},{"t":"15:30","w":"도요토미 석벽관","n":"천수각 티켓 공용"},{"t":"16:15","w":"오사카성 천수각","n":"¥1,200 · 입관 17:30 마감"},{"t":"17:50","w":"호코쿠 신사","n":"히데요시 동상 — 코스의 마침표"},{"t":"19:00","w":"숙소 체크인 → 대욕장"},{"t":"20:00","w":"저녁 야키니쿠 → 도톤보리 산책"}],"sections":[{"category":"관광지","places":[{"name_ko":"오사카 역사박물관","name_en":"Osaka Museum of History","feature":"10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · **화요일 휴관**","recommended":false,"essential":false,"lat":34.6826,"lng":135.5208,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8"},{"name_ko":"도요토미 석벽관","name_en":"Toyotomi Stone Wall Museum","feature":"2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 **도요토미 시대 진짜 석벽**을 지하에서 본다. 천수각 티켓 공용","recommended":true,"essential":false,"lat":34.6865,"lng":135.5267,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E"},{"name_ko":"오사카성 천수각","name_en":"Osaka Castle","feature":"1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},{"name_ko":"호코쿠 신사","name_en":"Hokoku Shrine","feature":"히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음","recommended":true,"essential":false,"lat":34.6842,"lng":135.5264,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE"}]}]},
 {"id":2,"tag":"DAY 2","name":"덴덴타운 전뇌지구","access":"닛폰바시역 (사카이스지선·킨테츠) · 8/25(화) · 전 구간 도보","schedule":[{"t":"09:30","w":"구로몬 시장","n":"오전이 가장 활발"},{"t":"11:00","w":"덴덴타운","n":"상점 대부분 11시 오픈 — 더 일찍 가면 셔터"},{"t":"13:00","w":"점심"},{"t":"14:00","w":"오타로드 → 도구야스지"},{"t":"15:30","w":"e스타디움 난바 본점","n":"난바파크스 1F"},{"t":"17:00","w":"숙소 → 대욕장·사우나","n":"술 마시기 전에 한 번 리셋"},{"t":"19:00","w":"저녁 — 쿠시카츠 → 이자카야 → 타코야키"}],"sections":[{"category":"관광지","places":[{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},{"name_ko":"덴덴타운 (닛폰바시)","name_en":"Den Den Town","feature":"서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. **대체로 11:00~19:00**","recommended":true,"essential":true,"lat":34.6647,"lng":135.506,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA"},{"name_ko":"오타로드","name_en":"Ota Road","feature":"덴덴타운 서쪽 한 블록. **메인도로만 보면 반쪽** — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다","recommended":true,"essential":false,"lat":34.661,"lng":135.5049,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA"},{"name_ko":"도구야스지 상점가","name_en":"Doguyasuji","feature":"주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음","recommended":false,"essential":false,"lat":34.6639,"lng":135.5035,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97"},{"name_ko":"난바파크스 · e스타디움","name_en":"Namba Parks / e-Stadium","feature":"1F **e스타디움 난바 본점** — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료","recommended":true,"essential":false,"lat":34.6616,"lng":135.502,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9"}]}]},
@@ -1407,7 +1413,53 @@ setupZoneMaps();
     var form = document.getElementById('auth-form');
     var submit = document.getElementById('auth-submit');
     var msg = document.getElementById('auth-msg');
+    var ime = document.getElementById('auth-ime');
     if (!input || !form) return;
+
+    /* ===== 한글 IME 자동 보정 =====
+       한/영 키가 한글이면 비번이 한글로 쳐진다. 웹에서 IME 를 강제로 끄는 방법은 없다
+       (CSS ime-mode 는 폐기됐고, 브라우저는 OS 입력기를 제어하지 못한다).
+       그래서 끄는 대신 **되돌린다** — 두벌식은 QWERTY 키 배열과 1:1 이라 역변환이 가능하다.
+       예: '변' → 초성 ㅂ(q) + 중성 ㅕ(u) + 종성 ㄴ(s) → 'qus'
+       조합 중(isComposing)에는 건드리지 않는다. 건드리면 입력이 깨진다. */
+    var CHO = ['r','R','s','e','E','f','a','q','Q','t','T','d','w','W','c','z','x','v','g'];
+    var JUNG = ['k','o','i','O','j','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l'];
+    var JONG = ['','r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g'];
+    /* 낱자(ㄱ~ㅣ, U+3131~U+3163) 51자 — 조합되지 않은 상태로 남는 경우 */
+    var JAMO = ('r R rt s sw sg e E f fr fa fq ft fx fv fg a q Q qt t T d w W c z x v g ' +
+                'k o i O j p u P h hk ho hl y n nj np nl b m ml l').split(' ');
+
+    function hangulToQwerty(str) {
+      var out = '';
+      for (var i = 0; i < str.length; i++) {
+        var code = str.charCodeAt(i);
+        if (code >= 0xAC00 && code <= 0xD7A3) {          // 완성형 음절
+          var n = code - 0xAC00;
+          out += CHO[Math.floor(n / 588)] + JUNG[Math.floor((n % 588) / 28)] + JONG[n % 28];
+        } else if (code >= 0x3131 && code <= 0x3163) {   // 호환 낱자
+          out += JAMO[code - 0x3131];
+        } else {
+          out += str[i];
+        }
+      }
+      return out;
+    }
+
+    var HANGUL = /[ㄱ-ㅣ가-힣]/;
+    function fixIme(e) {
+      if (e && e.isComposing) return;                    // 조합 중에는 손대지 않는다
+      var v = input.value || '';
+      if (!HANGUL.test(v)) return;
+      input.value = hangulToQwerty(v);
+      if (ime) {
+        ime.textContent = '한글로 입력돼서 영문으로 바꿨어요 — 그대로 확인 누르면 돼요';
+        ime.classList.add('show');
+        clearTimeout(fixIme._t);
+        fixIme._t = setTimeout(function () { ime.classList.remove('show'); }, 4000);
+      }
+    }
+    input.addEventListener('input', fixIme);
+    input.addEventListener('compositionend', function () { setTimeout(fixIme, 0); });
 
     var lockTimer = null;
     function updateLockState() {
