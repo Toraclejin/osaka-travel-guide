@@ -34,7 +34,8 @@
 ```
 오사카 여행 매거진/
 ├── index.html                 본체 — 이거 하나가 앱 전부
-├── overview.html              일행 공유용 구조도 (파생 산출물 — 데이터 바뀌면 같이 갱신)
+├── overview.html              일행 공유용 계획표 — **자동 생성물. 직접 고치지 말 것**
+├── tools/build-overview.js    ↑ 생성기 (`node tools/build-overview.js`). 앱 빌드가 아니라 개발 도구
 ├── DOC-MAP.md                 ★ 마스터 인덱스 · 정본 규칙 · 영향 매트릭스 (새 세션 첫 문서)
 ├── CLAUDE.md                  ← 이 문서 (운영 정본)
 ├── design.md                  ★ 디자인 정본 — 토큰 · 컴포넌트 · 레이아웃 · 보이스
@@ -77,7 +78,9 @@ GUIDE_DATA = {
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `base_hotel` | object \| **null** | `{name, area, note, lat?, lng?}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 ① 매스트헤드 호텔 칩 생략 ② 원정 길찾기 출발지가 `Osaka Station`으로 대체 (`excursionOrigin()`) ③ 지도에 숙소 핀·loop 동선 없음. **`lat`/`lng`를 채우면 각 구역 지도에 숙소 핀이 생기고 동선이 `숙소 → 장소들 → 숙소` loop로 바뀐다** (§ 7). 좌표는 R-D3 land-check 필수 |
-| `zones[].id` | number | 화면에 `AREA 01` 형태로 표시. 앵커 id = `zone-{id}` |
+| `zones[].id` | number | 앵커 id = `zone-{id}`. 내비 칩 번호 |
+| `zones[].tag` | string \| 생략 | 헤더 배지. **있으면 그걸 쓰고, 없으면 `AREA 01`** 로 폴백. v0.6부터 `DAY 1` / `DAY 2 밤` / `옵션` 을 쓴다 |
+| `zones[].schedule` | array \| 생략 | **그 날의 흐름.** `[{t:'14:00', w:'무엇을', n:'왜/주의'}]`. 없으면 시간표 블록 자체가 안 그려진다 (`buildSchedule` 이 `null` 반환) |
 | `zones[].access` | string | **역 기준**으로 쓴다 (`난바·신사이바시역 (미도스지선) · 기타에서 8분`). 숙소에 의존하지 않으므로 숙소 미정이어도 유효하다. 숙소가 정해지면 도보 시간만 덧붙이면 됨 |
 | `sections[].category` | string | **`관광지` / `맛집` / `카페` 셋 중 하나.** `CAT` 딕셔너리 키와 정확히 일치해야 색·아이콘·필터가 붙음 |
 
@@ -191,6 +194,8 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 **렌더**
 - `renderMast()` — 매스트헤드 (호텔 칩 · 총계 pill · 푸터 카운트)
 - `renderNav()` — 구역 칩 + 원정 칩 + 분류 필터 + 추천/필수 토글
+- `buildSchedule(zone)` — **그 날의 흐름** 시간표. `zone.schedule` 없으면 `null` 반환 → 기존 구역은 영향 없음
+  - ⚠ **분 단위 강박 일정표가 아니다** (`PRD.md § 7`). 시각을 박는 것은 ① 시설 마감처럼 어길 수 없는 것 ② 배 시각처럼 놓치면 끝나는 것 뿐. 나머지는 순서와 대략적 시작점만 준다
 - `buildCatSection(s)` — **구역·원정 공용** 카테고리 섹션. 필터가 `.catsec` 단위로 돌아가므로 구조를 바꾸면 필터가 깨진다
 - `buildCard(p, cat)` — 장소 카드
 - `renderZones()` / `renderExcursions()` / `buildExcursion(ex)`
@@ -253,7 +258,20 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 
 ```bash
 # 구역 내 최대 거리 점검
-node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.indexOf('const GUIDE_DATA = {'),e=h.indexOf('\n]};',s);const d=eval('('+h.slice(s+19,e+3)+')');const hav=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dA=t(b[0]-a[0]),dO=t(b[1]-a[1]);return 2*R*Math.asin(Math.sqrt(Math.sin(dA/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dO/2)**2))};d.zones.forEach(z=>{const p=[];z.sections.forEach(s=>s.places.forEach(x=>{if(x.lat)p.push([x.lat,x.lng])}));let m=0;p.forEach(a=>p.forEach(b=>{m=Math.max(m,hav(a,b))}));console.log((m>4?'!! ':'OK ')+'zone'+z.id+' 최대 '+m.toFixed(1)+'km  '+z.name)})"
+#  ⚠ GUIDE_DATA 추출은 반드시 괄호 매칭으로 한다. '\n]};' 같은 포맷 앵커를 쓰면
+#     데이터를 한 줄 JSON 으로 다시 쓰는 순간 조용히 깨진다 (v0.6 에서 실제로 겪음 · learning.md § 13).
+node -e "
+const H=require('fs').readFileSync('index.html','utf8');
+let i=H.indexOf('{',H.indexOf('const GUIDE_DATA = ')),d=0,q=0,e=0,end=i;
+for(let j=i;j<H.length;j++){const c=H[j];
+  if(q){ if(e)e=0; else if(c==='\\\\')e=1; else if(c==='\"')q=0; continue; }
+  if(c==='\"'){q=1;continue;}
+  if(c==='{'||c==='[')d++; else if(c==='}'||c===']'){d--; if(!d){end=j;break;}}}
+const G=JSON.parse(H.slice(i,end+1));
+const hav=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dA=t(b[0]-a[0]),dO=t(b[1]-a[1]);return 2*R*Math.asin(Math.sqrt(Math.sin(dA/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dO/2)**2))};
+G.zones.forEach(z=>{const p=[];z.sections.forEach(s=>s.places.forEach(x=>{if(x.lat)p.push([x.lat,x.lng])}));
+let m=0;p.forEach(a=>p.forEach(b=>{m=Math.max(m,hav(a,b))}));
+console.log((m>4?'!! ':'OK ')+(z.tag||('zone'+z.id)).padEnd(8)+'최대 '+m.toFixed(2)+'km  '+z.name);});"
 ```
 
 ### R-D9. 좌표 1개짜리 구역은 `fitBounds` 대신 `setView`
@@ -275,8 +293,18 @@ node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.index
 4. 미술관·박물관은 **월요일 휴관**이 기본값이다. 관광지도 같이 훑을 것
 
 ```bash
-# 정기휴무가 적힌 장소 비율 (맛집·카페 기준)
-node -e "const h=require('fs').readFileSync('index.html','utf8');const s=h.indexOf('const GUIDE_DATA = {'),e=h.indexOf('\n]};',s);const d=eval('('+h.slice(s+19,e+3)+')');let t=0,w=0;d.zones.forEach(z=>z.sections.forEach(sec=>{if(sec.category==='관광지')return;sec.places.forEach(p=>{t++;if(/휴무|휴관|무휴/.test(p.feature))w++})}));console.log(t?w+'/'+t+' 곳에 휴무 표기':'맛집·카페 데이터 없음')"
+# 정기휴무가 적힌 장소 비율 (맛집·카페 기준) — 추출은 위와 같은 괄호 매칭 방식
+node -e "
+const H=require('fs').readFileSync('index.html','utf8');
+let i=H.indexOf('{',H.indexOf('const GUIDE_DATA = ')),d=0,q=0,e=0,end=i;
+for(let j=i;j<H.length;j++){const c=H[j];
+  if(q){ if(e)e=0; else if(c==='\\\\')e=1; else if(c==='\"')q=0; continue; }
+  if(c==='\"'){q=1;continue;}
+  if(c==='{'||c==='[')d++; else if(c==='}'||c===']'){d--; if(!d){end=j;break;}}}
+const G=JSON.parse(H.slice(i,end+1));
+let t=0,w=0;G.zones.forEach(z=>z.sections.forEach(sec=>{if(sec.category==='관광지')return;
+sec.places.forEach(p=>{t++;if(/휴무|휴관|무휴/.test(p.feature))w++})}));
+console.log(t?w+'/'+t+' 곳에 휴무 표기':'맛집·카페 데이터 없음');"
 ```
 
 ### R-D11. 디자인은 세 곳이 같이 움직인다 (삼각 sync)
@@ -351,7 +379,8 @@ done
 | 6 | 필터 조합으로 결과 0 | "조건에 맞는 장소가 없어요" 표시 |
 | 7 | 지도 핀 탭 | 팝업 + 하단 이름 칩 하이라이트 연동 |
 | 7-a | 구역 지도 동선 | 번호 순서대로 점선 연결. 범례에 "직선이라 실제 길은 아니에요" 문구 |
-| 7-b | 교토 원정 지도 | **동선 점선 없음** (`noRoute`). 핀·범례는 정상 |
+| 7-b | 원정 지도 (`EXCURSIONS` 비어 있음) | 원정 섹션 0개. `EXCURSIONS`에 객체를 push 하면 즉시 되살아남 |
+| 7-d | 각 DAY 상단 시간표 | `이 날의 흐름` 블록. 옵션 구역(베이)엔 **없어야** 정상 (`schedule` 미정의) |
 | 7-c | 오사카성 구역 (1곳) | 동선 없음 + `setView` (골목 한 칸까지 안 튐, R-D9) |
 | 8 | 이름 칩 탭 | 해당 핀으로 지도 이동 + 강조 |
 | 9 | 장소 카드 탭 | 구글맵 새 탭. **엉뚱한 장소 아님** (R-D3) |

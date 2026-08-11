@@ -115,7 +115,8 @@ _디자인 시스템 **정본**_ · **v1.1** (2026-08-09) · Vol. III
 | 클래스 | 역할 | 제약 |
 |---|---|---|
 | `.zone` | 시내 구역 블록 | 필터 시 **통째로 숨김 가능** |
-| `.zone-head` · `.zone-name` · `.zone-tag` · `.zone-access` | 구역 헤더 (`AREA 01`) | `access`는 **역 기준** (숙소 비의존) |
+| `.zone-head` · `.zone-name` · `.zone-tag` · `.zone-access` | 구역 헤더 | 배지는 `zone.tag`(`DAY 1`) → 없으면 `AREA 01` 폴백. `access`는 **역 기준** (숙소 비의존) |
+| `.zone-sched` · `.zs-head` · `.zs-row` · `.zs-t` · `.zs-w` · `.zs-n` | **이 날의 흐름** 시간표 | 헤더는 구역 액센트 바탕 + 페이퍼 글자. 시각(`.zs-t`)은 `tabular-nums` 로 자릿수 정렬. `zone.schedule` 없으면 통째로 생략 |
 | `.catsec` · `.cat-head` · `.cat-ko` · `.cat-badge` · `.cat-cnt` · `.cat-line` | 카테고리 섹션 | ⚠ **`applyFilter`가 `.catsec` 단위로 돈다. 구조 바꾸면 필터가 깨진다** |
 | `.grid` · `.place` | 카드 그리드 | |
 | `.p-top` · `.p-name` · `.p-en` · `.p-feat` · `.p-go` | 카드 내부 | `.p-feat` 한 줄에 **정기휴무 포함** (R-D10) |

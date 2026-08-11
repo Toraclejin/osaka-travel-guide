@@ -1,303 +1,231 @@
 <!doctype html>
-<!--
-  오사카 여행 가이드 · 구조도 (overview)
-
-  ⚠ 파생 산출물이다. 정본은 index.html 의 GUIDE_DATA / EXCURSIONS.
-     여기 적힌 장소·구역은 그 데이터에서 옮겨 적은 것이므로,
-     데이터를 고치면 이 파일도 같이 고쳐야 한다. (CLAUDE.md R-D1 의 정신)
-     일행에게 "전체 구성"을 한 장으로 보여주는 용도이고, 앱 자체가 아니다.
--->
-<html lang="ko">
-<head>
+<!-- 자동 생성 파일 — 직접 고치지 마십시오.
+     정본: index.html 의 GUIDE_DATA / 생성: node tools/build-overview.js -->
+<html lang="ko"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
 <meta name="robots" content="noindex, nofollow">
-<title>오사카 여행 가이드 · 구조도</title>
+<title>오사카 여행 계획표 · 8/24~26</title>
 <style>
-  :root{
-    --frame:#1a1b4b; --indigo:#1a1b4b; --indigo-light:#4a4d8b;
-    --page:#f5f3ee; --page-tint:#ebe7df; --page-warm:#efece4; --white:#fff;
-    --ink:#2a2d3a; --ink-soft:#5a5d6a; --ink-faint:#8a8d99;
-    --osaka-red:#D8452E; --gold:#d4af37; --essential:#C0455E;
-    --cat-sight:#4A55A3; --cat-meal:#D67025; --cat-cafe:#8B6F47;
-    --theme-sub:#2E7D8C; --theme-hist:#7A6246;
-    --line:#d9d6cf; --line-faint:#e7e4dd; --shadow:rgba(26,27,75,.10);
-    --r:12px; --pad-x:clamp(18px,5vw,56px);
-    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",Roboto,system-ui,sans-serif;
-    --serif:Georgia,"Times New Roman","Apple SD Gothic Neo",serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
-       line-height:1.65;-webkit-text-size-adjust:100%;word-break:keep-all}
-  .wrap{max-width:860px;margin:0 auto}
-
-  /* masthead */
-  .mast{background:var(--frame);color:var(--page);padding:34px var(--pad-x) 28px}
-  .kicker{font-family:var(--serif);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
-          color:var(--osaka-red);font-weight:700;margin:0 0 10px}
-  .mast h1{font-family:var(--serif);font-size:clamp(38px,11vw,64px);line-height:.95;margin:0 0 12px;letter-spacing:-.02em}
-  .mast h1 span{color:var(--osaka-red)}
-  .lede{margin:0;font-size:14.5px;color:#cfcede;max-width:52ch}
-  .pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
-  .pill{border:1px solid rgba(245,243,238,.28);border-radius:999px;padding:5px 11px;font-size:11.5px;color:#e6e4ef}
-  .pill b{color:var(--page)}
-
-  /* sections */
-  main{padding:0 var(--pad-x) 60px}
-  section{margin-top:38px}
-  .sec-h{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--frame);padding-bottom:7px;margin-bottom:16px}
-  .sec-h .en{font-family:var(--serif);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
-  .sec-h h2{font-size:19px;margin:0;letter-spacing:-.01em}
-
-  .note{background:var(--page-warm);border-left:3px solid var(--osaka-red);border-radius:0 var(--r) var(--r) 0;
-        padding:13px 15px;font-size:13.5px;color:var(--ink-soft);margin:0 0 18px}
-  .note b{color:var(--ink)}
-
-  /* zone cards */
-  .zone{background:var(--white);border:1px solid var(--line);border-radius:var(--r);
-        padding:16px 17px;margin-bottom:13px;box-shadow:0 1px 3px var(--shadow)}
-  .zone-top{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-  .area{font-family:var(--serif);font-size:11px;letter-spacing:.13em;color:var(--white);
-        background:var(--frame);border-radius:4px;padding:3px 7px;flex:none}
-  .zone-top h3{font-size:16px;margin:0;letter-spacing:-.01em}
-  .cnt{font-size:11.5px;color:var(--ink-faint);margin-left:auto;flex:none}
-  .access{font-size:12.5px;color:var(--ink-soft);margin:8px 0 0;padding:7px 10px;
-          background:var(--page-tint);border-radius:7px}
-  ul.places{list-style:none;margin:12px 0 0;padding:0}
-  ul.places li{padding:8px 0;border-top:1px solid var(--line-faint)}
-  .pn{font-size:14px;font-weight:600}
-  .badge{display:inline-block;font-size:10px;line-height:1;padding:3px 5px;border-radius:4px;
-         margin-left:5px;vertical-align:1px;font-weight:700;color:#fff}
-  .b-star{background:var(--gold)} .b-ess{background:var(--essential)}
-  .b-hist{background:var(--theme-hist)} .b-sub{background:var(--theme-sub)}
-  .pf{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
-
-  /* excursion */
-  .ex{background:var(--frame);color:var(--page);border-radius:var(--r);padding:18px 17px}
-  .ex h3{margin:0;font-size:17px}
-  .ex .sub{font-size:12px;color:var(--osaka-red);font-weight:700;letter-spacing:.06em;margin:0 0 4px}
-  .ex p.intro{font-size:13.5px;color:#cfcede;margin:10px 0 0}
-  .routes{display:grid;gap:8px;margin-top:15px}
-  .rt{background:rgba(245,243,238,.07);border:1px solid rgba(245,243,238,.16);border-radius:8px;padding:9px 11px;font-size:13px}
-  .rt.best{border-color:var(--osaka-red);background:rgba(216,69,46,.14)}
-  .rt .nm{font-weight:600}
-  .rt .meta{font-size:11.5px;color:#b9b7c8;margin-top:2px}
-  .rt .tag{font-size:10px;background:var(--osaka-red);color:#fff;border-radius:3px;padding:2px 5px;margin-left:6px;font-weight:700}
-  .rules{margin:15px 0 0;padding:0;list-style:none;display:grid;gap:6px}
-  .rules li{font-size:12.5px;color:#dedcea;padding-left:15px;position:relative}
-  .rules li::before{content:"→";position:absolute;left:0;color:var(--osaka-red)}
-  .ex-places{margin-top:15px;padding-top:13px;border-top:1px solid rgba(245,243,238,.18);
-             font-size:12.5px;color:#cfcede;line-height:1.9}
-
-  /* tables */
-  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--white);
-        border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line-faint)}
-  th{background:var(--page-tint);font-size:11.5px;letter-spacing:.04em;color:var(--ink-soft);font-weight:600}
-  tr:last-child td{border-bottom:0}
-  .ok{color:var(--cat-sight);font-weight:700}
-  .gap{color:var(--osaka-red);font-weight:700}
-  .wait{color:var(--ink-faint);font-weight:700}
-
-  /* theme axis */
-  .axes{display:grid;gap:11px}
-  .axis{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:var(--r);
-        background:var(--white);padding:14px 15px}
-  .axis.sub{border-left-color:var(--theme-sub)}
-  .axis.hist{border-left-color:var(--theme-hist)}
-  .axis h4{margin:0 0 3px;font-size:14.5px}
-  .axis .cur{font-size:12.5px;color:var(--ink-soft)}
-  .axis .cur em{font-style:normal;color:var(--osaka-red);font-weight:700}
-
-  /* ask */
-  ol.ask{margin:0;padding-left:20px;font-size:13.5px}
-  ol.ask li{margin-bottom:7px}
-  ol.ask b{color:var(--osaka-red)}
-
-  footer{background:var(--frame);color:#a9a7bb;font-size:11.5px;padding:20px var(--pad-x) 26px;text-align:center}
-  footer b{color:var(--page)}
-</style>
-</head>
-<body>
-<div class="wrap">
-
+:root{--frame:#1a1b4b;--page:#f5f3ee;--page-tint:#ebe7df;--page-warm:#efece4;--white:#fff;
+--ink:#2a2d3a;--ink-soft:#5a5d6a;--ink-faint:#8a8d99;--osaka-red:#D8452E;--gold:#d4af37;--essential:#C0455E;
+--line:#d9d6cf;--line-faint:#e7e4dd;--r:12px;--pad-x:clamp(18px,5vw,56px);
+--sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",Roboto,system-ui,sans-serif;
+--serif:Georgia,"Times New Roman","Apple SD Gothic Neo",serif;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);line-height:1.6;word-break:keep-all;-webkit-text-size-adjust:100%}
+.wrap{max-width:860px;margin:0 auto}
+.mast{background:var(--frame);color:var(--page);padding:32px var(--pad-x) 26px}
+.kicker{font-family:var(--serif);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--osaka-red);font-weight:700;margin:0 0 9px}
+.mast h1{font-family:var(--serif);font-size:clamp(34px,10vw,58px);line-height:.95;margin:0 0 10px;letter-spacing:-.02em}
+.mast h1 span{color:var(--osaka-red)}
+.lede{margin:0;font-size:14px;color:#cfcede;max-width:52ch}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.pill{border:1px solid rgba(245,243,238,.28);border-radius:999px;padding:5px 11px;font-size:11.5px;color:#e6e4ef}
+.pill b{color:var(--page)}
+main{padding:0 var(--pad-x) 56px}
+.zone{margin-top:34px}
+.zone-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--frame);padding-bottom:8px}
+.tag{background:var(--osaka-red);color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:5px;flex:none}
+.zone-top h2{font-size:19px;margin:0;letter-spacing:-.01em}
+.cnt{margin-left:auto;font-size:11.5px;color:var(--ink-faint);flex:none}
+.access{font-size:12.5px;color:var(--ink-soft);margin:9px 0 0;padding:7px 10px;background:var(--page-tint);border-radius:7px}
+.sched{margin-top:13px;background:var(--page-warm);border:1px solid var(--line-faint);border-radius:var(--r);overflow:hidden}
+.zs-head{background:var(--frame);color:var(--page);font-size:12.5px;font-weight:700;padding:8px 13px}
+.zs-row{display:grid;grid-template-columns:56px 1fr;gap:11px;padding:9px 13px;border-top:1px solid var(--line-faint)}
+.zs-t{font-size:13px;font-weight:800;color:var(--osaka-red);font-variant-numeric:tabular-nums}
+.zs-w{font-size:14px}
+.zs-n{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+ul.places{list-style:none;margin:14px 0 0;padding:0}
+ul.places li{padding:11px 0;border-top:1px solid var(--line-faint)}
+.pn{font-size:15px;font-weight:600;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.num{background:var(--frame);color:#fff;font-size:11px;font-weight:800;min-width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.badge{font-size:10px;line-height:1;padding:3px 5px;border-radius:4px;font-weight:700;color:#fff}
+.b-star{background:var(--gold)}.b-ess{background:var(--essential)}
+.pf{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.pg{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--osaka-red);text-decoration:none;font-weight:600}
+.pg:hover{text-decoration:underline}
+footer{background:var(--frame);color:#a9a7bb;font-size:11.5px;padding:20px var(--pad-x) 26px;text-align:center}
+footer b{color:var(--page)}
+</style></head><body><div class="wrap">
 <header class="mast">
-  <p class="kicker">A Travel Guide · Structure</p>
+  <p class="kicker">A Travel Guide · Itinerary</p>
   <h1>OSAKA<span>.</span></h1>
-  <p class="lede">같이 가는 오사카·교토 — 전체 구성이 지금 어떻게 되어 있는지 한 장으로. 동선표가 아니라 <b>구역 목록</b>이다. 그날 있는 구역을 고르고, 그 안에서 각자 고르면 된다.</p>
-  <div class="pills">
-    <span class="pill">시내 <b>5구역</b></span>
-    <span class="pill">관광지 <b>17곳</b></span>
-    <span class="pill">원정 <b>교토 1</b> · 7곳</span>
-    <span class="pill">숙소 <b>미정</b></span>
-  </div>
+  <p class="lede">8/24(월) 입항 ~ 8/26(수) 출항 · 2박 3일 · 남자 4명. 날짜별 흐름과 갈 곳을 한 장으로. 시각은 참고용이고, 못 박은 건 시설 마감과 배 시간뿐이다 — 늦으면 뒤로 밀면 된다.</p>
+  <div class="pills"><span class="pill">2박 3일</span><span class="pill">총 <b>19곳</b></span><span class="pill">교토 <b>제외</b></span><span class="pill">숙소 <b>미정</b></span></div>
 </header>
-
 <main>
-
-  <section>
-    <div class="sec-h"><span class="en">Status</span><h2>숙소가 안 정해져도 이건 굴러간다</h2></div>
-    <p class="note">
-      각 구역의 접근 정보를 <b>숙소가 아니라 역 기준</b>으로 써 뒀다. 그래서 숙소가 어디로 정해지든 구역 목록은 그대로 쓸 수 있다.<br><br>
-      숙소가 정해지면 채워지는 건 세 가지뿐이다 — ① 상단 호텔 표시 ② 구역별 <b>도보 시간</b> 추가 ③ 교토 <b>추천 경로 확정</b>(우메다 쪽이면 JR, 난바 쪽이면 게이한).
-      지금은 4개 경로를 나란히 두고 있다.
-    </p>
+  <section class="zone">
+    <div class="zone-top"><span class="tag">DAY 1</span>
+      <h2>히데요시의 오사카</h2><span class="cnt">4곳</span></div>
+    <p class="access">다니마치욘초메역 (주오선·다니마치선) · 8/24(월) · 항구에서 주오선 직결</p>
+    <div class="sched"><div class="zs-head">이 날의 흐름 · 9단계</div>
+      <div class="zs-row"><div class="zs-t">11:00</div><div>
+        <div class="zs-w">팬스타 셔틀 → 코스모스퀘어</div><div class="zs-n">주오선 승차</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">12:00</div><div>
+        <div class="zs-w">숙소 짐 보관 (난바)</div><div class="zs-n">체크인 전</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">12:30</div><div>
+        <div class="zs-w">점심</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">14:00</div><div>
+        <div class="zs-w">오사카 역사박물관</div><div class="zs-n">¥600 · 입장 16:30 마감</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">15:30</div><div>
+        <div class="zs-w">도요토미 석벽관</div><div class="zs-n">천수각 티켓 공용</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">16:15</div><div>
+        <div class="zs-w">오사카성 천수각</div><div class="zs-n">¥1,200 · 입관 17:30 마감</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">17:50</div><div>
+        <div class="zs-w">호코쿠 신사</div><div class="zs-n">히데요시 동상 — 코스의 마침표</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">19:00</div><div>
+        <div class="zs-w">숙소 체크인 → 대욕장</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">20:00</div><div>
+        <div class="zs-w">저녁 야키니쿠 → 도톤보리 산책</div>
+      </div></div></div>
+    <ul class="places">
+      <li><div class="pn"><span class="num">1</span>오사카 역사박물관</div>
+        <div class="pf">10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · <b>화요일 휴관</b></div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">2</span>도요토미 석벽관<span class="badge b-star">★</span></div>
+        <div class="pf">2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 <b>도요토미 시대 진짜 석벽</b>을 지하에서 본다. 천수각 티켓 공용</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">3</span>오사카성 천수각<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf">1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Osaka%20Castle" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">4</span>호코쿠 신사<span class="badge b-star">★</span></div>
+        <div class="pf">히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
   </section>
-
-  <section>
-    <div class="sec-h"><span class="en">In the city</span><h2>시내 5구역</h2></div>
-    <p class="note">한 구역은 <b>그 안에서 걸어 다닐 수 있는 범위</b>로 잘랐다 (반경 2km 기준). 처음엔 오사카성과 베이를 한 구역으로 묶었다가 두 곳이 <b>9km</b> 떨어진 걸 발견하고 쪼갰다.</p>
-
-    <div class="zone">
-      <div class="zone-top"><span class="area">AREA 01</span><h3>미나미 (난바·도톤보리·신사이바시)</h3><span class="cnt">6곳</span></div>
-      <p class="access">난바·신사이바시역 (미도스지선) · 기타에서 8분</p>
-      <ul class="places">
-        <li><div class="pn">도톤보리 · 구리코 사인<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div><div class="pf">오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷</div></li>
-        <li><div class="pn">구로몬 시장<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div><div class="pf">"오사카의 부엌". 해산물·와규 꼬치 서서 먹기. 오전~오후가 활발</div></li>
-        <li><div class="pn">신사이바시스지 상점가<span class="badge b-star">★</span></div><div class="pf">600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류</div></li>
-        <li><div class="pn">호젠지 요코초<span class="badge b-star">★</span><span class="badge b-hist">역사·문화</span></div><div class="pf">이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적</div></li>
-        <li><div class="pn">아메리카무라</div><div class="pf">빈티지·스트리트 패션 구역. 산카쿠 공원 중심</div></li>
-        <li><div class="pn">난바 야사카 신사<span class="badge b-hist">역사·문화</span></div><div class="pf">거대한 사자머리 무대. 사진 한 장 확실한 곳</div></li>
-      </ul>
-    </div>
-
-    <div class="zone">
-      <div class="zone-top"><span class="area">AREA 02</span><h3>기타 (우메다·나카노시마)</h3><span class="cnt">4곳</span></div>
-      <p class="access">우메다·오사카역 (미도스지선/JR) · 미나미에서 8분</p>
-      <ul class="places">
-        <li><div class="pn">우메다 스카이빌딩 공중정원<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div><div class="pf">173m 옥외 전망대. 해질녘~야경 타이밍이 정답</div></li>
-        <li><div class="pn">HEP FIVE 관람차</div><div class="pf">빨간 관람차. 우메다 한복판. 짧고 가볍게</div></li>
-        <li><div class="pn">나카노시마 공원</div><div class="pf">강 사이 섬. 중앙공회당·장미원. 도심 속 산책 구간</div></li>
-        <li><div class="pn">오사카 나카노시마 미술관<span class="badge b-hist">역사·문화</span></div><div class="pf">검은 상자 건축. 비 오는 날 실내 대안 · <b>월요일 휴관 확인 필요</b></div></li>
-      </ul>
-    </div>
-
-    <div class="zone">
-      <div class="zone-top"><span class="area">AREA 03</span><h3>신세카이·덴노지·쓰루하시</h3><span class="cnt">4곳</span></div>
-      <p class="access">덴노지·신이마미야역 (미도스지선/JR 순환선) · 난바에서 5분</p>
-      <ul class="places">
-        <li><div class="pn">쓰텐카쿠<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div><div class="pf">신세카이 상징탑. 쇼와 레트로 간판 거리와 세트</div></li>
-        <li><div class="pn">시텐노지<span class="badge b-star">★</span><span class="badge b-hist">역사·문화</span></div><div class="pf">일본 最古급 관영 사찰(593년). 가람 배치가 교과서적</div></li>
-        <li><div class="pn">아베노 하루카스</div><div class="pf">일본 최고층급 300m. 전망대 하루카스300</div></li>
-        <li><div class="pn">쓰루하시 코리아타운</div><div class="pf">재일 코리안 상권. 한국 음식·식재료. 역 주변 골목 자체가 볼거리</div></li>
-      </ul>
-    </div>
-
-    <div class="zone">
-      <div class="zone-top"><span class="area">AREA 04</span><h3>오사카성·모리노미야</h3><span class="cnt">1곳</span></div>
-      <p class="access">오사카성공원역 (JR 순환선) · 모리노미야역 (주오선)</p>
-      <ul class="places">
-        <li><div class="pn">오사카성<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span><span class="badge b-hist">역사·문화</span></div><div class="pf">천수각 + 해자 + 공원. 최소 2시간. 니시노마루 정원에서 정면 뷰 — 도요토미 히데요시의 성</div></li>
-      </ul>
-    </div>
-
-    <div class="zone">
-      <div class="zone-top"><span class="area">AREA 05</span><h3>베이 (가이유칸·덴포잔)</h3><span class="cnt">2곳</span></div>
-      <p class="access">오사카코역 (주오선) · 반나절 코스</p>
-      <ul class="places">
-        <li><div class="pn">오사카 해유관 (가이유칸)<span class="badge b-star">★</span></div><div class="pf">세계 최대급 수족관. 고래상어. 베이 반나절</div></li>
-        <li><div class="pn">덴포잔 대관람차</div><div class="pf">해유관 옆. 항만·아카시 대교 방향 조망</div></li>
-      </ul>
-    </div>
+  <section class="zone">
+    <div class="zone-top"><span class="tag">DAY 2</span>
+      <h2>덴덴타운 전뇌지구</h2><span class="cnt">5곳</span></div>
+    <p class="access">닛폰바시역 (사카이스지선·킨테츠) · 8/25(화) · 전 구간 도보</p>
+    <div class="sched"><div class="zs-head">이 날의 흐름 · 7단계</div>
+      <div class="zs-row"><div class="zs-t">09:30</div><div>
+        <div class="zs-w">구로몬 시장</div><div class="zs-n">오전이 가장 활발</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">11:00</div><div>
+        <div class="zs-w">덴덴타운</div><div class="zs-n">상점 대부분 11시 오픈 — 더 일찍 가면 셔터</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">13:00</div><div>
+        <div class="zs-w">점심</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">14:00</div><div>
+        <div class="zs-w">오타로드 → 도구야스지</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">15:30</div><div>
+        <div class="zs-w">e스타디움 난바 본점</div><div class="zs-n">난바파크스 1F</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">17:00</div><div>
+        <div class="zs-w">숙소 → 대욕장·사우나</div><div class="zs-n">술 마시기 전에 한 번 리셋</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">19:00</div><div>
+        <div class="zs-w">저녁 — 쿠시카츠 → 이자카야 → 타코야키</div>
+      </div></div></div>
+    <ul class="places">
+      <li><div class="pn"><span class="num">1</span>구로몬 시장<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf">&quot;오사카의 부엌&quot;. 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Kuromon%20Ichiba%20Market" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">2</span>덴덴타운 (닛폰바시)<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf">서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. <b>대체로 11:00~19:00</b></div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">3</span>오타로드<span class="badge b-star">★</span></div>
+        <div class="pf">덴덴타운 서쪽 한 블록. <b>메인도로만 보면 반쪽</b> — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">4</span>도구야스지 상점가</div>
+        <div class="pf">주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">5</span>난바파크스 · e스타디움<span class="badge b-star">★</span></div>
+        <div class="pf">1F <b>e스타디움 난바 본점</b> — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
   </section>
-
-  <section>
-    <div class="sec-h"><span class="en">Excursion</span><h2>교토 당일 원정</h2></div>
-    <div class="ex">
-      <p class="sub">아래는 교토 가는 날에만 해당</p>
-      <h3>교토 — 오사카에서 편도 30~60분</h3>
-      <p class="intro">가깝다고 얕보면 하루가 증발한다. 교토는 <b>남쪽</b>(후시미이나리·기요미즈·기온)과 <b>북서쪽</b>(금각사·아라시야마)이 정반대라, 하루에 한쪽만 잡는 게 정답. 사찰 대부분 16:30~17:00에 닫으니 역순으로 짜지 말 것.</p>
-
-      <div class="routes">
-        <div class="rt best"><div class="nm">JR 신쾌속 <span class="tag">추천</span></div><div class="meta">오사카역 → 교토역 · 약 30분 · 약 ¥580</div></div>
-        <div class="rt"><div class="nm">한큐 교토선 특급</div><div class="meta">오사카우메다 → 교토카와라마치 · 약 45분 · 약 ¥410</div></div>
-        <div class="rt"><div class="nm">게이한 본선 특급</div><div class="meta">요도야바시 → 기온시조 · 약 55분 · 약 ¥430</div></div>
-        <div class="rt"><div class="nm">신칸센</div><div class="meta">신오사카 → 교토 · 약 15분 · 약 ¥1,450</div></div>
-      </div>
-
-      <ul class="rules">
-        <li>남쪽 or 북서쪽 — 하루에 한쪽만</li>
-        <li>아침 일찍 출발 (아라시야마는 9시 넘으면 사람에 묻힘)</li>
-        <li>닫는 시간 역산</li>
-        <li>시내 이동은 버스보다 전철+도보 (성수기 버스 정체·만차)</li>
-        <li>짐은 역 코인로커에 · IC카드 그대로 사용</li>
-        <li>촬영 매너 — 기온 사유 골목은 <b>촬영 금지 구역</b> 표지판 확인</li>
-      </ul>
-
-      <div class="ex-places">
-        <b>후시미이나리</b> 천 개의 붉은 도리이 · <b>기요미즈데라</b> 절벽 목조 무대 · <b>아라시야마 대나무길</b> 아침 승부 ·
-        <b>금각사</b> 북서쪽 · <b>기온 하나미코지</b> 해질녘 · <b>니조성</b> 우는 마루 · <b>니시키 시장</b> 교토의 부엌
-      </div>
-    </div>
+  <section class="zone">
+    <div class="zone-top"><span class="tag">DAY 2 밤</span>
+      <h2>신세카이</h2><span class="cnt">2곳</span></div>
+    <p class="access">에비스초·도부쓰엔마에역 · 난바파크스에서 지하철 2정거장</p>
+    <div class="sched"><div class="zs-head">이 날의 흐름 · 3단계</div>
+      <div class="zs-row"><div class="zs-t">18:30</div><div>
+        <div class="zs-w">쓰텐카쿠 일대 도착</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">19:00</div><div>
+        <div class="zs-w">쿠시카츠 다루마 총본점</div><div class="zs-n">줄 길면 호젠지점(난바)로 회차</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">21:00</div><div>
+        <div class="zs-w">난바 복귀 → 대욕장</div>
+      </div></div></div>
+    <ul class="places">
+      <li><div class="pn"><span class="num">1</span>쓰텐카쿠<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf">신세카이 상징탑. 쇼와 레트로 간판 거리와 세트. 쿠시카츠 골목이 발밑에 깔려 있음</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Tsutenkaku%20Tower" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">2</span>시텐노지<span class="badge b-star">★</span></div>
+        <div class="pf">593년 일본 最古급 관영 사찰. 히데요시보다 1000년 앞선 층. 낮에 시간 남으면</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Shitenno-ji%20Temple" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
   </section>
-
-  <section>
-    <div class="sec-h"><span class="en">Themes</span><h2>테마 축 — 왜 가는가</h2></div>
-    <p class="note">
-      구역·카테고리(관광지/맛집/카페)와 <b>따로 도는 축</b>이다. 오사카성은 관광지이면서 역사·문화이고, 덴덴타운은 관광지이면서 서브컬쳐다.
-      그래서 카테고리를 늘리지 않고 <b>테마를 따로</b> 뒀다. <b>두 테마는 같은 비중</b>으로 채운다.
-    </p>
-    <div class="axes">
-      <div class="axis sub">
-        <h4>서브컬쳐 · 게임 · e스포츠 · PC방</h4>
-        <p class="cur">덴덴타운(니혼바시 전자상가) · 게임센터 · e스포츠 시설 · 넷카페 방향.
-        현재 <em>0곳</em> — 실명·좌표 확인 후 넣을 예정. 목표 6~10곳.</p>
-      </div>
-      <div class="axis hist">
-        <h4>역사 · 문화</h4>
-        <p class="cur">오사카성 · 시텐노지 · 호젠지 요코초 · 난바 야사카 · 나카노시마 미술관 등 <em>5곳</em>이 이미 목록 안에 있다.
-        서브컬쳐와 같은 레벨까지 확충 예정. 목표 6~10곳.</p>
-      </div>
-    </div>
+  <section class="zone">
+    <div class="zone-top"><span class="tag">DAY 3</span>
+      <h2>오픈런 그리고 귀환</h2><span class="cnt">6곳</span></div>
+    <p class="access">신사이바시역 → 난바역 (미도스지선) · 8/26(수) · 전 구간 도보</p>
+    <div class="sched"><div class="zs-head">이 날의 흐름 · 7단계</div>
+      <div class="zs-row"><div class="zs-t">09:00</div><div>
+        <div class="zs-w">체크아웃 + 짐 보관</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">10:00</div><div>
+        <div class="zs-w">신사이바시 파르코 6F</div><div class="zs-n">오픈런 — 오후엔 대기표</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">11:15</div><div>
+        <div class="zs-w">남하 → 덴덴타운 2차전</div><div class="zs-n">어제 고민한 것 사기</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">12:00</div><div>
+        <div class="zs-w">마지막 점심</div><div class="zs-n">가벼운 것 — 배 타기 직전</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">13:00</div><div>
+        <div class="zs-w">숙소에서 짐 수령</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">13:30</div><div>
+        <div class="zs-w">난바 출발</div><div class="zs-n">혼마치 환승 → 주오선</div>
+      </div></div>
+      <div class="zs-row"><div class="zs-t">14:30</div><div>
+        <div class="zs-w">페리터미널 도착</div><div class="zs-n">집결 15:00 · 30분 여유</div>
+      </div></div></div>
+    <ul class="places">
+      <li><div class="pn"><span class="num">1</span>신사이바시 파르코 6F<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf"><b>캐릭터 스트리트</b> — 닌텐도 오사카·캡콤 스토어·동구리 공화국(지브리)·고질라·울트라맨 M78. <b>10시 오픈런</b></div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%BF%83%E6%96%8E%E6%A9%8BPARCO" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">2</span>신사이바시스지 상점가<span class="badge b-star">★</span></div>
+        <div class="pf">600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Shinsaibashi-suji%20Shopping%20Street" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">3</span>도톤보리 · 구리코 사인<span class="badge b-star">★</span><span class="badge b-ess">🇰🇷</span></div>
+        <div class="pf">오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Dotonbori%20Glico%20Sign" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">4</span>호젠지 요코초<span class="badge b-star">★</span></div>
+        <div class="pf">이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Hozenji%20Yokocho" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">5</span>아메리카무라</div>
+        <div class="pf">빈티지·스트리트 패션 구역. 산카쿠 공원 중심</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Amerikamura" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">6</span>난바 야사카 신사</div>
+        <div class="pf">거대한 사자머리 무대. 사진 한 장 확실한 곳</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E9%9B%A3%E6%B3%A2%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
   </section>
-
-  <section>
-    <div class="sec-h"><span class="en">Gaps</span><h2>아직 비어 있는 것</h2></div>
-    <table>
-      <tr><th>항목</th><th>목표</th><th>지금</th></tr>
-      <tr><td>시내 관광지</td><td>구역당 4~8</td><td class="ok">17곳 · 좌표 검증 완료</td></tr>
-      <tr><td>교토 원정</td><td>1</td><td class="ok">7곳 · 좌표 검증 완료</td></tr>
-      <tr><td><b>맛집</b></td><td>구역당 4~8</td><td class="gap">0곳 — 가장 큰 공백</td></tr>
-      <tr><td><b>카페</b></td><td>구역당 2~4</td><td class="gap">0곳</td></tr>
-      <tr><td><b>서브컬쳐</b></td><td>6~10</td><td class="gap">0곳</td></tr>
-      <tr><td><b>역사·문화</b></td><td>6~10</td><td class="gap">5곳</td></tr>
-      <tr><td>숙소</td><td>—</td><td class="wait">미정 (없어도 동작)</td></tr>
-      <tr><td>USJ · 나라 · 고베</td><td>선택</td><td class="wait">갈지 미정</td></tr>
-    </table>
-  </section>
-
-  <section>
-    <div class="sec-h"><span class="en">Decide</span><h2>같이 정해야 할 것</h2></div>
-    <ol class="ask">
-      <li><b>날짜와 기간</b> — 요일이 정해져야 휴무일을 맞춰 볼 수 있다. 미술관·박물관은 월요일 휴관이 기본</li>
-      <li><b>숙소</b> — 이름이 아니라 <b>구역</b>만 정해져도 충분하다 (우메다 쪽 / 난바 쪽)</li>
-      <li><b>인원과 하루 이동량</b> — 하루 2만보가 가능한지에 따라 구역당 장소 수가 달라진다</li>
-      <li><b>교토</b> — 당일치기 몇 번? 남쪽과 북서쪽 중 어디부터?</li>
-      <li><b>공항</b> — 간사이(KIX) / 이타미(ITM)</li>
-      <li><b>USJ</b> — 가면 원정으로 하나 더 붙는다</li>
-      <li><b>서브컬쳐 무게</b> — 덴덴타운 쇼핑 / 오락실 / e스포츠 관전 / PC방(넷카페) 중 어디에?</li>
-    </ol>
-  </section>
-
-  <section>
-    <div class="sec-h"><span class="en">How to use</span><h2>쓰는 법</h2></div>
-    <p class="note">
-      <b>동선표가 아니다.</b> 분 단위 일정은 한 곳만 어긋나도 전체가 무너지고, 지키느라 여행이 노동이 된다.<br><br>
-      그날 컨디션 보고 <b>구역 하나를 고르고</b>, 그 안에서 각자 끌리는 데를 고르면 된다.<br><br>
-      실제 가이드에서는 장소를 누르면 구글맵이 바로 열리고, 구역별 지도에 <b>번호 핀 + 도보 순서 점선</b>이 그려진다.
-      점선은 <b>직선이라 실제 길은 아니다</b> — "대략 이 순서로 이 방향" 까지만 보는 용도고, 정확한 길찾기는 구글맵이 한다.
-      교토는 남쪽과 북서쪽이 정반대라 일부러 선을 안 그었다.
-    </p>
-  </section>
-
-</main>
-
-<footer>
-  <b>오사카 여행 가이드</b> · 구조도 v0.5 · 2026-08-09<br>
-  이 페이지는 구성 요약본이다. 실제 가이드는 <b>index.html</b>.
-</footer>
-
-</div>
-</body>
-</html>
+  <section class="zone">
+    <div class="zone-top"><span class="tag">옵션</span>
+      <h2>베이 (항구 근처)</h2><span class="cnt">2곳</span></div>
+    <p class="access">오사카코·코스모스퀘어역 (주오선) · 페리터미널에서 1.4km</p>
+    
+    <ul class="places">
+      <li><div class="pn"><span class="num">1</span>오사카 해유관 (가이유칸)<span class="badge b-star">★</span></div>
+        <div class="pf">세계 최대급 수족관. 고래상어. <b>반나절 코스</b>라 8/26 오전에 넣으려면 다른 걸 다 빼야 함</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=Osaka%20Aquarium%20Kaiyukan" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li>
+      <li><div class="pn"><span class="num">2</span>덴포잔 대관람차</div>
+        <div class="pf">해유관 옆. 항만 조망. 배 타기 전 1시간이면 충분</div>
+        <a class="pg" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A9%E4%BF%9D%E5%B1%B1%E5%A4%A7%E8%A6%B3%E8%A6%A7%E8%BB%8A" target="_blank" rel="noopener noreferrer">구글맵 열기 →</a></li></ul>
+  </section></main>
+<footer><b>오사카 여행 계획표</b> · v0.6-2026-08-10-DAY-PLAN<br>
+자동 생성 — 정본은 <b>index.html</b> 의 GUIDE_DATA. 지도·동선은 실제 가이드에서 볼 수 있다.</footer>
+</div></body></html>
