@@ -234,6 +234,38 @@
     font-size: 0.75rem; font-weight: 800; letter-spacing: .04em;
   }
   .zone-name { font-family: var(--serif); font-weight: 700; font-size: clamp(27px,6vw,46px); line-height: 1; color: var(--indigo); letter-spacing: -.01em; }
+  /* 여행 메모 + 일본어 — 탭 2개 · 항목은 <details> 로 접어둔다 */
+  .tripinfo { margin: 34px 0 26px; }
+  .ti-head { display: flex; align-items: baseline; gap: 9px; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; }
+  .ti-tag { background: var(--indigo); color: var(--page); font-size: 0.6875rem; font-weight: 800; letter-spacing: .1em; padding: 4px 8px; border-radius: 4px; flex: none; }
+  .ti-title { font-size: 1.0625rem; margin: 0; letter-spacing: -.01em; }
+  .ti-tabs { display: flex; gap: 7px; margin: 13px 0 12px; }
+  .ti-tab { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: var(--white);
+            font: inherit; font-size: 0.875rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
+  .ti-tab.is-on { background: var(--indigo); border-color: var(--indigo); color: var(--page); }
+  .ti-panel.is-hide { display: none; }
+  .ti-lede { margin: 0 0 11px; font-size: 0.8125rem; color: var(--ink-faint); }
+  .ti-item { border: 1px solid var(--line); border-radius: 10px; background: var(--white); margin-bottom: 8px; overflow: hidden; }
+  .ti-item[open] { border-color: var(--osaka-red); }
+  .ti-sum { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 13px; cursor: pointer; list-style: none; }
+  .ti-sum::-webkit-details-marker { display: none; }
+  .ti-sum::after { content: '+'; margin-left: auto; font-size: 1.125rem; font-weight: 700; color: var(--ink-faint); flex: none; }
+  .ti-item[open] .ti-sum::after { content: '−'; color: var(--osaka-red); }
+  .ti-ico { font-size: 1.0625rem; flex: none; }
+  .ti-lbl { font-size: 0.9375rem; font-weight: 700; }
+  .ti-cnt { font-size: 0.75rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .ti-list { margin: 0; padding: 2px 15px 13px 32px; font-size: 0.8438rem; color: var(--ink-soft); line-height: 1.6; }
+  .ti-list li { margin: 5px 0; }
+  .ti-list b, .ph-tips b { color: var(--ink); }
+  .ph { padding: 9px 13px; border-top: 1px solid var(--line-faint); }
+  .ph-ko { font-size: 0.8125rem; color: var(--ink-faint); }
+  .ph-ja { font-size: 1rem; font-weight: 700; margin-top: 2px; line-height: 1.45; }
+  .ph-ro { font-size: 0.75rem; color: var(--ink-faint); font-style: italic; margin-top: 1px; }
+  .ph-tips { border-top: 1px solid var(--line-faint); background: var(--page-tint); padding: 11px 13px 12px; }
+  .ph-tips-h { font-size: 0.6875rem; font-weight: 800; letter-spacing: .08em; color: var(--osaka-red); margin-bottom: 5px; }
+  .ph-tips ul { margin: 0; padding-left: 17px; font-size: 0.8125rem; color: var(--ink-soft); line-height: 1.55; }
+  .ph-tips li { margin: 3px 0; }
+
   /* 선착장 ↔ 숙소 이동 — 페이지 맨 위(도착)와 맨 아래(복귀) */
   .transfer { margin: 26px 0 34px; background: var(--frame); color: var(--page); border-radius: var(--r); padding: 18px 17px 16px; }
   .tr-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
@@ -266,6 +298,7 @@
   .zs-t { font-size: 0.8125rem; font-weight: 800; color: var(--zc, var(--indigo)); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
   .zs-w { font-size: 0.875rem; line-height: 1.45; }
   .zs-n { font-size: 0.7813rem; color: var(--ink-soft); margin-top: 2px; }
+  .zone-date { font-size: 0.75rem; font-weight: 700; color: var(--zc, var(--indigo)); background: var(--page-tint); border-radius: 999px; padding: 3px 10px; flex: none; letter-spacing: .01em; }
   .zone-access { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 0.7813rem; color: var(--ink-faint); }
   .zone-access .ico { color: var(--zc); font-size: 0.875rem; }
 
@@ -549,12 +582,12 @@
    데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
    장소 추가/수정 시 이 객체만 고치면 됨.
    ============================================================ */
-const BUILD_VERSION = 'v0.9-2026-08-10-IME-FIX';
+const BUILD_VERSION = 'v0.10-2026-08-10-NOTES-JP';
 
-const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"transfer":{"arrival":{"tag":"ARRIVAL","date":"8/24 (월)","title":"오사카항 → 시내 숙소","lede":"배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.","steps":[{"t":"10:00","w":"하선","d":"오사카항 국제페리터미널 (난코·사키시마)"},{"t":"~10:40","w":"입국수속 · 세관","d":"Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성"},{"t":"~11:00","w":"팬스타 무료 셔틀 승차","d":"터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것"},{"t":"~11:10","w":"코스모스퀘어역에서 IC카드 준비","d":"ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름"},{"t":"~11:40","w":"주오선 → 혼마치 환승 → 미도스지선 → 난바","d":"환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다"},{"t":"12:00","w":"숙소 짐 보관","d":"체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함"}],"need":["여권 · 승선권","Visit Japan Web 등록 QR (없으면 종이 신고서)","엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다","IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820","숙소 이름·주소를 일본어로 캡처"],"tip":"IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다."},"departure":{"tag":"DEPARTURE","date":"8/26 (수)","title":"숙소 → 오사카항","lede":"이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.","warn":"선사 공지 기준 **수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)** 이다. 13:50 이 막차라면 난바에서 **12:50 이전에는 출발**해야 한다. 시각표는 시즌마다 바뀌니 **승선권·선사 공지로 반드시 재확인할 것.**","steps":[{"t":"~09:00","w":"체크아웃 · 짐은 숙소에 보관","d":"오전 일정은 짐 없이 움직인다"},{"t":"12:00","w":"마지막 점심","d":"배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레"},{"t":"12:30","w":"숙소에서 짐 수령"},{"t":"12:50","w":"난바 출발","d":"미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것"},{"t":"~13:20","w":"코스모스퀘어역 도착 → 2층에서 셔틀 승차","d":"역 1층 편의점이 마지막 일본 쇼핑 기회"},{"t":"~13:40","w":"페리터미널 도착"},{"t":"—","w":"발권 · 수하물 수속 → 출국수속","d":"공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30"},{"t":"17:00","w":"출항"}],"need":["여권 · 승선권","IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)","면세 구매분은 개봉하지 말 것","캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다"],"tip":"배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로."}},"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[{"id":1,"tag":"DAY 1","name":"히데요시의 오사카","access":"다니마치욘초메역 (주오선·다니마치선) · 8/24(월) · 항구에서 주오선 직결","schedule":[{"t":"11:00","w":"팬스타 셔틀 → 코스모스퀘어","n":"주오선 승차"},{"t":"12:00","w":"숙소 짐 보관 (난바)","n":"체크인 전"},{"t":"12:30","w":"점심"},{"t":"14:00","w":"오사카 역사박물관","n":"¥600 · 입장 16:30 마감"},{"t":"15:30","w":"도요토미 석벽관","n":"천수각 티켓 공용"},{"t":"16:15","w":"오사카성 천수각","n":"¥1,200 · 입관 17:30 마감"},{"t":"17:50","w":"호코쿠 신사","n":"히데요시 동상 — 코스의 마침표"},{"t":"19:00","w":"숙소 체크인 → 대욕장"},{"t":"20:00","w":"저녁 야키니쿠 → 도톤보리 산책"}],"sections":[{"category":"관광지","places":[{"name_ko":"오사카 역사박물관","name_en":"Osaka Museum of History","feature":"10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · **화요일 휴관**","recommended":false,"essential":false,"lat":34.6826,"lng":135.5208,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8"},{"name_ko":"도요토미 석벽관","name_en":"Toyotomi Stone Wall Museum","feature":"2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 **도요토미 시대 진짜 석벽**을 지하에서 본다. 천수각 티켓 공용","recommended":true,"essential":false,"lat":34.6865,"lng":135.5267,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E"},{"name_ko":"오사카성 천수각","name_en":"Osaka Castle","feature":"1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},{"name_ko":"호코쿠 신사","name_en":"Hokoku Shrine","feature":"히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음","recommended":true,"essential":false,"lat":34.6842,"lng":135.5264,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE"}]}]},
-{"id":2,"tag":"DAY 2","name":"덴덴타운 전뇌지구","access":"닛폰바시역 (사카이스지선·킨테츠) · 8/25(화) · 전 구간 도보","schedule":[{"t":"09:30","w":"구로몬 시장","n":"오전이 가장 활발"},{"t":"11:00","w":"덴덴타운","n":"상점 대부분 11시 오픈 — 더 일찍 가면 셔터"},{"t":"13:00","w":"점심"},{"t":"14:00","w":"오타로드 → 도구야스지"},{"t":"15:30","w":"e스타디움 난바 본점","n":"난바파크스 1F"},{"t":"17:00","w":"숙소 → 대욕장·사우나","n":"술 마시기 전에 한 번 리셋"},{"t":"19:00","w":"저녁 — 쿠시카츠 → 이자카야 → 타코야키"}],"sections":[{"category":"관광지","places":[{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},{"name_ko":"덴덴타운 (닛폰바시)","name_en":"Den Den Town","feature":"서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. **대체로 11:00~19:00**","recommended":true,"essential":true,"lat":34.6647,"lng":135.506,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA"},{"name_ko":"오타로드","name_en":"Ota Road","feature":"덴덴타운 서쪽 한 블록. **메인도로만 보면 반쪽** — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다","recommended":true,"essential":false,"lat":34.661,"lng":135.5049,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA"},{"name_ko":"도구야스지 상점가","name_en":"Doguyasuji","feature":"주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음","recommended":false,"essential":false,"lat":34.6639,"lng":135.5035,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97"},{"name_ko":"난바파크스 · e스타디움","name_en":"Namba Parks / e-Stadium","feature":"1F **e스타디움 난바 본점** — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료","recommended":true,"essential":false,"lat":34.6616,"lng":135.502,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9"}]}]},
-{"id":3,"tag":"DAY 2 밤","name":"신세카이","access":"에비스초·도부쓰엔마에역 · 난바파크스에서 지하철 2정거장","schedule":[{"t":"18:30","w":"쓰텐카쿠 일대 도착"},{"t":"19:00","w":"쿠시카츠 다루마 총본점","n":"줄 길면 호젠지점(난바)로 회차"},{"t":"21:00","w":"난바 복귀 → 대욕장"}],"sections":[{"category":"관광지","places":[{"name_ko":"쓰텐카쿠","name_en":"Tsutenkaku Tower","feature":"신세카이 상징탑. 쇼와 레트로 간판 거리와 세트. 쿠시카츠 골목이 발밑에 깔려 있음","recommended":true,"essential":true,"lat":34.6524,"lng":135.5063,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsutenkaku%20Tower"},{"name_ko":"시텐노지","name_en":"Shitenno-ji Temple","feature":"593년 일본 最古급 관영 사찰. 히데요시보다 1000년 앞선 층. 낮에 시간 남으면","recommended":true,"essential":false,"lat":34.6544,"lng":135.5163,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shitenno-ji%20Temple"}]}]},
-{"id":4,"tag":"DAY 3","name":"오픈런 그리고 귀환","access":"신사이바시역 → 난바역 (미도스지선) · 8/26(수) · 전 구간 도보","schedule":[{"t":"09:00","w":"체크아웃 + 짐 보관"},{"t":"10:00","w":"신사이바시 파르코 6F","n":"오픈런 — 오후엔 대기표"},{"t":"11:15","w":"남하 → 덴덴타운 2차전","n":"어제 고민한 것 사기"},{"t":"12:00","w":"마지막 점심","n":"가벼운 것 — 배 타기 직전"},{"t":"13:00","w":"숙소에서 짐 수령"},{"t":"13:30","w":"난바 출발","n":"혼마치 환승 → 주오선"},{"t":"14:30","w":"페리터미널 도착","n":"집결 15:00 · 30분 여유"}],"sections":[{"category":"관광지","places":[{"name_ko":"신사이바시 파르코 6F","name_en":"Shinsaibashi PARCO","feature":"**캐릭터 스트리트** — 닌텐도 오사카·캡콤 스토어·동구리 공화국(지브리)·고질라·울트라맨 M78. **10시 오픈런**","recommended":true,"essential":true,"lat":34.6738,"lng":135.5009,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%BF%83%E6%96%8E%E6%A9%8BPARCO"},{"name_ko":"신사이바시스지 상점가","name_en":"Shinsaibashi-suji","feature":"600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류","recommended":true,"essential":false,"lat":34.6723,"lng":135.501,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shinsaibashi-suji%20Shopping%20Street"},{"name_ko":"도톤보리 · 구리코 사인","name_en":"Dotonbori Glico Sign","feature":"오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷","recommended":true,"essential":true,"lat":34.6687,"lng":135.5013,"maps_url":"https://www.google.com/maps/search/?api=1&query=Dotonbori%20Glico%20Sign"},{"name_ko":"호젠지 요코초","name_en":"Hozenji Yokocho","feature":"이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적","recommended":true,"essential":false,"lat":34.6684,"lng":135.5025,"maps_url":"https://www.google.com/maps/search/?api=1&query=Hozenji%20Yokocho"},{"name_ko":"아메리카무라","name_en":"Amerikamura","feature":"빈티지·스트리트 패션 구역. 산카쿠 공원 중심","recommended":false,"essential":false,"lat":34.6716,"lng":135.4972,"maps_url":"https://www.google.com/maps/search/?api=1&query=Amerikamura"},{"name_ko":"난바 야사카 신사","name_en":"Namba Yasaka Shrine","feature":"거대한 사자머리 무대. 사진 한 장 확실한 곳","recommended":false,"essential":false,"lat":34.6615,"lng":135.4967,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E9%9B%A3%E6%B3%A2%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE"}]}]},
+const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"transfer":{"arrival":{"tag":"ARRIVAL","date":"8/24 (월)","title":"오사카항 → 시내 숙소","lede":"배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.","steps":[{"t":"10:00","w":"하선","d":"오사카항 국제페리터미널 (난코·사키시마)"},{"t":"~10:40","w":"입국수속 · 세관","d":"Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성"},{"t":"~11:00","w":"팬스타 무료 셔틀 승차","d":"터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것"},{"t":"~11:10","w":"코스모스퀘어역에서 IC카드 준비","d":"ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름"},{"t":"~11:40","w":"주오선 → 혼마치 환승 → 미도스지선 → 난바","d":"환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다"},{"t":"12:00","w":"숙소 짐 보관","d":"체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함"}],"need":["여권 · 승선권","Visit Japan Web 등록 QR (없으면 종이 신고서)","엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다","IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820","숙소 이름·주소를 일본어로 캡처"],"tip":"IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다."},"departure":{"tag":"DEPARTURE","date":"8/26 (수)","title":"숙소 → 오사카항","lede":"이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.","warn":"선사 공지 기준 **수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)** 이다. 13:50 이 막차라면 난바에서 **12:50 이전에는 출발**해야 한다. 시각표는 시즌마다 바뀌니 **승선권·선사 공지로 반드시 재확인할 것.**","steps":[{"t":"~09:00","w":"체크아웃 · 짐은 숙소에 보관","d":"오전 일정은 짐 없이 움직인다"},{"t":"12:00","w":"마지막 점심","d":"배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레"},{"t":"12:30","w":"숙소에서 짐 수령"},{"t":"12:50","w":"난바 출발","d":"미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것"},{"t":"~13:20","w":"코스모스퀘어역 도착 → 2층에서 셔틀 승차","d":"역 1층 편의점이 마지막 일본 쇼핑 기회"},{"t":"~13:40","w":"페리터미널 도착"},{"t":"—","w":"발권 · 수하물 수속 → 출국수속","d":"공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30"},{"t":"17:00","w":"출항"}],"need":["여권 · 승선권","IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)","면세 구매분은 개봉하지 말 것","캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다"],"tip":"배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로."}},"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[{"id":1,"tag":"DAY 1","date":"8/24 (월)","name":"히데요시의 오사카","access":"다니마치욘초메역 (주오선·다니마치선) · 항구에서 주오선 직결","schedule":[{"t":"11:00","w":"팬스타 셔틀 → 코스모스퀘어","n":"주오선 승차"},{"t":"12:00","w":"숙소 짐 보관 (난바)","n":"체크인 전"},{"t":"12:30","w":"점심"},{"t":"14:00","w":"오사카 역사박물관","n":"¥600 · 입장 16:30 마감"},{"t":"15:30","w":"도요토미 석벽관","n":"천수각 티켓 공용"},{"t":"16:15","w":"오사카성 천수각","n":"¥1,200 · 입관 17:30 마감"},{"t":"17:50","w":"호코쿠 신사","n":"히데요시 동상 — 코스의 마침표"},{"t":"19:00","w":"숙소 체크인 → 대욕장"},{"t":"20:00","w":"저녁 야키니쿠 → 도톤보리 산책"}],"sections":[{"category":"관광지","places":[{"name_ko":"오사카 역사박물관","name_en":"Osaka Museum of History","feature":"10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · **화요일 휴관**","recommended":false,"essential":false,"lat":34.6826,"lng":135.5208,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8"},{"name_ko":"도요토미 석벽관","name_en":"Toyotomi Stone Wall Museum","feature":"2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 **도요토미 시대 진짜 석벽**을 지하에서 본다. 천수각 티켓 공용","recommended":true,"essential":false,"lat":34.6865,"lng":135.5267,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E"},{"name_ko":"오사카성 천수각","name_en":"Osaka Castle","feature":"1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},{"name_ko":"호코쿠 신사","name_en":"Hokoku Shrine","feature":"히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음","recommended":true,"essential":false,"lat":34.6842,"lng":135.5264,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE"}]}]},
+{"id":2,"tag":"DAY 2","date":"8/25 (화)","name":"덴덴타운 전뇌지구","access":"닛폰바시역 (사카이스지선·킨테츠) · 전 구간 도보","schedule":[{"t":"09:30","w":"구로몬 시장","n":"오전이 가장 활발"},{"t":"11:00","w":"덴덴타운","n":"상점 대부분 11시 오픈 — 더 일찍 가면 셔터"},{"t":"13:00","w":"점심"},{"t":"14:00","w":"오타로드 → 도구야스지"},{"t":"15:30","w":"e스타디움 난바 본점","n":"난바파크스 1F"},{"t":"17:00","w":"숙소 → 대욕장·사우나","n":"술 마시기 전에 한 번 리셋"},{"t":"19:00","w":"저녁 — 쿠시카츠 → 이자카야 → 타코야키"}],"sections":[{"category":"관광지","places":[{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},{"name_ko":"덴덴타운 (닛폰바시)","name_en":"Den Den Town","feature":"서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. **대체로 11:00~19:00**","recommended":true,"essential":true,"lat":34.6647,"lng":135.506,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA"},{"name_ko":"오타로드","name_en":"Ota Road","feature":"덴덴타운 서쪽 한 블록. **메인도로만 보면 반쪽** — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다","recommended":true,"essential":false,"lat":34.661,"lng":135.5049,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA"},{"name_ko":"도구야스지 상점가","name_en":"Doguyasuji","feature":"주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음","recommended":false,"essential":false,"lat":34.6639,"lng":135.5035,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97"},{"name_ko":"난바파크스 · e스타디움","name_en":"Namba Parks / e-Stadium","feature":"1F **e스타디움 난바 본점** — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료","recommended":true,"essential":false,"lat":34.6616,"lng":135.502,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9"}]}]},
+{"id":3,"tag":"DAY 2 밤","date":"8/25 (화)","name":"신세카이","access":"에비스초·도부쓰엔마에역 · 난바파크스에서 지하철 2정거장","schedule":[{"t":"18:30","w":"쓰텐카쿠 일대 도착"},{"t":"19:00","w":"쿠시카츠 다루마 총본점","n":"줄 길면 호젠지점(난바)로 회차"},{"t":"21:00","w":"난바 복귀 → 대욕장"}],"sections":[{"category":"관광지","places":[{"name_ko":"쓰텐카쿠","name_en":"Tsutenkaku Tower","feature":"신세카이 상징탑. 쇼와 레트로 간판 거리와 세트. 쿠시카츠 골목이 발밑에 깔려 있음","recommended":true,"essential":true,"lat":34.6524,"lng":135.5063,"maps_url":"https://www.google.com/maps/search/?api=1&query=Tsutenkaku%20Tower"},{"name_ko":"시텐노지","name_en":"Shitenno-ji Temple","feature":"593년 일본 最古급 관영 사찰. 히데요시보다 1000년 앞선 층. 낮에 시간 남으면","recommended":true,"essential":false,"lat":34.6544,"lng":135.5163,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shitenno-ji%20Temple"}]}]},
+{"id":4,"tag":"DAY 3","date":"8/26 (수)","name":"오픈런 그리고 귀환","access":"신사이바시역 → 난바역 (미도스지선) · 전 구간 도보","schedule":[{"t":"09:00","w":"체크아웃 + 짐 보관"},{"t":"10:00","w":"신사이바시 파르코 6F","n":"오픈런 — 오후엔 대기표"},{"t":"11:15","w":"남하 → 덴덴타운 2차전","n":"어제 고민한 것 사기"},{"t":"12:00","w":"마지막 점심","n":"가벼운 것 — 배 타기 직전"},{"t":"13:00","w":"숙소에서 짐 수령"},{"t":"13:30","w":"난바 출발","n":"혼마치 환승 → 주오선"},{"t":"14:30","w":"페리터미널 도착","n":"집결 15:00 · 30분 여유"}],"sections":[{"category":"관광지","places":[{"name_ko":"신사이바시 파르코 6F","name_en":"Shinsaibashi PARCO","feature":"**캐릭터 스트리트** — 닌텐도 오사카·캡콤 스토어·동구리 공화국(지브리)·고질라·울트라맨 M78. **10시 오픈런**","recommended":true,"essential":true,"lat":34.6738,"lng":135.5009,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%BF%83%E6%96%8E%E6%A9%8BPARCO"},{"name_ko":"신사이바시스지 상점가","name_en":"Shinsaibashi-suji","feature":"600m 아케이드. 비 와도 걷기 좋음. 드럭스토어·의류","recommended":true,"essential":false,"lat":34.6723,"lng":135.501,"maps_url":"https://www.google.com/maps/search/?api=1&query=Shinsaibashi-suji%20Shopping%20Street"},{"name_ko":"도톤보리 · 구리코 사인","name_en":"Dotonbori Glico Sign","feature":"오사카 상징 네온 간판. 밤이 본편. 강변 산책로에서 정면 샷","recommended":true,"essential":true,"lat":34.6687,"lng":135.5013,"maps_url":"https://www.google.com/maps/search/?api=1&query=Dotonbori%20Glico%20Sign"},{"name_ko":"호젠지 요코초","name_en":"Hozenji Yokocho","feature":"이끼 낀 미즈카케 부동존 + 돌바닥 골목. 도톤보리 소음 바로 옆의 정적","recommended":true,"essential":false,"lat":34.6684,"lng":135.5025,"maps_url":"https://www.google.com/maps/search/?api=1&query=Hozenji%20Yokocho"},{"name_ko":"아메리카무라","name_en":"Amerikamura","feature":"빈티지·스트리트 패션 구역. 산카쿠 공원 중심","recommended":false,"essential":false,"lat":34.6716,"lng":135.4972,"maps_url":"https://www.google.com/maps/search/?api=1&query=Amerikamura"},{"name_ko":"난바 야사카 신사","name_en":"Namba Yasaka Shrine","feature":"거대한 사자머리 무대. 사진 한 장 확실한 곳","recommended":false,"essential":false,"lat":34.6615,"lng":135.4967,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E9%9B%A3%E6%B3%A2%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE"}]}]},
 {"id":5,"tag":"옵션","name":"베이 (항구 근처)","access":"오사카코·코스모스퀘어역 (주오선) · 페리터미널에서 1.4km","sections":[{"category":"관광지","places":[{"name_ko":"오사카 해유관 (가이유칸)","name_en":"Osaka Aquarium Kaiyukan","feature":"세계 최대급 수족관. 고래상어. **반나절 코스**라 8/26 오전에 넣으려면 다른 걸 다 빼야 함","recommended":true,"essential":false,"lat":34.6545,"lng":135.4289,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Aquarium%20Kaiyukan"},{"name_ko":"덴포잔 대관람차","name_en":"Tempozan Giant Ferris Wheel","feature":"해유관 옆. 항만 조망. 배 타기 전 1시간이면 충분","recommended":false,"essential":false,"lat":34.6563,"lng":135.4311,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A9%E4%BF%9D%E5%B1%B1%E5%A4%A7%E8%A6%B3%E8%A6%A7%E8%BB%8A"}]}]}]};
 
 /* ============================================================
@@ -658,7 +691,7 @@ function renderNav() {
     b.type = 'button';
     b.dataset.target = 'zone-' + z.id;
     b.style.setProperty('--zc', zoneAccent(zi));
-    b.appendChild(E('span', null, String(z.id).padStart(2, '0') + ' ' + z.name));
+    b.appendChild(E('span', null, (z.date ? z.date.replace(/ .*/, '') : String(z.id).padStart(2, '0')) + ' ' + z.name));
     b.addEventListener('click', () => {
       const el = document.getElementById('zone-' + z.id);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -794,6 +827,12 @@ function buildZoneMapLink(zone, accent) {
 /* 구역 지도 — Leaflet 인터랙티브 지도에 그 구역의 모든 장소를 핀으로 표시 + 하단 구글맵 버튼.
    ※ 구글맵은 API 키 없이는 임베드 차단(X-Frame-Options). 표시는 OSM 데이터 기반 지도,
      핀 탭 → 이름·설명 + '구글맵 열기', 하단 버튼 → 그 구역을 구글맵으로. */
+/* 여행 메모 + 일본어 — 하단 탭 2개.
+   일본어 시나리오는 도쿄 메인 매거진의 JP_SCENARIOS 를 이식한 것이다.
+   도쿄 고유 항목(대사관 번호)은 오사카 총영사관으로 교체했다 — 그대로 복붙하지 않는다 (CLAUDE.md § 0). */
+const TRIP_NOTES = [{"icon":"🆘","label":"응급","items":["**119** 구급·소방 · **110** 경찰. 일본 전역 공통","**주오사카 총영사관** 06-4256-2345 — 니시신사이바시 (난바에서 도보권)","야간·휴일 긴급 **090-3050-0746** · 영사콜센터 **+82-2-3210-0404** (24시간)","여권 사본을 폰에 저장. 분실 시 재발급이 훨씬 빠르다"]},{"icon":"🌏","label":"지진","items":["흔들리면 **책상 밑**으로. 밖으로 뛰쳐나가지 말 것 — 낙하물이 더 위험","**엘리베이터 금지.** 안에 있었다면 전 층 눌러 가장 먼저 열리는 곳에서 내린다","숙소 안내방송·직원 지시를 따른다. 대피소는 대개 근처 초·중학교","폰 긴급지진속보는 기본 켜져 있다. 알림음이 나면 일단 몸부터 낮춘다"]},{"icon":"🥵","label":"8월 더위","items":["오사카 8월은 **분지 더위**다. 도쿄보다 체감이 세다","물은 **자판기·편의점**이 어디에나 있다. 참지 말고 계속 마실 것","한낮 12~15시는 **실내로 피난** — 아케이드(신사이바시스지)·지하상가·백화점","오사카성은 **그늘이 적다.** 모자·양산·냉감타월 있으면 확실히 다르다"]},{"icon":"🙇","label":"매너","items":["**촬영 금지 구역**이 있다. 사유 골목·신사 본전 안·상점 내부는 표지판 확인","**사람 얼굴이 크게 나오는 사진**은 피한다. 특히 상점 직원·손님","전철에서 **통화 금지**. 대화도 작게","에스컬레이터는 오사카가 **오른쪽 서기** — 도쿄(왼쪽)와 반대다","**길에 쓰레기통이 거의 없다.** 나올 때까지 들고 다니거나 편의점에서 버린다","흡연은 **지정 구역만.** 길빵은 과태료 대상"]},{"icon":"💴","label":"돈·결제","items":["**IC카드(ICOCA)** 하나면 지하철·버스·편의점까지 된다. 보증금 ¥500은 반납 시 환급","카드가 대부분 되지만 **작은 가게·포장마차는 현금**만 받는 곳이 있다","충전 자판기는 **현금 전용**이 많다. 엔화 지폐를 조금 들고 다닐 것","면세는 여권 필요. 구매분은 **개봉하지 말고** 귀국 짐에"]},{"icon":"📶","label":"통신·기타","items":["eSIM 또는 포켓와이파이를 **출발 전에** 준비. 현지 개통은 번거롭다","**Visit Japan Web** 미리 등록하면 입국·세관이 QR 한 번으로 끝난다","구글맵이 전철 환승·플랫폼까지 정확하다. 일본 내 길찾기는 이걸로","콘센트는 **110V·2핀(A타입)** — 한국 기기는 대부분 그대로 되지만 돼지코가 필요할 수 있다"]}];
+const JP_SCENARIOS = [{"id":"taxi","icon":"🚖","label":"택시","tips":["뒷좌석 문 **자동**. 직접 열지 마세요","주소는 **일본어 종이 / 폰 화면**이 가장 정확","카드 결제 일반화. 부족하면 Suica·Pasmo도 OK","팁 문화 없음. 미터 그대로"],"phrases":[{"ko":"여기까지 가주세요","ja":"ここまでお願いします","romaji":"Koko made onegai shimasu"},{"ko":"이 주소로 가주세요 (폰 보여주기)","ja":"この住所までお願いします","romaji":"Kono jūsho made onegai shimasu"},{"ko":"영수증 부탁합니다","ja":"領収書をお願いします","romaji":"Ryōshūsho o onegai shimasu"},{"ko":"여기서 세워주세요","ja":"ここで止めてください","romaji":"Koko de tomete kudasai"},{"ko":"얼마인가요?","ja":"いくらですか？","romaji":"Ikura desu ka?"}]},{"id":"station","icon":"🚇","label":"전철역","tips":["거의 모든 안내 **영어 병기**","플랫폼 번호와 종점(終点)도 영어 표기","**IC 카드 → iPhone 지갑에 추가**하면 모바일 NFC로 OK","환승은 **Google Maps이 가장 정확** (실시간 플랫폼)"],"phrases":[{"ko":"○○역 어느 쪽?","ja":"○○駅はどっちですか？","romaji":"◯◯-eki wa docchi desu ka?"},{"ko":"○○역 가는 차, 몇 번 플랫폼?","ja":"○○駅は何番線ですか？","romaji":"◯◯-eki wa nan-bansen desu ka?"},{"ko":"○○역까지 얼마인가요?","ja":"○○駅までいくらですか？","romaji":"◯◯-eki made ikura desu ka?"},{"ko":"환승은 어디서?","ja":"どこで乗り換えですか？","romaji":"Doko de norikae desu ka?"},{"ko":"막차 시간이 언제인가요?","ja":"終電は何時ですか？","romaji":"Shūden wa nan-ji desu ka?"}]},{"id":"restaurant","icon":"🍜","label":"식당","tips":["점원 **영어 단어** 한두 개는 통함 (\"water\", \"menu\", \"card\")","메뉴 사진 **가리키기**가 가장 정확","계산은 **카운터에서** — 자리에서 X (대부분)","나갈 때 한 마디: **ごちそうさまでした** (gochisōsama deshita) \"잘 먹었습니다\""],"phrases":[{"ko":"한 명입니다","ja":"一人です","romaji":"Hitori desu"},{"ko":"두 명입니다","ja":"二人です","romaji":"Futari desu"},{"ko":"이거 부탁합니다 (메뉴 가리키며)","ja":"これお願いします","romaji":"Kore onegai shimasu"},{"ko":"추천은 무엇인가요?","ja":"おすすめは何ですか？","romaji":"Osusume wa nan desu ka?"},{"ko":"영어 메뉴 있나요?","ja":"英語のメニューはありますか？","romaji":"Eigo no menyū wa arimasu ka?"},{"ko":"카드 사용 가능한가요?","ja":"カード使えますか？","romaji":"Kādo tsukaemasu ka?"},{"ko":"계산해주세요","ja":"お会計お願いします","romaji":"Okaikei onegai shimasu"},{"ko":"잘 먹었습니다 (나갈 때)","ja":"ごちそうさまでした","romaji":"Gochisōsama deshita"}]},{"id":"izakaya","icon":"🍶","label":"이자카야 / 술집","tips":["**5~10석 카운터** 가게 흔함. 들어갈 때 잠깐 인사 (こんばんは / konbanwa)","**お通し (otōshi)** = 자릿값 안주 ¥300~500. 자동 제공 — 거부 어려움","**골든가이** 등 일부 가게 **チャージ料 (좌석료) ¥500~1,000** 별도. 입구 표시 확인","한 잔 + 한 안주 후 자리 양보 — 회전 빠름","계산은 카운터 / 손가락으로 ✕ 표시 = \"계산해주세요\""],"phrases":[{"ko":"안녕하세요 (저녁)","ja":"こんばんは","romaji":"Konbanwa"},{"ko":"한 명이요","ja":"一人ですけど","romaji":"Hitori desu kedo"},{"ko":"자리 있나요?","ja":"席ありますか？","romaji":"Seki arimasu ka?"},{"ko":"생맥주 한 잔 부탁해요","ja":"生ビール一つお願いします","romaji":"Nama bīru hitotsu onegai shimasu"},{"ko":"하이볼 한 잔 부탁해요","ja":"ハイボール一つお願いします","romaji":"Haibōru hitotsu onegai shimasu"},{"ko":"사케 (정종) 추천 부탁해요","ja":"日本酒のおすすめお願いします","romaji":"Nihonshu no osusume onegai shimasu"},{"ko":"같은 거 한 잔 더","ja":"もう一杯同じものをお願いします","romaji":"Mō ippai onaji mono o onegai shimasu"},{"ko":"인기 안주 한 가지 추천해주세요","ja":"人気のおつまみを一つ教えてください","romaji":"Ninki no otsumami o hitotsu oshiete kudasai"},{"ko":"오토시는 무엇인가요?","ja":"お通しは何ですか？","romaji":"Otōshi wa nan desu ka?"},{"ko":"좌석료(자릿값) 있나요?","ja":"チャージ料はありますか？","romaji":"Chāji-ryō wa arimasu ka?"},{"ko":"계산해주세요","ja":"お会計お願いします","romaji":"Okaikei onegai shimasu"},{"ko":"맛있었어요 (나갈 때)","ja":"おいしかったです","romaji":"Oishikatta desu"}]},{"id":"convenience","icon":"🏪","label":"편의점·매장","tips":["Lawson · 7-Eleven · Family Mart — **카드 / IC카드 / 현금** 모두 OK","비닐봉투 유료 (¥3~5)","도시락 데울지 점원이 물어봄 — **끄덕이거나 \"はい(hai)\"** = 예","편의점 ATM에서 **외화 카드 출금 가능** (Lawson·7-Eleven 추천)"],"phrases":[{"ko":"봉투 부탁합니다","ja":"袋お願いします","romaji":"Fukuro onegai shimasu"},{"ko":"봉투 필요 없어요","ja":"袋要りません","romaji":"Fukuro irimasen"},{"ko":"데워주세요","ja":"温めてください","romaji":"Atatamete kudasai"},{"ko":"젓가락 부탁합니다","ja":"お箸お願いします","romaji":"Ohashi onegai shimasu"},{"ko":"영수증 부탁합니다","ja":"レシートお願いします","romaji":"Reshīto onegai shimasu"}]},{"id":"directions","icon":"🗺️","label":"길 묻기 (손으로 짚으며)","tips":["**구글맵 화면 보여주기** 가 가장 빠름 — 일본어 검색이 정확","\"すみません\" (sumimasen) 으로 시작하면 거의 대답해줌","나이 든 분은 손으로 방향 가리켜줄 가능성 높음","편의점 점원에게 물어보면 친절. 지도 옆에 빌려달라고도 가능"],"phrases":[{"ko":"저기요 / 죄송합니다 (말 걸 때)","ja":"すみません","romaji":"Sumimasen"},{"ko":"여기 어디인가요? (지도 가리키며)","ja":"ここはどこですか？","romaji":"Koko wa doko desu ka?"},{"ko":"여기까지 어떻게 가요? (폰 화면 보여주며)","ja":"ここまでどう行きますか？","romaji":"Koko made dō ikimasu ka?"},{"ko":"걸어서 갈 수 있나요?","ja":"歩いて行けますか？","romaji":"Aruite ikemasu ka?"},{"ko":"얼마나 걸리나요?","ja":"どれくらいかかりますか？","romaji":"Dorekurai kakarimasu ka?"},{"ko":"근처에 ○○ 있나요?","ja":"この近くに○○はありますか？","romaji":"Kono chikaku ni ◯◯ wa arimasu ka?"},{"ko":"지도에 표시해주실 수 있나요?","ja":"地図に書いてもらえますか？","romaji":"Chizu ni kaite moraemasu ka?"},{"ko":"감사합니다, 도움이 됐어요","ja":"ありがとうございます、助かりました","romaji":"Arigatō gozaimasu, tasukarimashita"}]},{"id":"hotel","icon":"🏨","label":"호텔","tips":["체크인 시 여권 필수 + 사본 보관","대부분 영어 가능. 단어 X면 폰 번역 OK","**대욕장**은 가운(浴衣)+슬리퍼로 이동. 입욕 전 샤워 필수. 시계·휴대폰 X","체크아웃 후 짐 보관 — \"luggage\" 한 단어로도 통함"],"phrases":[{"ko":"체크인 부탁합니다","ja":"チェックインお願いします","romaji":"Chekku-in onegai shimasu"},{"ko":"체크아웃 부탁합니다","ja":"チェックアウトお願いします","romaji":"Chekku-auto onegai shimasu"},{"ko":"와이파이 비밀번호?","ja":"Wi-Fiのパスワードは？","romaji":"Wi-Fi no pasuwādo wa?"},{"ko":"대욕장은 몇 층인가요?","ja":"大浴場は何階ですか？","romaji":"Daiyokujō wa nan-kai desu ka?"},{"ko":"대욕장 운영 시간은?","ja":"大浴場は何時から何時までですか？","romaji":"Daiyokujō wa nan-ji kara nan-ji made desu ka?"},{"ko":"체크아웃 후 짐 보관 가능한가요?","ja":"チェックアウト後、荷物を預けられますか？","romaji":"Chekku-auto go, nimotsu o azukeraremasu ka?"},{"ko":"수건 한 장 더 부탁합니다","ja":"タオルをもう一つお願いします","romaji":"Taoru o mō hitotsu onegai shimasu"},{"ko":"아침 식사는 몇 시부터?","ja":"朝食は何時からですか？","romaji":"Chōshoku wa nan-ji kara desu ka?"}]},{"id":"emergency","icon":"🆘","label":"응급 / 도움","tips":["응급: **119** (구급·소방) / **110** (경찰)","편의점·역 직원에게 도움 요청 가능","약국 = **薬局 (yakkyoku)** / 병원 = **病院 (byōin)**","**주오사카 총영사관** 06-4256-2345 (평일 09:00~17:30) · 야간·휴일 긴급 090-3050-0746"],"phrases":[{"ko":"도와주세요","ja":"助けてください","romaji":"Tasukete kudasai"},{"ko":"몸이 안 좋아요","ja":"体調が悪いです","romaji":"Taichō ga warui desu"},{"ko":"병원이 어디인가요?","ja":"病院はどこですか？","romaji":"Byōin wa doko desu ka?"},{"ko":"약국이 어디인가요?","ja":"薬局はどこですか？","romaji":"Yakkyoku wa doko desu ka?"},{"ko":"구급차 불러주세요","ja":"救急車を呼んでください","romaji":"Kyūkyūsha o yonde kudasai"},{"ko":"경찰 불러주세요","ja":"警察を呼んでください","romaji":"Keisatsu o yonde kudasai"},{"ko":"여권을 잃어버렸어요","ja":"パスポートをなくしました","romaji":"Pasupōto o nakushimashita"},{"ko":"한국어 가능한 분 있나요?","ja":"韓国語ができる方はいますか？","romaji":"Kankokugo ga dekiru kata wa imasu ka?"},{"ko":"영어 가능한 분 있나요?","ja":"英語ができる方はいますか？","romaji":"Eigo ga dekiru kata wa imasu ka?"}]},{"id":"money","icon":"💴","label":"돈·환전·ATM","tips":["**Lawson·7-Eleven ATM** = 외화 카드 출금 best (24시간, 영어 OK)","환전소보다 ATM 이 환율 좋은 경우 흔함","카드 결제 일반화 — 도심·관광지는 거의 다 가능","**현금 필요** 케이스: 골든가이 일부 / 5석 술집 / 노포 식당 / 신사·절 헌금"],"phrases":[{"ko":"ATM은 어디인가요?","ja":"ATMはどこですか？","romaji":"ATM wa doko desu ka?"},{"ko":"환전 가능한가요?","ja":"両替できますか？","romaji":"Ryōgae dekimasu ka?"},{"ko":"카드 사용 가능한가요?","ja":"カード使えますか？","romaji":"Kādo tsukaemasu ka?"},{"ko":"현금만 받나요?","ja":"現金だけですか？","romaji":"Genkin dake desu ka?"},{"ko":"잔돈으로 부탁드려요","ja":"小銭でお願いします","romaji":"Kozeni de onegai shimasu"}]},{"id":"photo","icon":"📷","label":"사진·관광","tips":["신사·절 본전 안 / 일부 박물관 = **사진 금지**. 표지 확인","사람 찍을 때는 미리 양해 (불쾌해할 수 있음)","입장료는 보통 ¥500~2,000. 학생 할인 ID 가져갈 것 (대학생 한정)"],"phrases":[{"ko":"사진 찍어도 되나요?","ja":"写真を撮ってもいいですか？","romaji":"Shashin o totte mo ī desu ka?"},{"ko":"저랑 같이 한 장 부탁드려요","ja":"一緒に写真を撮ってもらえますか？","romaji":"Issho ni shashin o totte moraemasu ka?"},{"ko":"입장료 얼마인가요?","ja":"入場料はいくらですか？","romaji":"Nyūjōryō wa ikura desu ka?"},{"ko":"몇 시까지 영업하나요?","ja":"何時までですか？","romaji":"Nan-ji made desu ka?"},{"ko":"오늘 휴무인가요?","ja":"今日はお休みですか？","romaji":"Kyō wa oyasumi desu ka?"},{"ko":"여기 들어가도 되나요?","ja":"入ってもいいですか？","romaji":"Haitte mo ī desu ka?"}]}];
+
 const ZONE_MAP_REG = [];
 function buildZoneMap(zone, accent) {
   if (!zoneCenter(zone)) return null;
@@ -1038,6 +1077,109 @@ function buildSchedule(zone) {
   return wrap;
 }
 
+/* **강조** 를 <b> 로. innerHTML 을 쓰지 않고 조각을 나눠 textContent 로 넣는다 (CSP 정책 유지) */
+function rich(el, str) {
+  String(str == null ? '' : str).split(/\*\*/).forEach((part, i) => {
+    el.appendChild(i % 2 ? E('b', null, part) : E('span', null, part));
+  });
+  return el;
+}
+
+/* 여행 메모 + 일본어 — 탭 2개.
+   일본어는 시나리오별 <details> 로 접어둔다. 네이티브라 JS 가 필요 없고,
+   여행지에서 필요한 상황 하나만 펴서 보면 된다 ("보고 싶은 사람만 열어서"). */
+function renderTripInfo() {
+  if (typeof TRIP_NOTES === 'undefined' && typeof JP_SCENARIOS === 'undefined') return null;
+  const sec = E('section', 'tripinfo');
+  sec.id = 'tripinfo';
+
+  const head = E('div', 'ti-head');
+  head.appendChild(E('span', 'ti-tag', 'NOTES'));
+  head.appendChild(E('h2', 'ti-title', '여행 메모'));
+  sec.appendChild(head);
+
+  const tabs = E('div', 'ti-tabs');
+  tabs.setAttribute('role', 'tablist');
+  const panels = [];
+  const defs = [
+    { key: 'trip', label: '여행', build: buildTripNotes },
+    { key: 'jp', label: '일본어', build: buildJpPanel }
+  ];
+  defs.forEach((d, idx) => {
+    const b = E('button', 'ti-tab' + (idx === 0 ? ' is-on' : ''), d.label);
+    b.type = 'button';
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+    const p = d.build();
+    p.className = 'ti-panel' + (idx === 0 ? '' : ' is-hide');
+    panels.push({ btn: b, panel: p });
+    b.addEventListener('click', () => {
+      panels.forEach(x => {
+        const on = x.btn === b;
+        x.btn.classList.toggle('is-on', on);
+        x.btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        x.panel.classList.toggle('is-hide', !on);
+      });
+    });
+    tabs.appendChild(b);
+  });
+  sec.appendChild(tabs);
+  panels.forEach(x => sec.appendChild(x.panel));
+  return sec;
+}
+
+function buildTripNotes() {
+  const wrap = E('div', null);
+  (typeof TRIP_NOTES === 'undefined' ? [] : TRIP_NOTES).forEach(n => {
+    const d = document.createElement('details');
+    d.className = 'ti-item';
+    const s = document.createElement('summary');
+    s.className = 'ti-sum';
+    s.appendChild(E('span', 'ti-ico', n.icon || ''));
+    s.appendChild(E('span', 'ti-lbl', n.label || ''));
+    s.appendChild(E('span', 'ti-cnt', String((n.items || []).length)));
+    d.appendChild(s);
+    const ul = E('ul', 'ti-list');
+    (n.items || []).forEach(t => ul.appendChild(rich(E('li', null), t)));
+    d.appendChild(ul);
+    wrap.appendChild(d);
+  });
+  return wrap;
+}
+
+function buildJpPanel() {
+  const wrap = E('div', null);
+  wrap.appendChild(E('p', 'ti-lede', '상황을 골라 펴면 돼. 일본어를 그대로 보여줘도 통해.'));
+  (typeof JP_SCENARIOS === 'undefined' ? [] : JP_SCENARIOS).forEach(scn => {
+    const d = document.createElement('details');
+    d.className = 'ti-item';
+    const s = document.createElement('summary');
+    s.className = 'ti-sum';
+    s.appendChild(E('span', 'ti-ico', scn.icon || ''));
+    s.appendChild(E('span', 'ti-lbl', scn.label || scn.id));
+    s.appendChild(E('span', 'ti-cnt', String((scn.phrases || []).length)));
+    d.appendChild(s);
+
+    (scn.phrases || []).forEach(p => {
+      const row = E('div', 'ph');
+      row.appendChild(E('div', 'ph-ko', p.ko));
+      row.appendChild(E('div', 'ph-ja', p.ja));
+      if (p.romaji) row.appendChild(E('div', 'ph-ro', p.romaji));
+      d.appendChild(row);
+    });
+    if (scn.tips && scn.tips.length) {
+      const t = E('div', 'ph-tips');
+      t.appendChild(E('div', 'ph-tips-h', '알아둘 것'));
+      const ul = E('ul', null);
+      scn.tips.forEach(x => ul.appendChild(rich(E('li', null), x)));
+      t.appendChild(ul);
+      d.appendChild(t);
+    }
+    wrap.appendChild(d);
+  });
+  return wrap;
+}
+
 /* 선착장 ↔ 숙소 이동 블록.
    도착(ARRIVAL)은 첫 구역 앞, 복귀(DEPARTURE)는 마지막 구역 뒤에 놓는다 —
    여행이 시작되고 끝나는 순서 그대로 페이지에 박히도록. */
@@ -1104,6 +1246,7 @@ function renderZones() {
     // zone.tag 가 있으면 그걸 쓴다 (DAY 1 등). 없으면 기존 AREA 번호.
     tag.appendChild(E('span', null, zone.tag || ('AREA ' + String(zone.id).padStart(2, '0'))));
     head.appendChild(tag);
+    if (zone.date) head.appendChild(E('span', 'zone-date', zone.date));
     head.appendChild(E('h2', 'zone-name', zone.name));
     if (zone.access) {
       const acc = E('span', 'zone-access');
@@ -1126,7 +1269,10 @@ function renderZones() {
   empty.id = 'empty';
   body.appendChild(empty);
 
-  // 복귀 블록은 맨 끝. (도착 블록은 renderZones 시작 전에 이미 넣었다)
+  // 여행 메모 + 일본어 → 그 다음 복귀 블록이 맨 끝.
+  // (도착 블록은 renderZones 시작 전에 이미 넣었다)
+  const ti = renderTripInfo();
+  if (ti) body.appendChild(ti);
   const dep = buildTransfer('departure');
   if (dep) body.appendChild(dep);
 }

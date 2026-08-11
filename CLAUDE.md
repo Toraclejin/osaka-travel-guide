@@ -80,6 +80,7 @@ GUIDE_DATA = {
 | `base_hotel` | object \| **null** | `{name, area, note, lat?, lng?}`. **숙소 미정이면 `null`** — 가짜 자리표시자 넣지 말 것. `null`이면 ① 매스트헤드 호텔 칩 생략 ② 원정 길찾기 출발지가 `Osaka Station`으로 대체 (`excursionOrigin()`) ③ 지도에 숙소 핀·loop 동선 없음. **`lat`/`lng`를 채우면 각 구역 지도에 숙소 핀이 생기고 동선이 `숙소 → 장소들 → 숙소` loop로 바뀐다** (§ 7). 좌표는 R-D3 land-check 필수 |
 | `zones[].id` | number | 앵커 id = `zone-{id}`. 내비 칩 번호 |
 | `transfer` | object \| 생략 | **선착장 ↔ 숙소 이동.** `{arrival:{...}, departure:{...}}`. 각각 `{tag, date, title, lede, warn?, steps:[{t,w,d?}], need:[string], tip?}`. **`arrival`은 첫 구역 앞, `departure`는 맨 끝**에 렌더 — 여행이 시작·끝나는 순서 그대로. `warn`의 `**강조**`는 `<b>`로 변환된다 (`innerHTML` 아님 — 조각을 나눠 `textContent`) |
+| `zones[].date` | string \| 생략 | `'8/24 (월)'`. **헤더 배지 + 내비 칩 앞머리**(`8/24 히데요시의 오사카`)에 쓰인다. 없으면 내비 칩은 기존 `01` 번호로 폴백. **`access` 에 날짜를 중복해 쓰지 말 것** |
 | `zones[].tag` | string \| 생략 | 헤더 배지. **있으면 그걸 쓰고, 없으면 `AREA 01`** 로 폴백. v0.6부터 `DAY 1` / `DAY 2 밤` / `옵션` 을 쓴다 |
 | `zones[].schedule` | array \| 생략 | **그 날의 흐름.** `[{t:'14:00', w:'무엇을', n:'왜/주의'}]`. 없으면 시간표 블록 자체가 안 그려진다 (`buildSchedule` 이 `null` 반환) |
 | `zones[].access` | string | **역 기준**으로 쓴다 (`난바·신사이바시역 (미도스지선) · 기타에서 8분`). 숙소에 의존하지 않으므로 숙소 미정이어도 유효하다. 숙소가 정해지면 도보 시간만 덧붙이면 됨 |
@@ -195,6 +196,11 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 **렌더**
 - `renderMast()` — 매스트헤드 (호텔 칩 · 총계 pill · 푸터 카운트)
 - `renderNav()` — 구역 칩 + 원정 칩 + 분류 필터 + 추천/필수 토글
+- `rich(el, str)` — `**강조**` → `<b>`. **`innerHTML` 을 쓰지 않는다** — 조각을 나눠 `textContent` 로 넣는다 (§ 6 정책 유지)
+- `renderTripInfo()` — **여행 메모 + 일본어** 탭 2개. `TRIP_NOTES` / `JP_SCENARIOS` 상수를 읽는다
+  - 항목은 네이티브 **`<details>`** 로 접는다. JS 토글을 만들지 말 것 — 접근성·키보드·모바일이 공짜로 따라온다
+  - `JP_SCENARIOS` 는 **도쿄 메인 매거진에서 이식**(10 시나리오 · 71 문장). 도쿄 고유였던 대사관 번호만 오사카 총영사관으로 교체했다
+  - ⚠ 새 문장을 넣을 때 **도쿄 지명이 섞이지 않았는지** § 9 점검 5로 확인
 - `buildTransfer(kind)` — `'arrival'` / `'departure'` 이동 블록. `GUIDE_DATA.transfer` 없으면 `null`
   - **도착은 `renderZones` 맨 앞, 복귀는 `#empty` 뒤.** 순서를 바꾸지 말 것 — 페이지가 곧 여행의 시간축이다
   - ⚠ 셔틀·수속 시각은 **시즌마다 바뀐다.** `warn`에 "재확인" 문구를 반드시 남길 것
@@ -353,9 +359,13 @@ node -e "const h=require('fs').readFileSync('index.html','utf8'); const cats=[..
 
 ```bash
 # 5. 이전 매거진 잔재 (도쿄·우에노·디즈니 등)
-#    의도된 언급은 제외한다 — BUILD_VERSION(이식 출처) · R-D2 룰 주석 ·
-#    "왜 도쿄처럼 못 하는지"를 설명하는 주석(OSRM / 도쿄식 loop).
-grep -niE "tokyo|도쿄|우에노|디즈니|마이하마" index.html | grep -vE "BUILD_VERSION|R-D2|OSRM|도쿄식" || echo "OK — 잔재 없음"
+#    의도된 언급은 제외한다:
+#      BUILD_VERSION(이식 출처) · R-D2 룰 주석 · "왜 도쿄처럼 못 하는지" 주석(OSRM/도쿄식 loop)
+#      이식 출처 주석(도쿄 고유·도쿄 메인) · **독자에게 유용한 비교**(도쿄보다 / 도쿄(왼쪽))
+#    ⚠ 마지막 항목이 핵심이다 — "에스컬레이터는 오사카가 오른쪽, 도쿄는 왼쪽" 같은 문구는
+#      잔재가 아니라 정보다. 잔재는 "지우는 걸 잊은 것", 비교는 "일부러 쓴 것".
+grep -niE "tokyo|도쿄|우에노|디즈니|마이하마|신주쿠|나리타" index.html \
+  | grep -vE "BUILD_VERSION|R-D2|OSRM|도쿄식|도쿄 고유|도쿄 메인|도쿄보다|도쿄\(" || echo "OK — 잔재 없음"
 ```
 
 ```bash
