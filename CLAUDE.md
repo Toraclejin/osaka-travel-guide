@@ -270,6 +270,70 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 - ✅ `place_id`를 모르면 **쿼리만 있는 URL**을 쓴다 (`?api=1&query=영문명`). 이쪽이 틀린 place_id보다 안전
 - 📍 현재 시드 좌표는 **전부 미검증**. § 12 참고
 
+### R-D12. 링크는 **HTTP 200이 아니라 "맞는 곳에 닿는지"**로 검증한다
+
+- **v0.12 사고**: 심층 정보 19곳의 링크를 `HEAD` 요청으로 200만 확인하고 "19/19 정상"이라고 보고했다. 실제로는 **2건이 잘못된 곳으로 갔다.**
+  - 호코쿠 신사 → `ko:도요쿠니 신사`는 **동음이의 페이지** (오사카 것은 한국어 위키에 아예 없음)
+  - 신사이바시 파르코 → `ja:心斎橋PARCO`는 **회사 문서 `パルコ`로 리다이렉트** (6층에 뭐가 있는지와 무관)
+- **둘 다 HTTP 200이었다.** 200은 "서버가 응답했다"일 뿐 "맞는 문서다"가 아니다.
+
+**검증 항목 (링크 종류별)**
+
+| 링크 | 200으로 부족한 이유 | 실제로 확인할 것 |
+|---|---|---|
+| `maps_url` | 구글맵은 **아무 쿼리나 200**을 준다 | 쿼리를 **Nominatim으로 역검증** → 우리 `lat`/`lng`와의 거리. **0.4km 이내**면 통과 |
+| 위키 | 동음이의·엉뚱한 리다이렉트도 200 | API `redirects=1` + `prop=pageprops` → **`disambiguation` 없음** + **최종 제목이 의도한 대상** |
+| 공식 페이지 | SPA는 본문이 비어 보인다 | 실제 렌더 후 **찾는 정보가 있는지** (WebFetch 등) |
+
+**우선순위**: 한국어 위키 → 없으면 일본어 위키 → 그것도 아니면 **공식 페이지**. 억지로 위키를 붙이지 말 것.
+
+```bash
+# 구글맵 쿼리 역검증 — 쿼리가 우리 좌표와 같은 곳을 가리키나 (Nominatim 1req/s)
+#  판정: <0.4km 통과 / 0.4~1.2km 확인 / >1.2km 또는 결과없음 = 실패
+node -e "
+const H=require('fs').readFileSync('index.html','utf8');
+let i=H.indexOf('{',H.indexOf('const GUIDE_DATA = ')),d=0,q=0,e=0,end=i;
+for(let j=i;j<H.length;j++){const c=H[j];
+  if(q){ if(e)e=0; else if(c==='\\\\')e=1; else if(c==='\"')q=0; continue; }
+  if(c==='\"'){q=1;continue;}
+  if(c==='{'||c==='[')d++; else if(c==='}'||c===']'){d--; if(!d){end=j;break;}}}
+const G=JSON.parse(H.slice(i,end+1));
+const hav=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dA=t(b[0]-a[0]),dO=t(b[1]-a[1]);return 2*R*Math.asin(Math.sqrt(Math.sin(dA/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dO/2)**2))};
+const P=[];G.zones.forEach(z=>z.sections.forEach(s=>s.places.forEach(p=>P.push(p))));
+(async()=>{for(const p of P){ if(!p.lat) continue;
+  const qq=new URL(p.maps_url).searchParams.get('query');
+  const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(qq),
+    {headers:{'User-Agent':'osaka-guide-linkcheck/1.0 (personal travel guide QA)'}});
+  const j=await r.json();
+  if(!j[0]) console.log('!! '+p.name_ko+' 검색결과 없음');
+  else { const dd=hav([p.lat,p.lng],[+j[0].lat,+j[0].lon]);
+    console.log((dd<0.4?'OK ':dd<1.2?'~~ ':'!! ')+p.name_ko+'  '+dd.toFixed(2)+'km'); }
+  await new Promise(s=>setTimeout(s,1100)); }})();"
+```
+
+```bash
+# 위키 링크 — 동음이의 / 리다이렉트 최종 제목 확인 (429 나면 대기를 늘릴 것)
+node -e "
+const H=require('fs').readFileSync('index.html','utf8');
+let i=H.indexOf('{',H.indexOf('const GUIDE_DATA = ')),d=0,q=0,e=0,end=i;
+for(let j=i;j<H.length;j++){const c=H[j];
+  if(q){ if(e)e=0; else if(c==='\\\\')e=1; else if(c==='\"')q=0; continue; }
+  if(c==='\"'){q=1;continue;}
+  if(c==='{'||c==='[')d++; else if(c==='}'||c===']'){d--; if(!d){end=j;break;}}}
+const G=JSON.parse(H.slice(i,end+1));
+const P=[];G.zones.forEach(z=>z.sections.forEach(s=>s.places.forEach(p=>{if(p.deep&&p.deep.link)P.push(p)})));
+(async()=>{for(const p of P){
+  const m=p.deep.link.url.match(/^https:\/\/(\w+)\.wikipedia\.org\/wiki\/(.+)\$/);
+  if(!m){ console.log('-- '+p.name_ko+' 위키 아님 (직접 확인)'); continue; }
+  const r=await fetch('https://'+m[1]+'.wikipedia.org/w/api.php?action=query&format=json&redirects=1&prop=pageprops&titles='+encodeURIComponent(decodeURIComponent(m[2])),
+    {headers:{'User-Agent':'osaka-guide-linkcheck/1.0'}});
+  const t=await r.text(); if(t[0]!=='{'){ console.log('?? '+p.name_ko+' 속도제한 — 재시도'); await new Promise(s=>setTimeout(s,5000)); continue; }
+  const pg=Object.values(JSON.parse(t).query.pages)[0];
+  const dis=pg.pageprops&&pg.pageprops.disambiguation!==undefined;
+  console.log((pg.missing!==undefined?'!! 문서없음 ':dis?'!! 동음이의 ':'OK ')+p.name_ko+' → '+pg.title);
+  await new Promise(s=>setTimeout(s,1600)); }})();"
+```
+
 ### R-D4. `CAT` 키와 `category` 문자열은 정확히 일치
 - `관광지` / `맛집` / `카페` 외의 문자열을 쓰면 fallback 스타일로 떨어지고 분류 필터에서 빠진다.
 
