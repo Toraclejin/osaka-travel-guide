@@ -26,6 +26,11 @@
   /* =====================================================
      오사카 여행 가이드 — 단일 파일 · 외부 의존성 0 · 시스템 폰트
      ===================================================== */
+  /* 루트 폰트 스케일 — 모든 font-size 가 rem 이라 여기 하나로 전체가 커진다.
+     375px 에서 약 17.3px, 1080px 에서 약 19.8px, 그 이상은 20.5px 로 고정.
+     px 고정이던 v0.7 까지는 PC 에서 글자가 작아 보였다. */
+  html { font-size: clamp(17px, 16px + 0.35vw, 20.5px); -webkit-text-size-adjust: 100%; }
+
   :root {
     --frame:      #1a1b4b;
     --page:       #f5f3ee;
@@ -78,7 +83,7 @@
     text-align: center; color: var(--ink);
   }
   .auth-eyebrow {
-    font-family: var(--sans); font-weight: 700; font-size: 10px;
+    font-family: var(--sans); font-weight: 700; font-size: 0.7188rem;
     letter-spacing: .32em; text-transform: uppercase; color: var(--osaka-red); margin-bottom: 14px;
   }
   .auth-title {
@@ -86,18 +91,18 @@
     line-height: 1.02; letter-spacing: -.02em; color: var(--indigo); margin: 0 0 10px;
   }
   .auth-title .red { color: var(--osaka-red); }
-  .auth-deck { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-soft); margin: 0 0 24px; }
+  .auth-deck { font-family: var(--serif); font-style: italic; font-size: 0.8125rem; color: var(--ink-soft); margin: 0 0 24px; }
   .auth-q {
     display: inline-flex; align-items: baseline; gap: 8px; padding: 10px 16px;
     background: var(--page-warm); border-left: 2px solid var(--osaka-red);
     border-radius: 0 6px 6px 0; margin-bottom: 18px;
   }
-  .auth-q-mark { font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .18em; color: var(--osaka-red); }
-  .auth-q-text { font-family: var(--serif); font-style: italic; font-size: 14.5px; color: var(--ink); }
+  .auth-q-mark { font-family: var(--sans); font-weight: 700; font-size: 0.75rem; letter-spacing: .18em; color: var(--osaka-red); }
+  .auth-q-text { font-family: var(--serif); font-style: italic; font-size: 0.9063rem; color: var(--ink); }
   .auth-form { display: flex; gap: 8px; margin-bottom: 12px; }
   .auth-input {
     flex: 1; padding: 12px 16px; border: 1px solid var(--line); border-radius: 6px;
-    background: #fff; font-family: var(--sans); font-size: 18px; letter-spacing: .4em;
+    background: #fff; font-family: var(--sans); font-size: 1.125rem; letter-spacing: .4em;
     text-align: center; color: var(--ink); outline: none; transition: border-color .15s;
     -webkit-text-security: disc; text-security: disc;
   }
@@ -105,14 +110,14 @@
   .auth-input:disabled { opacity: .5; cursor: not-allowed; }
   .auth-submit {
     padding: 12px 18px; background: var(--indigo); color: var(--page); border: none; border-radius: 6px;
-    font-family: var(--sans); font-weight: 600; font-size: 12px; letter-spacing: .18em;
+    font-family: var(--sans); font-weight: 600; font-size: 0.75rem; letter-spacing: .18em;
     text-transform: uppercase; cursor: pointer; transition: background .15s; white-space: nowrap;
   }
   .auth-submit:hover:not(:disabled) { background: var(--osaka-red); }
   .auth-submit:disabled { opacity: .5; cursor: not-allowed; }
-  .auth-msg { font-family: var(--sans); font-size: 12.5px; color: var(--osaka-red); min-height: 18px; margin-bottom: 8px; }
+  .auth-msg { font-family: var(--sans); font-size: 0.7813rem; color: var(--osaka-red); min-height: 18px; margin-bottom: 8px; }
   .auth-msg.ok { color: #2e7d32; }
-  .auth-note { font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-faint); }
+  .auth-note { font-family: var(--serif); font-style: italic; font-size: 0.7188rem; color: var(--ink-faint); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -122,7 +127,7 @@
       var(--frame);
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.6;
     word-break: keep-all;
     overflow-wrap: anywhere;
@@ -153,22 +158,22 @@
   /* ===== Masthead ===== */
   .masthead { padding: clamp(30px,7vw,60px) var(--pad-x) clamp(20px,4vw,30px); background: linear-gradient(180deg, var(--page-warm), var(--page)); }
   .kicker {
-    font-size: 11.5px; font-weight: 700; letter-spacing: .34em; text-transform: uppercase;
+    font-size: 0.7188rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase;
     color: var(--osaka-red); display: flex; align-items: center; gap: 9px; margin-bottom: 12px;
   }
   .kicker::before { content:''; width: 22px; height: 2px; background: var(--osaka-red); }
   .mast-title { font-size: clamp(58px,17vw,150px); font-weight: 900; letter-spacing: -.045em; line-height: .82; color: var(--indigo); }
   .mast-title .dot { color: var(--osaka-red); }
   .mast-sub { font-family: var(--serif); font-style: italic; font-size: clamp(19px,4.4vw,30px); color: var(--ink-soft); margin-top: 10px; }
-  .mast-lede { margin-top: 16px; max-width: 56ch; font-size: 15px; color: var(--ink-soft); }
+  .mast-lede { margin-top: 16px; max-width: 56ch; font-size: 0.9375rem; color: var(--ink-soft); }
 
   .mast-meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 9px; }
   .pill {
     display: inline-flex; align-items: center; gap: 7px;
     background: var(--page-tint); border: 1px solid var(--line); border-radius: 999px;
-    padding: 7px 13px; font-size: 13px; color: var(--ink);
+    padding: 7px 13px; font-size: 0.8125rem; color: var(--ink);
   }
-  .pill .ico { color: var(--osaka-red); font-size: 15px; }
+  .pill .ico { color: var(--osaka-red); font-size: 0.9375rem; }
   .pill b { font-weight: 700; }
 
   /* ===== Sticky nav ===== */
@@ -186,23 +191,23 @@
     scrollbar-width: none; flex: 1; padding-bottom: 1px;
   }
   .nav-row .scroller::-webkit-scrollbar { display: none; }
-  .nav-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; flex-shrink: 0; }
+  .nav-lbl { font-size: 0.7188rem; font-weight: 700; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; flex-shrink: 0; }
 
   .chip {
     flex-shrink: 0; cursor: pointer; white-space: nowrap;
     border: 1px solid var(--line); background: var(--white); color: var(--ink-soft);
-    border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500;
+    border-radius: 999px; padding: 6px 13px; font-size: 0.8125rem; font-weight: 500;
     display: inline-flex; align-items: center; gap: 7px; line-height: 1;
     transition: background .15s, color .15s, border-color .15s; font-family: inherit;
   }
   .chip:hover { border-color: var(--indigo-light); color: var(--indigo); }
-  .chip .cnt { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .chip .cnt { font-size: 0.75rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .chip .swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .zone-chip[aria-current="true"] { background: var(--zc, var(--indigo)); border-color: var(--zc, var(--indigo)); color: #fff; }
   .chip[aria-pressed="true"] { background: var(--indigo); border-color: var(--indigo); color: #fff; }
   .chip[aria-pressed="true"] .cnt { color: rgba(255,255,255,.72); }
   .chip.rec { gap: 6px; }
-  .chip.rec .ico { font-size: 13px; color: var(--gold-dark); }
+  .chip.rec .ico { font-size: 0.8125rem; color: var(--gold-dark); }
   .chip.rec[aria-pressed="true"] { background: var(--gold); border-color: var(--gold-dark); color: #3a2e05; }
   .chip.rec[aria-pressed="true"] .ico { color: #3a2e05; }
   .chip.rec[aria-pressed="true"] .cnt { color: rgba(58,46,5,.6); }
@@ -221,43 +226,43 @@
   .zone-tag {
     display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
     background: var(--zc); color: #fff; border-radius: 7px; padding: 5px 10px;
-    font-size: 12px; font-weight: 800; letter-spacing: .04em;
+    font-size: 0.75rem; font-weight: 800; letter-spacing: .04em;
   }
   .zone-name { font-family: var(--serif); font-weight: 700; font-size: clamp(27px,6vw,46px); line-height: 1; color: var(--indigo); letter-spacing: -.01em; }
   /* 선착장 ↔ 숙소 이동 — 페이지 맨 위(도착)와 맨 아래(복귀) */
   .transfer { margin: 26px 0 34px; background: var(--frame); color: var(--page); border-radius: var(--r); padding: 18px 17px 16px; }
   .tr-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
-  .tr-tag { background: var(--osaka-red); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; padding: 4px 8px; border-radius: 4px; flex: none; }
-  .tr-title { font-size: 17px; margin: 0; letter-spacing: -.01em; }
-  .tr-date { margin-left: auto; font-size: 12px; color: #b9b7c8; flex: none; }
-  .tr-lede { margin: 10px 0 0; font-size: 13.5px; color: #cfcede; }
+  .tr-tag { background: var(--osaka-red); color: #fff; font-size: 0.7188rem; font-weight: 800; letter-spacing: .1em; padding: 4px 8px; border-radius: 4px; flex: none; }
+  .tr-title { font-size: 1.0625rem; margin: 0; letter-spacing: -.01em; }
+  .tr-date { margin-left: auto; font-size: 0.75rem; color: #b9b7c8; flex: none; }
+  .tr-lede { margin: 10px 0 0; font-size: 0.8438rem; color: #cfcede; }
   .tr-warn { display: flex; gap: 8px; margin-top: 13px; padding: 11px 12px; border-radius: 8px; background: rgba(216,69,46,.16); border: 1px solid rgba(216,69,46,.5); }
   .tr-warn-ico { flex: none; color: var(--osaka-red); display: inline-flex; margin-top: 1px; }
-  .tr-warn-t { font-size: 13px; color: #f0eef7; line-height: 1.55; }
+  .tr-warn-t { font-size: 0.8125rem; color: #f0eef7; line-height: 1.55; }
   .tr-warn-t b { color: #fff; }
   .tr-row { display: grid; grid-template-columns: 58px 1fr; gap: 11px; padding: 9px 0; border-top: 1px solid rgba(245,243,238,.14); }
   .tr-row:first-of-type { margin-top: 13px; }
-  .tr-t { font-size: 12.5px; font-weight: 800; color: var(--osaka-red); font-variant-numeric: tabular-nums; }
-  .tr-w { font-size: 14px; }
-  .tr-d { font-size: 12.5px; color: #b9b7c8; margin-top: 2px; line-height: 1.5; }
+  .tr-t { font-size: 0.7813rem; font-weight: 800; color: var(--osaka-red); font-variant-numeric: tabular-nums; }
+  .tr-w { font-size: 0.875rem; }
+  .tr-d { font-size: 0.7813rem; color: #b9b7c8; margin-top: 2px; line-height: 1.5; }
   .tr-need { margin-top: 15px; padding: 12px 13px; background: rgba(245,243,238,.08); border-radius: 8px; }
-  .tr-need-h { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; color: var(--osaka-red); margin-bottom: 6px; }
-  .tr-need-l { margin: 0; padding-left: 17px; font-size: 13px; color: #dedcea; }
+  .tr-need-h { font-size: 0.7188rem; font-weight: 700; letter-spacing: .08em; color: var(--osaka-red); margin-bottom: 6px; }
+  .tr-need-l { margin: 0; padding-left: 17px; font-size: 0.8125rem; color: #dedcea; }
   .tr-need-l li { margin: 3px 0; }
-  .tr-tip { margin: 13px 0 0; font-size: 12.5px; color: #b9b7c8; font-style: italic; }
+  .tr-tip { margin: 13px 0 0; font-size: 0.7813rem; color: #b9b7c8; font-style: italic; }
   /* 이 날의 흐름 — zone.schedule */
   .zone-sched { margin: 15px 0 6px; background: var(--page-warm); border: 1px solid var(--line-faint); border-radius: var(--r); overflow: hidden; }
   .zs-head { display: flex; align-items: center; gap: 7px; padding: 9px 13px; background: var(--zc, var(--indigo)); color: var(--page); }
   .zs-head .zs-ico { display: inline-flex; opacity: .85; }
-  .zs-head-t { font-size: 12.5px; font-weight: 700; letter-spacing: .02em; }
-  .zs-head-n { margin-left: auto; font-size: 11.5px; opacity: .8; }
+  .zs-head-t { font-size: 0.7813rem; font-weight: 700; letter-spacing: .02em; }
+  .zs-head-n { margin-left: auto; font-size: 0.7188rem; opacity: .8; }
   .zs-row { display: grid; grid-template-columns: 56px 1fr; gap: 11px; padding: 9px 13px; border-top: 1px solid var(--line-faint); }
   .zs-row:first-of-type { border-top: 0; }
-  .zs-t { font-size: 13px; font-weight: 800; color: var(--zc, var(--indigo)); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-  .zs-w { font-size: 14px; line-height: 1.45; }
-  .zs-n { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-  .zone-access { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-faint); }
-  .zone-access .ico { color: var(--zc); font-size: 14px; }
+  .zs-t { font-size: 0.8125rem; font-weight: 800; color: var(--zc, var(--indigo)); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .zs-w { font-size: 0.875rem; line-height: 1.45; }
+  .zs-n { font-size: 0.7813rem; color: var(--ink-soft); margin-top: 2px; }
+  .zone-access { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 0.7813rem; color: var(--ink-faint); }
+  .zone-access .ico { color: var(--zc); font-size: 0.875rem; }
 
   /* ===== Zone map link (탭하면 실제 구글맵으로 그 구역이 열림) ===== */
   .zone-map-link {
@@ -271,11 +276,11 @@
   .zone-map-link:hover { box-shadow: 0 8px 20px var(--shadow); transform: translateY(-1px); }
   .zone-map-link:active { transform: translateY(0); box-shadow: 0 3px 10px var(--shadow); }
   .zml-icon { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; background: var(--zc); color: #fff; display: flex; align-items: center; justify-content: center; }
-  .zml-icon .ico { font-size: 20px; }
+  .zml-icon .ico { font-size: 1.25rem; }
   .zml-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .zml-title { font-size: 14.5px; font-weight: 700; color: var(--ink); }
-  .zml-sub { font-size: 12px; color: var(--ink-faint); margin-top: 1px; }
-  .zml-arrow { flex-shrink: 0; font-size: 18px; color: var(--zc); transition: transform .15s; }
+  .zml-title { font-size: 0.9063rem; font-weight: 700; color: var(--ink); }
+  .zml-sub { font-size: 0.75rem; color: var(--ink-faint); margin-top: 1px; }
+  .zml-arrow { flex-shrink: 0; font-size: 1.125rem; color: var(--zc); transition: transform .15s; }
   .zone-map-link:hover .zml-arrow { transform: translateX(3px); }
 
   /* ===== Zone embedded map (실제 구글맵 iframe + 하단 전체화면 버튼) ===== */
@@ -285,26 +290,26 @@
   .zone-map .zone-map-link { margin-top: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: #fff; }
   .zone-map .zone-map-link:hover { transform: none; box-shadow: none; background: var(--page-warm); }
   .zone-map .zone-map-link:active { transform: none; }
-  .map-pop .mp-name { font-weight: 700; font-size: 14px; color: var(--ink); }
-  .map-pop .mp-feat { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.45; }
-  .map-pop .mp-link { display: inline-block; margin-top: 7px; font-size: 12.5px; font-weight: 700; color: var(--indigo); text-decoration: none; }
+  .map-pop .mp-name { font-weight: 700; font-size: 0.875rem; color: var(--ink); }
+  .map-pop .mp-feat { font-size: 0.75rem; color: var(--ink-soft); margin-top: 3px; line-height: 1.45; }
+  .map-pop .mp-link { display: inline-block; margin-top: 7px; font-size: 0.7813rem; font-weight: 700; color: var(--indigo); text-decoration: none; }
   .map-pop .mp-link:hover { color: var(--osaka-red); }
   /* 번호 핀 + 범례 — 지도에서 어느 점이 어디인지 바로 보이게 (todo 2026-06-21) */
   .zm-pin.leaflet-div-icon { background: transparent; border: 0; }
-  .zm-pin-dot { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; font-size: 11.5px; font-weight: 800; line-height: 1; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); font-family: inherit; }
+  .zm-pin-dot { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; font-size: 0.7188rem; font-weight: 800; line-height: 1; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); font-family: inherit; }
   .zm-pin.is-rec .zm-pin-dot { box-shadow: 0 0 0 2px rgba(212,175,55,.5), 0 1px 5px rgba(0,0,0,.4); }
   /* 숙소 핀 — base_hotel 에 좌표가 들어올 때만 그려진다 (숙소 미정이면 아예 없음) */
   .zm-pin-home { background: var(--frame); border-radius: 5px; width: 18px; height: 18px; }
   .zm-pin.is-home .zm-pin-dot { box-shadow: 0 0 0 2px rgba(26,27,75,.35), 0 1px 5px rgba(0,0,0,.35); }
   .zm-legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 11px 12px; border-top: 1px solid var(--line); background: #fff; }
-  .zm-leg-item { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid var(--line); border-radius: 999px; background: var(--page-warm); padding: 4px 11px 4px 4px; font: inherit; font-size: 12px; color: var(--ink); cursor: pointer; transition: border-color .15s, transform .05s; }
+  .zm-leg-item { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid var(--line); border-radius: 999px; background: var(--page-warm); padding: 4px 11px 4px 4px; font: inherit; font-size: 0.75rem; color: var(--ink); cursor: pointer; transition: border-color .15s, transform .05s; }
   .zm-leg-item:hover { border-color: var(--zc); }
   .zm-leg-item:active { transform: translateY(1px); }
-  .zm-leg-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; flex: 0 0 auto; color: #fff; font-size: 10.5px; font-weight: 800; line-height: 1; }
+  .zm-leg-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; flex: 0 0 auto; color: #fff; font-size: 0.7188rem; font-weight: 800; line-height: 1; }
   .zm-leg-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .zm-leg-item.is-rec .zm-leg-name { font-weight: 700; }
   /* 이름↔핀 하이라이트 연동 */
-  .zm-legend-hint { flex: 0 0 100%; font-size: 11px; color: var(--ink-soft); margin: 0 2px 2px; }
+  .zm-legend-hint { flex: 0 0 100%; font-size: 0.75rem; color: var(--ink-soft); margin: 0 2px 2px; }
   .zm-pin .zm-pin-dot { transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
   .zone-map-canvas.zm-focus .zm-pin .zm-pin-dot { opacity: .28; }
   .zone-map-canvas.zm-focus .zm-pin.zm-pin--active .zm-pin-dot,
@@ -322,21 +327,21 @@
   .dir-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(168,51,106,.34); }
   .dir-btn:active { transform: translateY(0); }
   .dir-ico { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .dir-ico .ico { font-size: 22px; }
+  .dir-ico .ico { font-size: 1.375rem; }
   .dir-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .dir-t { font-size: 15px; font-weight: 800; }
-  .dir-sub { font-size: 11.5px; opacity: .9; margin-top: 1px; }
-  .dir-arrow { flex-shrink: 0; font-size: 20px; }
+  .dir-t { font-size: 0.9375rem; font-weight: 800; }
+  .dir-sub { font-size: 0.7188rem; opacity: .9; margin-top: 1px; }
+  .dir-arrow { flex-shrink: 0; font-size: 1.25rem; }
 
   /* ===== Category section ===== */
   .catsec { margin-top: clamp(18px,4vw,26px); }
   .catsec.hide { display: none; }
   .cat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
-  .cat-badge { display: inline-flex; align-items: center; gap: 6px; color: #fff; border-radius: 7px; padding: 5px 11px 5px 9px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; }
-  .cat-badge .ico { font-size: 14px; }
-  .cat-ko { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .cat-badge { display: inline-flex; align-items: center; gap: 6px; color: #fff; border-radius: 7px; padding: 5px 11px 5px 9px; font-size: 0.7188rem; font-weight: 800; letter-spacing: .1em; }
+  .cat-badge .ico { font-size: 0.875rem; }
+  .cat-ko { font-size: 0.875rem; font-weight: 700; color: var(--ink); }
   .cat-line { flex: 1; height: 1px; background: var(--line-faint); }
-  .cat-cnt { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .cat-cnt { font-size: 0.75rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 
   /* ===== Place cards ===== */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px,1fr)); gap: 11px; }
@@ -352,21 +357,21 @@
   .place.hide { display: none; }
   .place.rec { background: linear-gradient(180deg,#fffdf4,#fff); }
   .place.essential { background: linear-gradient(180deg,#fff6f8,#fff); }
-  .p-essential { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--essential); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; border-radius: 999px; padding: 3px 9px; box-shadow: 0 0 0 3px var(--essential-glow); white-space: nowrap; }
+  .p-essential { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--essential); color: #fff; font-size: 0.7188rem; font-weight: 800; letter-spacing: .02em; border-radius: 999px; padding: 3px 9px; box-shadow: 0 0 0 3px var(--essential-glow); white-space: nowrap; }
 
   .p-top { display: flex; align-items: flex-start; gap: 9px; }
-  .p-name { flex: 1; font-size: 16.5px; font-weight: 700; line-height: 1.3; color: var(--ink); }
-  .p-star { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--gold); color: #3a2e05; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; border-radius: 999px; padding: 3px 8px 3px 6px; box-shadow: 0 0 0 3px var(--gold-glow); white-space: nowrap; }
-  .p-star .ico { font-size: 11px; }
-  .p-en { font-size: 11.5px; font-weight: 500; letter-spacing: .04em; color: var(--ink-faint); margin-top: 3px; }
-  .p-feat { font-size: 13.5px; color: var(--ink-soft); margin-top: 9px; flex: 1; }
-  .p-go { margin-top: 13px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--indigo); }
-  .p-go .ico { font-size: 14px; color: var(--osaka-red); }
+  .p-name { flex: 1; font-size: 1.0313rem; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .p-star { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; background: var(--gold); color: #3a2e05; font-size: 0.7188rem; font-weight: 800; letter-spacing: .04em; border-radius: 999px; padding: 3px 8px 3px 6px; box-shadow: 0 0 0 3px var(--gold-glow); white-space: nowrap; }
+  .p-star .ico { font-size: 0.75rem; }
+  .p-en { font-size: 0.7188rem; font-weight: 500; letter-spacing: .04em; color: var(--ink-faint); margin-top: 3px; }
+  .p-feat { font-size: 0.8438rem; color: var(--ink-soft); margin-top: 9px; flex: 1; }
+  .p-go { margin-top: 13px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.7813rem; font-weight: 700; color: var(--indigo); }
+  .p-go .ico { font-size: 0.875rem; color: var(--osaka-red); }
   .p-go .arrow { transition: transform .15s; }
   .place:hover .p-go { color: var(--osaka-red); }
   .place:hover .p-go .arrow { transform: translateX(3px); }
 
-  .empty { display: none; text-align: center; color: var(--ink-faint); font-size: 14px; padding: 56px 0; }
+  .empty { display: none; text-align: center; color: var(--ink-faint); font-size: 0.875rem; padding: 56px 0; }
   .empty.show { display: block; }
 
   /* ===== 원정(Excursion) 섹션 — 하루 통째로 쓰는 시외 일정 전용 블록 ===== */
@@ -384,59 +389,87 @@
   .excursion::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--zc); z-index: 1; }
   .excursion .zone-head { border-bottom-color: var(--zc); }
   .excursion .zone-tag { background: var(--zc); }
-  .ex-scope { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--zc); background: rgba(168,51,106,.08); border: 1px solid rgba(168,51,106,.25); border-radius: 999px; padding: 6px 12px; }
-  .ex-scope .ico { font-size: 13px; }
-  .ex-intro { margin-top: 12px; font-size: 14.5px; color: var(--ink-soft); max-width: 60ch; }
+  .ex-scope { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 0.75rem; font-weight: 700; letter-spacing: .02em; color: var(--zc); background: rgba(168,51,106,.08); border: 1px solid rgba(168,51,106,.25); border-radius: 999px; padding: 6px 12px; }
+  .ex-scope .ico { font-size: 0.8125rem; }
+  .ex-intro { margin-top: 12px; font-size: 0.9063rem; color: var(--ink-soft); max-width: 60ch; }
   .block-h { display: flex; align-items: center; gap: 9px; margin: clamp(20px,4vw,28px) 0 13px; }
   .block-h .bh-bar { width: 16px; height: 2px; background: var(--zc); }
-  .block-h .bh-t { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--zc); text-transform: uppercase; }
-  .block-h .bh-ko { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .block-h .bh-t { font-size: 0.75rem; font-weight: 800; letter-spacing: .12em; color: var(--zc); text-transform: uppercase; }
+  .block-h .bh-ko { font-size: 0.9375rem; font-weight: 700; color: var(--ink); }
 
   .route-card { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--zc); border-radius: var(--r); padding: 14px 16px; }
   .route-card + .route-card { margin-top: 10px; }
   a.route-card { display: block; text-decoration: none; color: inherit; cursor: pointer; transition: box-shadow .15s, transform .15s, border-color .15s; -webkit-tap-highlight-color: rgba(168,51,106,.08); }
   a.route-card:hover { box-shadow: 0 10px 24px var(--shadow); transform: translateY(-1px); border-color: var(--zc); }
   a.route-card:active { transform: translateY(0); box-shadow: 0 3px 10px var(--shadow); }
-  .rc-go { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-faint); display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; color: var(--zc); }
-  .rc-go .ico { font-size: 15px; }
+  .rc-go { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-faint); display: flex; align-items: center; gap: 7px; font-size: 0.7813rem; font-weight: 700; color: var(--zc); }
+  .rc-go .ico { font-size: 0.9375rem; }
   .rc-go .rc-go-arrow { margin-left: auto; transition: transform .15s; }
   a.route-card:hover .rc-go-arrow { transform: translateX(3px); }
   .rc-head { display: flex; align-items: center; gap: 10px; }
-  .rc-num { width: 26px; height: 26px; border-radius: 50%; background: var(--zc); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .rc-name { flex: 1; font-size: 15px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-  .rc-best { font-size: 10px; font-weight: 800; letter-spacing: .04em; color: #fff; background: var(--zc); border-radius: 999px; padding: 2px 7px; }
-  .rc-meta { font-size: 12px; color: var(--ink-faint); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rc-num { width: 26px; height: 26px; border-radius: 50%; background: var(--zc); color: #fff; font-weight: 800; font-size: 0.8125rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rc-name { flex: 1; font-size: 0.9375rem; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .rc-best { font-size: 0.7188rem; font-weight: 800; letter-spacing: .04em; color: #fff; background: var(--zc); border-radius: 999px; padding: 2px 7px; }
+  .rc-meta { font-size: 0.75rem; color: var(--ink-faint); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .rc-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 11px; }
-  .rc-step { background: var(--page-tint); border: 1px solid var(--line); border-radius: 7px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
-  .rc-conn { display: inline-flex; align-items: center; gap: 4px; color: var(--zc); font-size: 11px; font-weight: 600; }
-  .rc-conn .ico { font-size: 13px; }
-  .rc-note { margin-top: 10px; font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .rc-step { background: var(--page-tint); border: 1px solid var(--line); border-radius: 7px; padding: 5px 10px; font-size: 0.8125rem; font-weight: 600; color: var(--ink); }
+  .rc-conn { display: inline-flex; align-items: center; gap: 4px; color: var(--zc); font-size: 0.75rem; font-weight: 600; }
+  .rc-conn .ico { font-size: 0.8125rem; }
+  .rc-note { margin-top: 10px; font-size: 0.8125rem; color: var(--ink-soft); line-height: 1.55; }
 
   .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .info-list li { display: flex; gap: 9px; font-size: 13.5px; color: var(--ink-soft); }
+  .info-list li { display: flex; gap: 9px; font-size: 0.8438rem; color: var(--ink-soft); }
   .info-list li .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--zc); margin-top: 7px; flex-shrink: 0; }
 
   .todo-list { border-top: 1px solid var(--line-faint); }
   .todo-item { display: flex; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--line-faint); }
   .todo-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--zc); color: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  .todo-mark .ico { font-size: 13px; }
-  .todo-t { font-size: 14px; font-weight: 700; color: var(--ink); }
-  .todo-d { font-size: 13px; color: var(--ink-soft); margin-top: 2px; line-height: 1.55; }
-  .dine-note { margin: 10px 0 4px; font-size: 12.5px; color: var(--ink-faint); }
+  .todo-mark .ico { font-size: 0.8125rem; }
+  .todo-t { font-size: 0.875rem; font-weight: 700; color: var(--ink); }
+  .todo-d { font-size: 0.8125rem; color: var(--ink-soft); margin-top: 2px; line-height: 1.55; }
+  .dine-note { margin: 10px 0 4px; font-size: 0.7813rem; color: var(--ink-faint); }
 
   /* ===== Footer ===== */
-  .foot { border-top: 1px solid var(--line); padding: 22px var(--pad-x) 28px; color: var(--ink-faint); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+  .foot { border-top: 1px solid var(--line); padding: 22px var(--pad-x) 28px; color: var(--ink-faint); font-size: 0.75rem; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
 
   /* ===== Back to top ===== */
   .totop {
     position: fixed; right: 16px; bottom: 16px; z-index: 40;
     width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
-    background: var(--indigo); color: #fff; font-size: 18px;
+    background: var(--indigo); color: #fff; font-size: 1.125rem;
     box-shadow: 0 6px 18px rgba(13,14,46,.4); display: none; align-items: center; justify-content: center;
     opacity: 0; transition: opacity .2s;
   }
   .totop.show { display: flex; opacity: 1; }
-  .totop .ico { font-size: 20px; }
+  .totop .ico { font-size: 1.25rem; }
+
+  /* ===== 모바일 범용성 =====
+     기준 뷰포트는 375×812 지만, 320px(구형 SE)부터 태블릿·PC 까지 안 깨지게.
+     - 손가락 탭 타깃은 최소 44px (Apple HIG). 여행 중 걸으면서 누른다.
+     - 줄바꿈은 keep-all + break-word 로 한국어가 어절 중간에 안 끊기게.
+     - 폰트는 rem 이라 html 의 clamp 하나로 전 화면이 같이 커진다. */
+  .chip, .zone-chip { min-height: 44px; }
+  .zm-leg-item { min-height: 40px; padding: 6px 13px 6px 5px; }
+  .p-go, .rc-go, .mp-link { display: inline-flex; align-items: center; min-height: 32px; }
+  .place, .route-card, .dir-btn, .zone-map-link { -webkit-tap-highlight-color: rgba(216,69,46,.12); }
+
+  /* 아주 좁은 화면 (320~359px) — 여백을 줄여 본문 폭을 확보 */
+  @media (max-width: 359px) {
+    :root { --pad-x: 14px; }
+    .zs-row, .tr-row { grid-template-columns: 52px 1fr; gap: 8px; }
+    .zone-tag, .tr-tag { letter-spacing: .04em; }
+  }
+
+  /* 태블릿 이상 — 카드가 좁아 보이지 않게 최소폭을 키운다 (글자가 커졌으므로) */
+  @media (min-width: 700px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 13px; }
+    .zs-row, .tr-row { grid-template-columns: 74px 1fr; }
+  }
+
+  /* 넓은 화면 — 한 줄이 너무 길어지면 읽기 힘들다. 본문 계열만 폭을 제한 */
+  @media (min-width: 1000px) {
+    .tr-lede, .zs-w, .tr-w, .p-feat { max-width: 62ch; }
+  }
 
   @media (max-width: 600px) {
     body { padding: 0; }
@@ -510,7 +543,7 @@
    데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
    장소 추가/수정 시 이 객체만 고치면 됨.
    ============================================================ */
-const BUILD_VERSION = 'v0.7-2026-08-10-PORT-TRANSFER';
+const BUILD_VERSION = 'v0.8-2026-08-10-TYPE-SCALE';
 
 const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"transfer":{"arrival":{"tag":"ARRIVAL","date":"8/24 (월)","title":"오사카항 → 시내 숙소","lede":"배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.","steps":[{"t":"10:00","w":"하선","d":"오사카항 국제페리터미널 (난코·사키시마)"},{"t":"~10:40","w":"입국수속 · 세관","d":"Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성"},{"t":"~11:00","w":"팬스타 무료 셔틀 승차","d":"터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것"},{"t":"~11:10","w":"코스모스퀘어역에서 IC카드 준비","d":"ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름"},{"t":"~11:40","w":"주오선 → 혼마치 환승 → 미도스지선 → 난바","d":"환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다"},{"t":"12:00","w":"숙소 짐 보관","d":"체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함"}],"need":["여권 · 승선권","Visit Japan Web 등록 QR (없으면 종이 신고서)","엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다","IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820","숙소 이름·주소를 일본어로 캡처"],"tip":"IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다."},"departure":{"tag":"DEPARTURE","date":"8/26 (수)","title":"숙소 → 오사카항","lede":"이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.","warn":"선사 공지 기준 **수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)** 이다. 13:50 이 막차라면 난바에서 **12:50 이전에는 출발**해야 한다. 시각표는 시즌마다 바뀌니 **승선권·선사 공지로 반드시 재확인할 것.**","steps":[{"t":"~09:00","w":"체크아웃 · 짐은 숙소에 보관","d":"오전 일정은 짐 없이 움직인다"},{"t":"12:00","w":"마지막 점심","d":"배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레"},{"t":"12:30","w":"숙소에서 짐 수령"},{"t":"12:50","w":"난바 출발","d":"미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것"},{"t":"~13:20","w":"코스모스퀘어역 도착 → 2층에서 셔틀 승차","d":"역 1층 편의점이 마지막 일본 쇼핑 기회"},{"t":"~13:40","w":"페리터미널 도착"},{"t":"—","w":"발권 · 수하물 수속 → 출국수속","d":"공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30"},{"t":"17:00","w":"출항"}],"need":["여권 · 승선권","IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)","면세 구매분은 개봉하지 말 것","캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다"],"tip":"배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로."}},"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[{"id":1,"tag":"DAY 1","name":"히데요시의 오사카","access":"다니마치욘초메역 (주오선·다니마치선) · 8/24(월) · 항구에서 주오선 직결","schedule":[{"t":"11:00","w":"팬스타 셔틀 → 코스모스퀘어","n":"주오선 승차"},{"t":"12:00","w":"숙소 짐 보관 (난바)","n":"체크인 전"},{"t":"12:30","w":"점심"},{"t":"14:00","w":"오사카 역사박물관","n":"¥600 · 입장 16:30 마감"},{"t":"15:30","w":"도요토미 석벽관","n":"천수각 티켓 공용"},{"t":"16:15","w":"오사카성 천수각","n":"¥1,200 · 입관 17:30 마감"},{"t":"17:50","w":"호코쿠 신사","n":"히데요시 동상 — 코스의 마침표"},{"t":"19:00","w":"숙소 체크인 → 대욕장"},{"t":"20:00","w":"저녁 야키니쿠 → 도톤보리 산책"}],"sections":[{"category":"관광지","places":[{"name_ko":"오사카 역사박물관","name_en":"Osaka Museum of History","feature":"10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · **화요일 휴관**","recommended":false,"essential":false,"lat":34.6826,"lng":135.5208,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8"},{"name_ko":"도요토미 석벽관","name_en":"Toyotomi Stone Wall Museum","feature":"2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 **도요토미 시대 진짜 석벽**을 지하에서 본다. 천수각 티켓 공용","recommended":true,"essential":false,"lat":34.6865,"lng":135.5267,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E"},{"name_ko":"오사카성 천수각","name_en":"Osaka Castle","feature":"1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},{"name_ko":"호코쿠 신사","name_en":"Hokoku Shrine","feature":"히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음","recommended":true,"essential":false,"lat":34.6842,"lng":135.5264,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE"}]}]},
 {"id":2,"tag":"DAY 2","name":"덴덴타운 전뇌지구","access":"닛폰바시역 (사카이스지선·킨테츠) · 8/25(화) · 전 구간 도보","schedule":[{"t":"09:30","w":"구로몬 시장","n":"오전이 가장 활발"},{"t":"11:00","w":"덴덴타운","n":"상점 대부분 11시 오픈 — 더 일찍 가면 셔터"},{"t":"13:00","w":"점심"},{"t":"14:00","w":"오타로드 → 도구야스지"},{"t":"15:30","w":"e스타디움 난바 본점","n":"난바파크스 1F"},{"t":"17:00","w":"숙소 → 대욕장·사우나","n":"술 마시기 전에 한 번 리셋"},{"t":"19:00","w":"저녁 — 쿠시카츠 → 이자카야 → 타코야키"}],"sections":[{"category":"관광지","places":[{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},{"name_ko":"덴덴타운 (닛폰바시)","name_en":"Den Den Town","feature":"서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. **대체로 11:00~19:00**","recommended":true,"essential":true,"lat":34.6647,"lng":135.506,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA"},{"name_ko":"오타로드","name_en":"Ota Road","feature":"덴덴타운 서쪽 한 블록. **메인도로만 보면 반쪽** — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다","recommended":true,"essential":false,"lat":34.661,"lng":135.5049,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA"},{"name_ko":"도구야스지 상점가","name_en":"Doguyasuji","feature":"주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음","recommended":false,"essential":false,"lat":34.6639,"lng":135.5035,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97"},{"name_ko":"난바파크스 · e스타디움","name_en":"Namba Parks / e-Stadium","feature":"1F **e스타디움 난바 본점** — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료","recommended":true,"essential":false,"lat":34.6616,"lng":135.502,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9"}]}]},
