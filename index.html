@@ -181,9 +181,11 @@
   .pill .ico { color: var(--osaka-red); font-size: 0.9375rem; }
   .pill b { font-weight: 700; }
 
-  /* ===== Sticky nav ===== */
+  /* ===== Sticky bar — 최상위 탭 + 구역/분류 내비를 한 덩어리로 =====
+     둘을 각각 sticky top:0 으로 두면 서로 겹친다. 하나로 묶어야
+     탭 높이가 rem 스케일로 변해도 계산 없이 항상 붙어 있는다. */
+  .stickybar { position: sticky; top: 0; z-index: 40; }
   .nav {
-    position: sticky; top: 0; z-index: 30;
     background: rgba(245,243,238,.9);
     -webkit-backdrop-filter: saturate(180%) blur(10px);
     backdrop-filter: saturate(180%) blur(10px);
@@ -234,17 +236,17 @@
     font-size: 0.75rem; font-weight: 800; letter-spacing: .04em;
   }
   .zone-name { font-family: var(--serif); font-weight: 700; font-size: clamp(27px,6vw,46px); line-height: 1; color: var(--indigo); letter-spacing: -.01em; }
-  /* 여행 메모 + 일본어 — 탭 2개 · 항목은 <details> 로 접어둔다 */
-  .tripinfo { margin: 34px 0 26px; }
-  .ti-head { display: flex; align-items: baseline; gap: 9px; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; }
-  .ti-tag { background: var(--indigo); color: var(--page); font-size: 0.6875rem; font-weight: 800; letter-spacing: .1em; padding: 4px 8px; border-radius: 4px; flex: none; }
-  .ti-title { font-size: 1.0625rem; margin: 0; letter-spacing: -.01em; }
-  .ti-tabs { display: flex; gap: 7px; margin: 13px 0 12px; }
-  .ti-tab { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: var(--white);
-            font: inherit; font-size: 0.875rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
-  .ti-tab.is-on { background: var(--indigo); border-color: var(--indigo); color: var(--page); }
-  .ti-panel.is-hide { display: none; }
-  .ti-lede { margin: 0 0 11px; font-size: 0.8125rem; color: var(--ink-faint); }
+  /* 최상위 탭 — 여행 / 알아둘 것 / 일본어 */
+  .toptabs { display: flex; gap: 0; padding: 0 var(--pad-x); background: var(--page); }
+  .toptab { flex: 1; min-height: 52px; border: 0; border-bottom: 3px solid transparent; background: none;
+            font: inherit; font-size: 0.9375rem; font-weight: 700; color: var(--ink-faint); cursor: pointer;
+            letter-spacing: -.01em; transition: color .15s, border-color .15s; }
+  .toptab.is-on { color: var(--indigo); border-bottom-color: var(--osaka-red); }
+  .toptab:active { background: var(--page-tint); }
+  .toppanel.is-hide, .nav.is-hide { display: none; }
+
+  /* 탭 안 항목 — <details> 로 접어둔다 */
+  .ti-lede { margin: 4px 0 13px; font-size: 0.8125rem; color: var(--ink-faint); }
   .ti-item { border: 1px solid var(--line); border-radius: 10px; background: var(--white); margin-bottom: 8px; overflow: hidden; }
   .ti-item[open] { border-color: var(--osaka-red); }
   .ti-sum { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 13px; cursor: pointer; list-style: none; }
@@ -556,7 +558,10 @@
       <div class="mast-meta" id="mast-meta"></div>
     </header>
 
-    <nav class="nav" aria-label="구역 및 필터">
+    <div class="stickybar">
+    <div class="toptabs" id="toptabs" role="tablist" aria-label="화면 전환"></div>
+
+    <nav class="nav" id="nav" aria-label="구역 및 필터">
       <div class="nav-row zones">
         <span class="nav-lbl">구역</span>
         <div class="scroller" id="zone-nav"></div>
@@ -566,6 +571,7 @@
         <div class="scroller" id="filter-nav"></div>
       </div>
     </nav>
+    </div><!-- /stickybar -->
 
     <div class="body" id="body"></div>
 
@@ -582,7 +588,7 @@
    데이터 — 단일 정본 (사이드카 JSON 없음. R-D1 참고)
    장소 추가/수정 시 이 객체만 고치면 됨.
    ============================================================ */
-const BUILD_VERSION = 'v0.10-2026-08-10-NOTES-JP';
+const BUILD_VERSION = 'v0.11-2026-08-10-TOP-TABS';
 
 const GUIDE_DATA = {"title":"오사카 여행 가이드","base_hotel":null,"transfer":{"arrival":{"tag":"ARRIVAL","date":"8/24 (월)","title":"오사카항 → 시내 숙소","lede":"배에서 내려 숙소에 짐을 맡기기까지. 여기만 통과하면 그 뒤는 전부 도보와 지하철이다.","steps":[{"t":"10:00","w":"하선","d":"오사카항 국제페리터미널 (난코·사키시마)"},{"t":"~10:40","w":"입국수속 · 세관","d":"Visit Japan Web 을 미리 등록해 두면 QR 로 통과. 안 했으면 종이 신고서 작성"},{"t":"~11:00","w":"팬스타 무료 셔틀 승차","d":"터미널 앞 → 코스모스퀘어역. 선사 운영이라 무료. 도착편에 맞춰 운행하지만 시각은 승선권으로 확인할 것"},{"t":"~11:10","w":"코스모스퀘어역에서 IC카드 준비","d":"ICOCA 자판기. 보증금 ¥500 포함이고 반납 시 돌려받는다. 4명이면 여기서 한 번에 끝내는 게 빠름"},{"t":"~11:40","w":"주오선 → 혼마치 환승 → 미도스지선 → 난바","d":"환승 1회. 코스모스퀘어가 주오선 종점이라 방향 헷갈릴 일이 없다"},{"t":"12:00","w":"숙소 짐 보관","d":"체크인 전이라도 대부분 맡아준다. 숙소 이름을 일본어로 저장해 두면 편함"}],"need":["여권 · 승선권","Visit Japan Web 등록 QR (없으면 종이 신고서)","엔화 현금 — IC카드 충전 자판기는 현금만 받는 곳이 많다","IC카드(ICOCA) 또는 오사카 메트로 1일권 ¥820","숙소 이름·주소를 일본어로 캡처"],"tip":"IC카드 한 장이면 지하철·버스·편의점까지 다 된다. 4명 모두 만드는 게 결과적으로 제일 싸고 빠르다."},"departure":{"tag":"DEPARTURE","date":"8/26 (수)","title":"숙소 → 오사카항","lede":"이 날은 쇼핑보다 배가 먼저다. 셔틀 막차를 기준으로 역산해서 움직인다.","warn":"선사 공지 기준 **수요일 코스모스퀘어역 출발 셔틀은 12:35~13:50 (15분 간격)** 이다. 13:50 이 막차라면 난바에서 **12:50 이전에는 출발**해야 한다. 시각표는 시즌마다 바뀌니 **승선권·선사 공지로 반드시 재확인할 것.**","steps":[{"t":"~09:00","w":"체크아웃 · 짐은 숙소에 보관","d":"오전 일정은 짐 없이 움직인다"},{"t":"12:00","w":"마지막 점심","d":"배 타기 직전이라 가벼운 걸로 — 규카츠·우동·카레"},{"t":"12:30","w":"숙소에서 짐 수령"},{"t":"12:50","w":"난바 출발","d":"미도스지선 → 혼마치 환승 → 주오선. 4명이면 항상 늦어지니 여유를 둘 것"},{"t":"~13:20","w":"코스모스퀘어역 도착 → 2층에서 셔틀 승차","d":"역 1층 편의점이 마지막 일본 쇼핑 기회"},{"t":"~13:40","w":"페리터미널 도착"},{"t":"—","w":"발권 · 수하물 수속 → 출국수속","d":"공지 기준 수요일 발권·수하물 12:50~14:10, 출국수속 14:00~14:30"},{"t":"17:00","w":"출항"}],"need":["여권 · 승선권","IC카드 — 반납하면 보증금 ¥500 환급 (계속 쓸 거면 그냥 소지)","면세 구매분은 개봉하지 말 것","캐리어 무게 — 덴덴타운에서 산 게 생각보다 무겁다"],"tip":"배는 비행기보다 변수가 적어 보여도 국제선이라 수속이 붙는다. 목표 시각보다 30분 먼저 도착하는 걸 기본값으로."}},"maps_url_format":"https://www.google.com/maps/search/?api=1&query={NAME}","zones":[{"id":1,"tag":"DAY 1","date":"8/24 (월)","name":"히데요시의 오사카","access":"다니마치욘초메역 (주오선·다니마치선) · 항구에서 주오선 직결","schedule":[{"t":"11:00","w":"팬스타 셔틀 → 코스모스퀘어","n":"주오선 승차"},{"t":"12:00","w":"숙소 짐 보관 (난바)","n":"체크인 전"},{"t":"12:30","w":"점심"},{"t":"14:00","w":"오사카 역사박물관","n":"¥600 · 입장 16:30 마감"},{"t":"15:30","w":"도요토미 석벽관","n":"천수각 티켓 공용"},{"t":"16:15","w":"오사카성 천수각","n":"¥1,200 · 입관 17:30 마감"},{"t":"17:50","w":"호코쿠 신사","n":"히데요시 동상 — 코스의 마침표"},{"t":"19:00","w":"숙소 체크인 → 대욕장"},{"t":"20:00","w":"저녁 야키니쿠 → 도톤보리 산책"}],"sections":[{"category":"관광지","places":[{"name_ko":"오사카 역사박물관","name_en":"Osaka Museum of History","feature":"10층부터 내려오며 보는 구조. 히데요시 시대 오사카가 어떤 도시였는지 깔고 들어가면 성이 다르게 보임. ¥600 · **화요일 휴관**","recommended":false,"essential":false,"lat":34.6826,"lng":135.5208,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8"},{"name_ko":"도요토미 석벽관","name_en":"Toyotomi Stone Wall Museum","feature":"2025년 개관. 지금 보이는 석벽은 도쿠가와가 다시 쌓은 것 — 여기서 **도요토미 시대 진짜 석벽**을 지하에서 본다. 천수각 티켓 공용","recommended":true,"essential":false,"lat":34.6865,"lng":135.5267,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E8%87%A3%E7%9F%B3%E5%9E%A3%E9%A4%A8%20%E5%A4%A7%E9%98%AA%E5%9F%8E"},{"name_ko":"오사카성 천수각","name_en":"Osaka Castle","feature":"1583년 히데요시 축성. 내부가 사실상 박물관 — 전국시대 자료 약 1만 점. ¥1,200 · 입관 17:30 마감","recommended":true,"essential":true,"lat":34.6873,"lng":135.5259,"maps_url":"https://www.google.com/maps/search/?api=1&query=Osaka%20Castle"},{"name_ko":"호코쿠 신사","name_en":"Hokoku Shrine","feature":"히데요시를 모신 신사. 경내에 히데요시 동상. 성에서 나오는 길목이라 마지막에 들르면 딱 맞음","recommended":true,"essential":false,"lat":34.6842,"lng":135.5264,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E9%98%AA%E5%9F%8E%E8%B1%8A%E5%9C%8B%E7%A5%9E%E7%A4%BE"}]}]},
 {"id":2,"tag":"DAY 2","date":"8/25 (화)","name":"덴덴타운 전뇌지구","access":"닛폰바시역 (사카이스지선·킨테츠) · 전 구간 도보","schedule":[{"t":"09:30","w":"구로몬 시장","n":"오전이 가장 활발"},{"t":"11:00","w":"덴덴타운","n":"상점 대부분 11시 오픈 — 더 일찍 가면 셔터"},{"t":"13:00","w":"점심"},{"t":"14:00","w":"오타로드 → 도구야스지"},{"t":"15:30","w":"e스타디움 난바 본점","n":"난바파크스 1F"},{"t":"17:00","w":"숙소 → 대욕장·사우나","n":"술 마시기 전에 한 번 리셋"},{"t":"19:00","w":"저녁 — 쿠시카츠 → 이자카야 → 타코야키"}],"sections":[{"category":"관광지","places":[{"name_ko":"구로몬 시장","name_en":"Kuromon Ichiba Market","feature":"\"오사카의 부엌\". 해산물·와규 꼬치 서서 먹기. 덴덴타운 바로 위 100m — 아침에 여기서 먹고 그대로 내려가면 됨","recommended":true,"essential":true,"lat":34.6656,"lng":135.5061,"maps_url":"https://www.google.com/maps/search/?api=1&query=Kuromon%20Ichiba%20Market"},{"name_ko":"덴덴타운 (닛폰바시)","name_en":"Den Den Town","feature":"서쪽 아키하바라. 애니·피규어·레트로게임·프라모델·TCG·중고 콘솔. 슈퍼포테이토·만다라케·스루가야·애니메이트·조신. **대체로 11:00~19:00**","recommended":true,"essential":true,"lat":34.6647,"lng":135.506,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97%20%E5%A4%A7%E9%98%AA"},{"name_ko":"오타로드","name_en":"Ota Road","feature":"덴덴타운 서쪽 한 블록. **메인도로만 보면 반쪽** — 여기까지 들어와야 굿즈·중고샵 밀도가 나온다","recommended":true,"essential":false,"lat":34.661,"lng":135.5049,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%82%AA%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89%20%E5%A4%A7%E9%98%AA"},{"name_ko":"도구야스지 상점가","name_en":"Doguyasuji","feature":"주방용품 상점가. 일본도 만드는 기술로 벼린 주방칼·식품 샘플. 남는 시간에 붙이기 좋음","recommended":false,"essential":false,"lat":34.6639,"lng":135.5035,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E6%97%A5%E5%89%8D%E9%81%93%E5%85%B7%E5%B1%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97"},{"name_ko":"난바파크스 · e스타디움","name_en":"Namba Parks / e-Stadium","feature":"1F **e스타디움 난바 본점** — 2024년 오픈, 일본 최대급 e스포츠 시설. 옥상정원 무료","recommended":true,"essential":false,"lat":34.6616,"lng":135.502,"maps_url":"https://www.google.com/maps/search/?api=1&query=%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9"}]}]},
@@ -1085,47 +1091,53 @@ function rich(el, str) {
   return el;
 }
 
-/* 여행 메모 + 일본어 — 탭 2개.
-   일본어는 시나리오별 <details> 로 접어둔다. 네이티브라 JS 가 필요 없고,
-   여행지에서 필요한 상황 하나만 펴서 보면 된다 ("보고 싶은 사람만 열어서"). */
-function renderTripInfo() {
-  if (typeof TRIP_NOTES === 'undefined' && typeof JP_SCENARIOS === 'undefined') return null;
-  const sec = E('section', 'tripinfo');
-  sec.id = 'tripinfo';
+/* ===== 최상위 탭 — 여행 / 알아둘 것 / 일본어 =====
+   페이지 전체를 세 갈래로 나눈다. 셋의 성격이 다르기 때문이다:
+     여행    — 어디를 가나 (일정·장소·지도·동선)
+     알아둘 것 — 어떻게 대처하나 (응급·지진·더위·매너·결제·통신)
+     일본어   — 뭐라고 말하나 (71 문장)
+   구역 칩·분류 필터는 '여행' 에서만 의미가 있으므로 다른 탭에서는 내비를 통째로 숨긴다.
+   각 탭 안의 항목은 네이티브 <details> — 필요한 것만 펴서 본다. */
+const TOP_TABS = [
+  { key: 'trip',  label: '여행',      nav: true  },
+  { key: 'notes', label: '알아둘 것', nav: false, build: function () { return buildTripNotes(); } },
+  { key: 'jp',    label: '일본어',    nav: false, build: function () { return buildJpPanel(); } }
+];
+let PANEL = {};
 
-  const head = E('div', 'ti-head');
-  head.appendChild(E('span', 'ti-tag', 'NOTES'));
-  head.appendChild(E('h2', 'ti-title', '여행 메모'));
-  sec.appendChild(head);
+function renderTopTabs() {
+  const host = document.getElementById('toptabs');
+  const body = document.getElementById('body');
+  const nav = document.getElementById('nav');
+  if (!host || !body) return;
 
-  const tabs = E('div', 'ti-tabs');
-  tabs.setAttribute('role', 'tablist');
-  const panels = [];
-  const defs = [
-    { key: 'trip', label: '여행', build: buildTripNotes },
-    { key: 'jp', label: '일본어', build: buildJpPanel }
-  ];
-  defs.forEach((d, idx) => {
-    const b = E('button', 'ti-tab' + (idx === 0 ? ' is-on' : ''), d.label);
+  const btns = [];
+  TOP_TABS.forEach((t, idx) => {
+    const panel = E('div', 'toppanel' + (idx === 0 ? '' : ' is-hide'));
+    panel.id = 'panel-' + t.key;
+    if (t.build) panel.appendChild(t.build());
+    body.appendChild(panel);
+    PANEL[t.key] = panel;
+
+    const b = E('button', 'toptab' + (idx === 0 ? ' is-on' : ''), t.label);
     b.type = 'button';
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
-    const p = d.build();
-    p.className = 'ti-panel' + (idx === 0 ? '' : ' is-hide');
-    panels.push({ btn: b, panel: p });
     b.addEventListener('click', () => {
-      panels.forEach(x => {
-        const on = x.btn === b;
-        x.btn.classList.toggle('is-on', on);
-        x.btn.setAttribute('aria-selected', on ? 'true' : 'false');
-        x.panel.classList.toggle('is-hide', !on);
+      btns.forEach((x, i) => {
+        const on = x === b;
+        x.classList.toggle('is-on', on);
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
+        PANEL[TOP_TABS[i].key].classList.toggle('is-hide', !on);
+        if (on && nav) nav.classList.toggle('is-hide', !TOP_TABS[i].nav);
       });
+      // 탭을 바꾸면 그 화면의 처음부터 보는 게 맞다
+      try { host.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+      if (t.nav) { try { refreshVisibleMaps(); } catch (e) {} }
     });
-    tabs.appendChild(b);
+    btns.push(b);
+    host.appendChild(b);
   });
-  sec.appendChild(tabs);
-  panels.forEach(x => sec.appendChild(x.panel));
-  return sec;
 }
 
 function buildTripNotes() {
@@ -1169,7 +1181,7 @@ function buildJpPanel() {
     });
     if (scn.tips && scn.tips.length) {
       const t = E('div', 'ph-tips');
-      t.appendChild(E('div', 'ph-tips-h', '알아둘 것'));
+      t.appendChild(E('div', 'ph-tips-h', '팁'));
       const ul = E('ul', null);
       scn.tips.forEach(x => ul.appendChild(rich(E('li', null), x)));
       t.appendChild(ul);
@@ -1231,7 +1243,8 @@ function buildTransfer(kind) {
 }
 
 function renderZones() {
-  const body = document.getElementById('body');
+  // 일정·장소는 '여행' 탭 안에 들어간다 (renderTopTabs 가 먼저 패널을 만든다)
+  const body = PANEL.trip || document.getElementById('body');
   const arr = buildTransfer('arrival');
   if (arr) body.appendChild(arr);
 
@@ -1269,10 +1282,7 @@ function renderZones() {
   empty.id = 'empty';
   body.appendChild(empty);
 
-  // 여행 메모 + 일본어 → 그 다음 복귀 블록이 맨 끝.
-  // (도착 블록은 renderZones 시작 전에 이미 넣었다)
-  const ti = renderTripInfo();
-  if (ti) body.appendChild(ti);
+  // 복귀 블록이 '여행' 탭의 맨 끝. (도착 블록은 renderZones 시작 전에 이미 넣었다)
   const dep = buildTransfer('departure');
   if (dep) body.appendChild(dep);
 }
@@ -1298,7 +1308,7 @@ function excursionDirUrl(ex, mode) {
     '&travelmode=' + (mode === 'driving' ? 'driving' : 'transit');
 }
 function renderExcursions() {
-  const body = document.getElementById('body');
+  const body = PANEL.trip || document.getElementById('body');
   EXCURSIONS.forEach(ex => body.appendChild(buildExcursion(ex)));
 }
 
@@ -1507,6 +1517,7 @@ function setupToTop() {
    ============================================================ */
 document.title = GUIDE_DATA.title;
 renderMast();
+renderTopTabs();
 renderNav();
 renderZones();
 renderExcursions();

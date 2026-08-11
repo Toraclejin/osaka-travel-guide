@@ -197,7 +197,11 @@ node -e "console.log(require('crypto').createHash('sha256').update('새비번').
 - `renderMast()` — 매스트헤드 (호텔 칩 · 총계 pill · 푸터 카운트)
 - `renderNav()` — 구역 칩 + 원정 칩 + 분류 필터 + 추천/필수 토글
 - `rich(el, str)` — `**강조**` → `<b>`. **`innerHTML` 을 쓰지 않는다** — 조각을 나눠 `textContent` 로 넣는다 (§ 6 정책 유지)
-- `renderTripInfo()` — **여행 메모 + 일본어** 탭 2개. `TRIP_NOTES` / `JP_SCENARIOS` 상수를 읽는다
+- `renderTopTabs()` — **최상위 탭 3개**. `TOP_TABS` 상수가 정의하고 `PANEL` 에 패널 참조를 담는다
+  - **여행** (일정·장소·지도) / **알아둘 것** (`TRIP_NOTES`) / **일본어** (`JP_SCENARIOS`)
+  - ⚠ **`renderZones`·`renderExcursions` 보다 먼저 호출해야 한다** — 그것들이 `PANEL.trip` 에 붙기 때문
+  - 구역 칩·분류 필터(`#nav`)는 **여행 탭에서만** 의미가 있어 다른 탭에서 통째로 숨긴다 (`TOP_TABS[].nav`)
+  - 탭 전환 시 `refreshVisibleMaps()` 를 부른다 — 숨겨져 있던 지도는 크기가 0이라 `invalidateSize` 가 필요하다
   - 항목은 네이티브 **`<details>`** 로 접는다. JS 토글을 만들지 말 것 — 접근성·키보드·모바일이 공짜로 따라온다
   - `JP_SCENARIOS` 는 **도쿄 메인 매거진에서 이식**(10 시나리오 · 71 문장). 도쿄 고유였던 대사관 번호만 오사카 총영사관으로 교체했다
   - ⚠ 새 문장을 넣을 때 **도쿄 지명이 섞이지 않았는지** § 9 점검 5로 확인
