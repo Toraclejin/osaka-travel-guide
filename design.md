@@ -114,7 +114,7 @@ _디자인 시스템 **정본**_ · **v1.1** (2026-08-09) · Vol. III
 | `.masthead` · `.kicker` · `.mast-title` · `.mast-sub` · `.mast-lede` | 표지 블록 | `OSAKA.` = 도시명+마침표, 시리즈 형식 |
 | `.mast-meta` · `.pill` | 총계·호텔 칩 | **`base_hotel: null`이면 호텔 칩 생략** |
 | `.nav` · `.nav-row` · `.nav-lbl` | sticky 내비 | 가로 스크롤러. **세로 스크롤 금지 (R-D7)** |
-| `.zone-chip` · `.chip` | 구역(DAY) 바로가기 | `aria-pressed` 필수. 분류 필터는 v0.20에서 제거 — 내비는 **한 줄** |
+| `.zone-chip` · `.chip` | 구역(DAY) 바로가기 | 상태는 **`aria-current`** 로 표시한다. 분류 필터는 v0.20에서 제거 — 내비는 **한 줄**이고, 필터 시절의 `aria-pressed`·`.chip.rec`·`.chip.ess`·`.nav-row.zones` 점선·`.hide`·`.empty` **CSS는 v0.21에서 같이 지웠다** (JS만 지우고 CSS를 남겨 이중선이 그어져 있었다) |
 | `.foot` | 푸터 카운트 | |
 
 ### 2.2 지면 (페이퍼 면)
@@ -126,7 +126,7 @@ _디자인 시스템 **정본**_ · **v1.1** (2026-08-09) · Vol. III
 | `.zone-sched` · `.zs-head` · `.zs-row` · `.zs-t` · `.zs-w` · `.zs-n` | **이 날의 흐름** 시간표 | 헤더는 구역 액센트 바탕 + 페이퍼 글자. 시각(`.zs-t`)은 `tabular-nums` 로 자릿수 정렬. `zone.schedule` 없으면 통째로 생략 |
 | `.catsec` · `.cat-head` · `.cat-ko` · `.cat-badge` · `.cat-cnt` · `.cat-line` | 카테고리 섹션 | `관광지` / `맛집` / `카페` 소제목 + 개수 |
 | `.grid` · `.place` | 카드 그리드 | |
-| `.p-top` · `.p-name` · `.p-en` · `.p-feat` · `.p-go` | 카드 내부 | `.p-feat` 한 줄에 **정기휴무 포함** (R-D10) |
+| `.p-top` · `.p-name` · `.p-en` · `.p-feat` · `.p-go` | 카드 내부 | `.p-feat` 한 줄에 **정기휴무 포함** (R-D10) · 본문은 `--ink-soft`, **`**강조**` 조각(`.p-feat b`)만 `--ink`** — 바탕이 흐려서 굵기만으로는 강조가 안 산다 (v0.21) |
 | `.p-star` · `.p-essential` | ★ / 🇰🇷 뱃지 | § 1.4 전용 토큰 |
 | `.stickybar` | 최상위 탭 + 내비를 묶은 **단일 sticky** | ⚠ 둘을 각각 `sticky top:0` 으로 두면 겹친다. 하나로 묶어야 탭 높이가 rem 스케일로 변해도 계산 없이 붙어 있는다 |
 | `.toptabs` · `.toptab` | **최상위 탭 3개** (여행 / 알아둘 것 / 일본어) | 밑줄형 탭. 활성은 포인트색 3px 밑줄 + 인디고 글자. 최소 높이 52px |
