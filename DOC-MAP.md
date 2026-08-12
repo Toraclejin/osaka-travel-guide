@@ -40,6 +40,11 @@ learning.md (무엇을 배웠나)   ·   OSAKA_TRANSPLANT_GUIDE.md (어디서 �
 | ✕ | [`README.md`](README.md) | 사용자용 실행법 · 현재 상태 | 릴리스마다 |
 | ✕ | `overview.html` | **일행 공유용 계획표** — DAY별 흐름 + 장소 + 구글맵 링크 | 자동 생성 |
 | ✕ | `tools/build-overview.js` | ↑ **생성기.** `GUIDE_DATA` → `overview.html` | 스키마 변경 시 |
+| ✕ | `hotel.html` | **숙소 안내** — 일행 공유용 한 장 (비용·시설·객실) | 예약 변경 시 |
+
+> ⚠ `hotel.html` 은 **손으로 유지하는 파일이다** (`overview.html` 과 달리 자동 생성이 아니다).
+> 2026-08-10 부킹닷컴 예약 화면의 값을 옮겨 적었으므로 **예약을 바꾸면 이 파일도 같이 고친다.**
+> 숙소가 확정되면 `GUIDE_DATA.base_hotel` 과 값이 어긋나지 않는지 확인할 것.
 
 > ⚠ `overview.html`은 **자동 생성물이다. 직접 고치지 말 것.** 고치면 다음 생성 때 날아간다.
 > 데이터를 바꾼 뒤 **`node tools/build-overview.js`** 를 돌린다. 손으로 유지하던 시절엔 R-D1이 경고한 "정본 행세하는 두 번째 사본"이 될 위험이 있었고, 생성기로 그 위험을 구조적으로 없앴다.
