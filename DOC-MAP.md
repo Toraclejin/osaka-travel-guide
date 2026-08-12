@@ -38,18 +38,13 @@ learning.md (무엇을 배웠나)   ·   OSAKA_TRANSPLANT_GUIDE.md (어디서 �
 | 3 | [`learning.md`](learning.md) | 회귀·함정·결정의 서사 (R-D 룰이 생긴 이유) | 큰 변경마다 |
 | ✕ | [`DOC-MAP.md`](DOC-MAP.md) | 위계 · 정본 규칙 · 영향 매트릭스 | 낮음 |
 | ✕ | [`README.md`](README.md) | 사용자용 실행법 · 현재 상태 | 릴리스마다 |
-| ✕ | `overview.html` | **일행 공유용 계획표** — DAY별 흐름 + 장소 + 구글맵 링크 | 자동 생성 |
-| ✕ | `tools/build-overview.js` | ↑ **생성기.** `GUIDE_DATA` → `overview.html` | 스키마 변경 시 |
 | ✕ | `hotel.html` | **숙소 안내** — 일행 공유용 한 장 (비용·시설·객실) | 예약 변경 시 |
 
-> ⚠ `hotel.html` 은 **손으로 유지하는 파일이다** (`overview.html` 과 달리 자동 생성이 아니다).
-> 2026-08-10 부킹닷컴 예약 화면의 값을 옮겨 적었으므로 **예약을 바꾸면 이 파일도 같이 고친다.**
-> 숙소가 확정되면 `GUIDE_DATA.base_hotel` 과 값이 어긋나지 않는지 확인할 것.
-
-> ⚠ `overview.html`은 **자동 생성물이다. 직접 고치지 말 것.** 고치면 다음 생성 때 날아간다.
-> 데이터를 바꾼 뒤 **`node tools/build-overview.js`** 를 돌린다. 손으로 유지하던 시절엔 R-D1이 경고한 "정본 행세하는 두 번째 사본"이 될 위험이 있었고, 생성기로 그 위험을 구조적으로 없앴다.
-> 앱이 아니므로 **비번 게이트가 없다** — 공개 위치에 올릴 때 주의 (§ 6).
-> 생성기는 앱의 빌드 단계가 **아니다.** `index.html`은 여전히 더블클릭으로 열린다 (`PRD.md § 5`).
+> ⚠ `hotel.html` 은 **손으로 유지하는 파일이다.** 2026-08-10 부킹닷컴 예약 화면의 값을 옮겨 적었으므로
+> **예약을 바꾸면 이 파일도 같이 고친다.** `GUIDE_DATA.base_hotel` 과 값이 어긋나지 않는지도 확인할 것.
+>
+> 📌 `overview.html` 과 그 생성기는 **v0.16에서 폐기**했다 — 비번 게이트를 없애면서 `index.html` 이
+> 상위집합이 됐고, 링크가 둘이면 "어느 걸 봐야 하나"가 마찰이 됐다.
 
 ### 2.1 의도적으로 안 만드는 문서
 
@@ -135,11 +130,10 @@ L0~L3 전 문서는 끝에 **참조**를 둔다 — **위**(출처) / **옆**(�
 
 | 만지는 것 | 같이 볼 것 |
 |---|---|
-| 비번 변경 | `CLAUDE.md § 6` → `AUTH_KEY` **v bump** → `.auth-q-text` 힌트 → **R-D2** → § 9 점검 3 |
+| 비공개가 다시 필요해질 때 | **클라이언트 게이트를 되살리지 말 것** — public 소스에선 원리상 무력하다. `private repo` 로 옮긴다 (`CLAUDE.md § 6`) |
 | 외부 의존 추가 | `PRD.md § 5` 2개 상한 → CSP **완화 금지** |
 | 새 데이터 파일 | **R-D1 위반.** 만들지 않는다 |
-| 장소·구역 데이터 변경 | **`overview.html` 같이 갱신** (파생 산출물 — § 2 하단 경고) |
-| `transfer` (선착장 이동) 편집 | 셔틀·수속 시각은 **시즌마다 바뀐다** → `warn`에 재확인 문구 유지 → `CLAUDE.md § 7 buildTransfer` → **`node tools/build-overview.js` 재실행** |
+| `transfer`·`move` (이동 경로) 편집 | 셔틀·수속 시각은 **시즌마다 바뀐다** → `warn` 재확인 문구 유지 → `move.from`/`to` 는 **구글맵 검색어**라 R-D12로 실재 확인 → `CLAUDE.md § 7` |
 | `zone.schedule` (시간표) 편집 | `PRD.md § 2` 의 선을 넘는지 확인 — **시설 마감·배 시각만 못 박는다** → `CLAUDE.md § 7 buildSchedule` |
 | 데이터 **포맷**(들여쓰기·줄바꿈) 변경 | ⚠ `CLAUDE.md § 8·§ 9` 의 bash 추출기가 **포맷 앵커가 아니라 괄호 매칭**인지 확인. 앵커식이면 조용히 깨진다 (`learning.md § 13`) |
 | 새 문서 신설 | § 2 등록 → 참조 섹션 → § 7 통과 |
@@ -153,7 +147,9 @@ L0~L3 전 문서는 끝에 **참조**를 둔다 — **위**(출처) / **옆**(�
 
 | 영역 | 키워드 | 문서 |
 |---|---|---|
-| CSP · 게이트 FOUC | `Content-Security-Policy`, `auth-gate` | `CLAUDE.md § 6` |
+| CSP | `Content-Security-Policy` | `CLAUDE.md § 6` |
+| 최상위 탭 | `TOP_TABS`, `renderTopTabs`, `PANEL` | `CLAUDE.md § 7` |
+| 이동 경로 | `METRO`, `buildMove`, `moveUrl` | `CLAUDE.md § 7` |
 | 디자인 토큰 | `:root {` | **`design.md § 1`** |
 | 컴포넌트 CSS | `.zone`, `.place`, `.catsec`, `.excursion` | `design.md § 2` |
 | 빌드 스탬프 | `BUILD_VERSION` | `CLAUDE.md § 4` |
@@ -166,7 +162,7 @@ L0~L3 전 문서는 끝에 **참조**를 둔다 — **위**(출처) / **옆**(�
 | 지도 | `buildZoneMap`, `initLeafletMap`, `fitBounds` | `CLAUDE.md § 7` · R-D5·R-D9 |
 | 길찾기 | `excursionOrigin`, `excursionDirUrl` | `CLAUDE.md § 7` |
 | 필터·스파이 | `applyFilter`, `setupScrollSpy` | `CLAUDE.md § 7` · R-D7 |
-| 게이트 로직 | `AUTH_HASH`, `AUTH_KEY` | `CLAUDE.md § 6` |
+| 여행 메모·일본어 | `TRIP_NOTES`, `JP_SCENARIOS` | `CLAUDE.md § 7` |
 
 ---
 
