@@ -142,7 +142,8 @@ GUIDE_DATA = {
 3. `maps_url`은 영문명을 URL 인코딩해서 만든다. 영문명으로 지오코딩이 안 되는 곳은 **일본어 정식명**을 쿼리로 쓴다 (§ 13 참고)
 4. 좌표는 § 8 R-D3의 land-check를 거친다
 5. `BUILD_VERSION` 갱신
-6. § 9 자가 점검 실행
+6. **`PRD.md` § 9 버전 히스토리에 한 줄 추가** — 장소든 메모든 링크든, **앱을 바꾸면 PRD 일지에도 한 줄**. `BUILD_VERSION` 과 항상 세트다. v0.22~v0.26 이 이걸 빠뜨려 정본이 5버전 밀렸다 (§ 9 점검 7 이 자동으로 잡는다)
+7. § 9 자가 점검 실행
 
 ---
 
@@ -455,6 +456,12 @@ for f in *.md; do
   s="OK "; [ "$reg" -eq 0 ] && s="!!미등록 "; [ "$inb" -eq 0 ] && s="$s!!인바운드0 "; [ "$out" -eq 0 ] && s="$s!!막다른길 "
   echo "$s$f (등록:$reg 인:$inb 아웃:$out)"
 done
+```
+
+```bash
+# 7. 버전 동기화 — 앱(BUILD_VERSION)과 PRD §9 최신 버전이 같은지 (v0.22~v0.26 이 밀렸던 재발 방지)
+#    앱을 바꾸면 PRD §9 에도 한 줄 (§ 4 절차 6번). 이 둘은 항상 세트다. 불일치면 PRD 일지가 밀린 것.
+node -e "const fs=require('fs'); const b=(fs.readFileSync('index.html','utf8').match(/BUILD_VERSION\s*=\s*'v(0\.\d+)/)||[])[1]; const p=Math.max(...[...fs.readFileSync('PRD.md','utf8').matchAll(/\*\*v(0\.\d+)\*\*/g)].map(m=>+m[1].split('.')[1])); console.log(('0.'+p)===b?'OK (앱 v'+b+' = PRD v0.'+p+')':'!! 불일치 — 앱 v'+b+' / PRD 최신 v0.'+p+' → PRD §9 에 행 추가');"
 ```
 
 ---
