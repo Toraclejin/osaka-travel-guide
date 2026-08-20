@@ -4,3 +4,6 @@
 .env.local
 node_modules/
 .vscode/
+
+# Codex 등이 자동 생성하는 CLAUDE.md 쌍둥이 — 이중 정본 방지 (사용자가 안 만듦, v0.24/v0.32 에서 반복 삭제)
+AGENTS.md
